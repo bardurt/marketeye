@@ -1,0 +1,33 @@
+#btn_clear_execution{
+    -fx-base: #E8A893;
+}
+
+#btn_add_execution{
+    -fx-base: #93CFE8;
+}
+
+#btn_save_trade{
+     -fx-base: #A5E893;
+}
+
+#label_ticker{
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 18;
+}
+
+#label_error{
+    -fx-text-fill: red;
+    -fx-font-weight: bold;
+    -fx-font-size: 18;
+}
+
+.header_label {
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 16;
+}
+
+.chart-plot-background {
+    -fx-background-color: #FFFFFF;
+}

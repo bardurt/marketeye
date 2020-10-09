@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.canvas.Canvas?>
+<GridPane prefHeight="512" prefWidth="720" xmlns="http://javafx.com/javafx/8.0.999-ea"
+          xmlns:fx="http://javafx.com/fxml/1">
+    <columnConstraints>
+        <ColumnConstraints halignment="CENTER"/>
+    </columnConstraints>
+
+    <VBox alignment="CENTER"
+          GridPane.rowIndex="0"
+          GridPane.columnIndex="0">
+
+        <padding>
+            <Insets bottom="10"
+                    left="10"
+                    right="10"
+                    top="10"/>
+        </padding>
+
+        <Label fx:id="label_ticker"
+               text="Ticker :"/>
+
+        <Separator orientation="HORIZONTAL"/>
+
+        <HBox fx:id="loading_box"
+              alignment="CENTER">
+
+            <Label fx:id="label_loading"
+                   visible="false"/>
+
+            <ProgressIndicator fx:id="pi_loading"
+                               visible="false"/>
+
+        </HBox>
+
+    </VBox>
+
+    <TabPane fx:id="tab_pane"
+             tabClosingPolicy="UNAVAILABLE"
+             GridPane.columnIndex="0"
+             GridPane.rowIndex="2">
+
+        <tabs>
+
+            <Tab fx:id="tab_main" text="Main">
+
+                <VBox>
+                    <padding>
+                        <Insets bottom="10" left="10" right="10" top="10"/>
+                    </padding>
+
+                    <GridPane>
+
+                        <GridPane GridPane.columnIndex="0"
+                                  GridPane.rowIndex="0">
+
+                            <VBox spacing="10"
+                                  GridPane.columnIndex="0"
+                                  GridPane.rowIndex="0"
+                                  GridPane.rowSpan="3">
+
+                                <Label minHeight="16" text="Ticker"
+                                       GridPane.columnIndex="0"
+                                       GridPane.rowIndex="0"
+                                       styleClass="header_label"/>
+
+                                <TextField fx:id="tf_ticker"
+                                           GridPane.columnIndex="0"
+                                           GridPane.rowIndex="1"/>
+
+                            </VBox>
+
+                        </GridPane>
+
+                        <VBox GridPane.columnIndex="0"
+                              GridPane.rowIndex="3">
+
+                            <padding>
+                                <Insets bottom="10"
+                                        top="10"/>
+                            </padding>
+
+                            <Label text="Data Provider"
+                                   styleClass="header_label"/>
+
+                            <fx:define>
+                                <ToggleGroup fx:id="toggle_group_data"/>
+                            </fx:define>
+
+                            <HBox>
+
+                                <padding>
+                                    <Insets top="10"/>
+                                </padding>
+
+                                <VBox GridPane.columnIndex="0"
+                                      GridPane.rowIndex="2">
+
+                                    <RadioButton fx:id="rb_yahoo"
+                                                 text="Yahoo Finance"
+                                                 selected="true"
+                                                 toggleGroup="$toggle_group_data"/>
+
+                                </VBox>
+
+
+                                <VBox GridPane.columnIndex="0"
+                                      GridPane.rowIndex="2">
+
+                                    <padding>
+                                        <Insets left="10"/>
+                                    </padding>
+
+                                    <RadioButton fx:id="rb_alpha_vantage"
+                                                 text="Alpha Vantage"
+                                                 toggleGroup="$toggle_group_data"/>
+
+                                </VBox>
+
+                            </HBox>
+
+                        </VBox>
+
+                        <VBox GridPane.columnIndex="0"
+                              GridPane.rowIndex="4">
+
+                            <padding>
+                                <Insets bottom="10" top="10"/>
+                            </padding>
+
+                            <Label text="VPA Rule"
+                                   styleClass="header_label"/>
+
+                            <fx:define>
+                                <ToggleGroup fx:id="toggle_group_vpa_rule"/>
+                            </fx:define>
+
+                            <HBox>
+
+                                <padding>
+                                    <Insets top="10"/>
+                                </padding>
+
+                                <VBox GridPane.columnIndex="0"
+                                      GridPane.rowIndex="2">
+
+                                    <RadioButton fx:id="rb_one_point"
+                                                 text="H"
+                                                 selected="true"
+                                                 toggleGroup="$toggle_group_vpa_rule"/>
+
+                                </VBox>
+
+                                <VBox GridPane.columnIndex="0"
+                                      GridPane.rowIndex="2">
+
+                                    <padding>
+                                        <Insets left="10"/>
+                                    </padding>
+
+                                    <RadioButton fx:id="rb_four_point"
+                                                 text="OHLC"
+                                                 toggleGroup="$toggle_group_vpa_rule"/>
+
+                                </VBox>
+
+                                <VBox GridPane.columnIndex="0"
+                                      GridPane.rowIndex="2">
+
+                                    <padding>
+                                        <Insets left="10"/>
+                                    </padding>
+
+                                    <RadioButton fx:id="rb_five_point"
+                                                 text="OHLCM"
+                                                 toggleGroup="$toggle_group_vpa_rule"/>
+
+                                </VBox>
+
+                            </HBox>
+
+                        </VBox>
+
+                        <VBox GridPane.columnIndex="0"
+                              GridPane.rowIndex="5">
+
+                            <padding>
+                                <Insets bottom="10"
+                                        top="10"/>
+                            </padding>
+
+                            <Button fx:id="btn_create_report"
+                                    text="Create Report"/>
+
+                        </VBox>
+
+                        <columnConstraints>
+                            <ColumnConstraints/>
+                            <ColumnConstraints/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                        </rowConstraints>
+                    </GridPane>
+
+                </VBox>
+
+            </Tab>
+
+            <Tab fx:id="tab_supply_zones" text="Supply Zones">
+
+                <VBox>
+                    <padding>
+                        <Insets bottom="10" left="10" right="10" top="10"/>
+                    </padding>
+
+                    <GridPane>
+
+                        <GridPane GridPane.columnIndex="0"
+                                  GridPane.rowIndex="0">
+
+                            <VBox spacing="10"
+                                  GridPane.columnIndex="0"
+                                  GridPane.rowIndex="0"
+                                  GridPane.rowSpan="3">
+
+                                <Label text="Top % filter"
+                                       styleClass="header_label"/>
+
+                                <TextField fx:id="tf_percent_filter"/>
+
+                            </VBox>
+
+                        </GridPane>
+
+                        <VBox spacing="10"
+                              GridPane.columnIndex="0"
+                              GridPane.rowIndex="1">
+
+                            <padding>
+                                <Insets top="5"
+                                        bottom="5"/>
+                            </padding>
+                            <Button fx:id="btn_filter_precent"
+                                    text="Filter"/>
+                        </VBox>
+
+
+                        <TableView prefHeight="720.0"
+                                   prefWidth="1024.0"
+                                   GridPane.hgrow="ALWAYS"
+                                   GridPane.vgrow="ALWAYS"
+                                   GridPane.columnIndex="0"
+                                   GridPane.rowIndex="2"
+                                   fx:id="table_supply_zones">
+
+                        </TableView>
+                        <columnConstraints>
+                            <ColumnConstraints/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints/>
+                        </rowConstraints>
+                    </GridPane>
+
+                </VBox>
+
+            </Tab>
+
+
+            <Tab fx:id="tab_gap" text="Gap Analysis">
+
+                <VBox>
+                    <padding>
+                        <Insets bottom="10" left="10" right="10" top="10"/>
+                    </padding>
+
+                    <GridPane GridPane.columnIndex="0"
+                              GridPane.rowIndex="3">
+
+                        <GridPane GridPane.columnIndex="0"
+                                  GridPane.rowIndex="0">
+
+                            <VBox spacing="10"
+                                  GridPane.columnIndex="0"
+                                  GridPane.rowIndex="0"
+                                  GridPane.rowSpan="3">
+
+                                <Label styleClass="header_label"
+                                       text="Gap Up %"/>
+
+                                <TextField fx:id="tf_gap_percent"/>
+
+                            </VBox>
+
+                        </GridPane>
+
+                        <VBox spacing="10"
+                              GridPane.columnIndex="0"
+                              GridPane.rowIndex="1">
+
+                            <padding>
+                                <Insets top="5"
+                                        bottom="5"/>
+                            </padding>
+
+                            <Button fx:id="btn_analyse_gap" text="Analyze"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="2"/>
+                        </VBox>
+
+                        <TextArea fx:id="ta_gap_analysis" editable="false" GridPane.columnIndex="0"
+                                  GridPane.rowIndex="2"
+                                  GridPane.rowSpan="3"
+                                  prefHeight="720.0"
+                                  GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS"/>
+
+                        <columnConstraints>
+                            <ColumnConstraints/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints/>
+                        </rowConstraints>
+                    </GridPane>
+
+                </VBox>
+
+            </Tab>
+
+            <Tab fx:id="tab_prediction" text="Prediction">
+
+                <VBox>
+                    <padding>
+                        <Insets bottom="10" left="10" right="10" top="10"/>
+                    </padding>
+
+                    <GridPane GridPane.columnIndex="0" GridPane.rowIndex="3">
+
+                        <GridPane GridPane.columnIndex="0" GridPane.rowIndex="0">
+
+                            <VBox spacing="10"
+                                  GridPane.columnIndex="0" GridPane.rowIndex="0"
+                                  GridPane.rowSpan="3">
+
+                                <Label styleClass="header_label" minHeight="16" text="Price" GridPane.columnIndex="0"
+                                       GridPane.rowIndex="0"/>
+
+                                <TextField fx:id="tf_prediction_price" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+
+                            </VBox>
+
+                            <HBox spacing="10"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                  GridPane.rowSpan="3">
+
+                                <padding>
+                                    <Insets left="5" right="5"/>
+                                </padding>
+
+                                <Separator orientation="VERTICAL"/>
+
+                            </HBox>
+
+                            <VBox spacing="10"
+                                  GridPane.columnIndex="2" GridPane.rowIndex="0">
+
+                                <padding>
+                                    <Insets left="5" right="5"/>
+                                </padding>
+
+                                <Label minHeight="16" text="News" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                                       styleClass="header_label"/>
+
+                                <fx:define>
+                                    <ToggleGroup fx:id="group_news"/>
+                                </fx:define>
+
+                                <ChoiceBox id="cb_news"/>
+
+                            </VBox>
+
+                            <VBox spacing="10"
+                                  GridPane.columnIndex="3" GridPane.rowIndex="0">
+
+                                <padding>
+                                    <Insets left="5" right="5"/>
+                                </padding>
+
+                                <Label minHeight="16" text="Trend" GridPane.columnIndex="3" GridPane.rowIndex="1"
+                                       styleClass="header_label"/>
+
+                                <ChoiceBox id="cb_trend"/>
+
+                            </VBox>
+
+                            <VBox spacing="10"
+                                  GridPane.columnIndex="4" GridPane.rowIndex="0">
+
+                                <padding>
+                                    <Insets left="5" right="5"/>
+                                </padding>
+
+                                <Label minHeight="16" text="Gap" GridPane.columnIndex="3" GridPane.rowIndex="2"
+                                       styleClass="header_label"/>
+
+                                <RadioButton id="rb_gap" text="Use Gap Analysis"/>
+
+                            </VBox>
+
+                        </GridPane>
+
+                        <VBox spacing="10"
+                              GridPane.columnIndex="0" GridPane.rowIndex="2">
+
+                            <padding>
+                                <Insets top="5" bottom="5"/>
+                            </padding>
+
+                            <Button fx:id="btn_predict" text="Predict" GridPane.columnIndex="0"
+                                    GridPane.rowIndex="2"/>
+                        </VBox>
+
+
+                        <TableView prefHeight="720.0" prefWidth="1024.0"
+                                   GridPane.hgrow="ALWAYS"
+                                   GridPane.vgrow="ALWAYS"
+                                   GridPane.columnIndex="0"
+                                   GridPane.columnSpan="4"
+                                   GridPane.rowIndex="3"
+                                   fx:id="table_prediction">
+                        </TableView>
+                        <columnConstraints>
+                            <ColumnConstraints/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints/>
+                        </rowConstraints>
+                    </GridPane>
+
+                </VBox>
+
+            </Tab>
+
+        </tabs>
+
+    </TabPane>
+
+    <VBox alignment="CENTER" GridPane.rowIndex="3" GridPane.columnIndex="0">
+        <padding>
+            <Insets bottom="10" left="10" right="10" top="10"/>
+        </padding>
+
+        <Label fx:id="label_error"/>
+
+    </VBox>
+
+</GridPane>
