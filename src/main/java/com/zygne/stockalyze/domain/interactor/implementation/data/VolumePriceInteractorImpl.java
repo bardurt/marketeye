@@ -1,12 +1,11 @@
 package com.zygne.stockalyze.domain.interactor.implementation.data;
 
-import com.zygne.stockalyze.domain.MainThread;
+import com.zygne.stockalyze.domain.executor.MainThread;
 import com.zygne.stockalyze.domain.executor.Executor;
 import com.zygne.stockalyze.domain.interactor.base.BaseInteractor;
 import com.zygne.stockalyze.domain.interactor.implementation.data.base.VolumePriceInteractor;
 import com.zygne.stockalyze.domain.model.Histogram;
-import com.zygne.stockalyze.domain.model.VolumePriceLevel;
-import com.zygne.stockalyze.ui.fx.Main;
+import com.zygne.stockalyze.domain.model.VolumePrice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,45 +25,60 @@ public class VolumePriceInteractorImpl extends BaseInteractor implements VolumeP
 
     @Override
     public void run() {
-        List<VolumePriceLevel> data;
+        List<VolumePrice> data;
 
-        if(rule == 0){
-            data = onePoint();
-        } else if(rule == 1){
-            data = fourPoint();
+        System.out.println("VolumePriceInteractorImpl");
+
+        if (rule == 0) {
+            data = high();
+        } else if (rule == 1) {
+            data = low();
+        } else if (rule == 2) {
+            data = ohlc();
         } else {
-            data = fivePoint();
+            data = ohlcm();
         }
 
-        List<VolumePriceLevel> finalData = data;
+        List<VolumePrice> finalData = data;
         mainThread.post(() -> callback.onVolumePriceCreated(finalData));
     }
 
 
-    private List<VolumePriceLevel> onePoint(){
-        List<VolumePriceLevel> data = new ArrayList<>();
-        for(Histogram e : histogramList){
+    private List<VolumePrice> high() {
+        List<VolumePrice> data = new ArrayList<>();
+        for (Histogram e : histogramList) {
 
-            VolumePriceLevel vp1 = new VolumePriceLevel(e.high, e.volume);
+            VolumePrice vp1 = new VolumePrice(e.high, e.volume);
             data.add(vp1);
         }
 
         return data;
     }
 
-    private List<VolumePriceLevel> fivePoint(){
-        List<VolumePriceLevel> data = new ArrayList<>();
-        for(Histogram e : histogramList){
+    private List<VolumePrice> low() {
+        List<VolumePrice> data = new ArrayList<>();
+        for (Histogram e : histogramList) {
+
+            VolumePrice vp1 = new VolumePrice(e.low, e.volume);
+            data.add(vp1);
+        }
+
+        return data;
+    }
+
+    private List<VolumePrice> ohlcm() {
+        List<VolumePrice> data = new ArrayList<>();
+        for (Histogram e : histogramList) {
 
             long volume = (long) (e.volume * e.decay);
 
-            VolumePriceLevel vp1 = new VolumePriceLevel(e.open, (long) (volume * 0.25));
-            VolumePriceLevel vp2 = new VolumePriceLevel(e.high, (long) (volume * 0.2));
-            VolumePriceLevel vp3 = new VolumePriceLevel(e.low, (long) (volume * 0.2));
-            VolumePriceLevel vp4 = new VolumePriceLevel(e.close, (long) (volume * 0.25));
+            VolumePrice vp1 = new VolumePrice(e.open, (long) (volume * 0.25));
+            VolumePrice vp2 = new VolumePrice(e.high, (long) (volume * 0.2));
+            VolumePrice vp3 = new VolumePrice(e.low, (long) (volume * 0.2));
+            VolumePrice vp4 = new VolumePrice(e.close, (long) (volume * 0.25));
 
-            int middle = (e.high - e.low) / 2;
-            VolumePriceLevel vp5 = new VolumePriceLevel(middle, (long) (volume * 0.1));
+            double middle = (e.high - e.low) / 2;
+            VolumePrice vp5 = new VolumePrice(middle, (long) (volume * 0.1));
 
             data.add(vp1);
             data.add(vp2);
@@ -76,16 +90,16 @@ public class VolumePriceInteractorImpl extends BaseInteractor implements VolumeP
         return data;
     }
 
-    private List<VolumePriceLevel> fourPoint(){
-        List<VolumePriceLevel> data = new ArrayList<>();
-        for(Histogram e : histogramList){
+    private List<VolumePrice> ohlc() {
+        List<VolumePrice> data = new ArrayList<>();
+        for (Histogram e : histogramList) {
 
             long volume = (long) (e.volume * e.decay);
 
-            VolumePriceLevel vp1 = new VolumePriceLevel(e.open, (long) (volume * 0.25));
-            VolumePriceLevel vp2 = new VolumePriceLevel(e.high, (long) (volume * 0.25));
-            VolumePriceLevel vp3 = new VolumePriceLevel(e.low, (long) (volume * 0.25));
-            VolumePriceLevel vp4 = new VolumePriceLevel(e.close, (long) (volume * 0.25));
+            VolumePrice vp1 = new VolumePrice(e.open, (long) (volume * 0.25));
+            VolumePrice vp2 = new VolumePrice(e.high, (long) (volume * 0.25));
+            VolumePrice vp3 = new VolumePrice(e.low, (long) (volume * 0.25));
+            VolumePrice vp4 = new VolumePrice(e.close, (long) (volume * 0.25));
 
             data.add(vp1);
             data.add(vp2);

@@ -1,20 +1,23 @@
 package com.zygne.stockalyze.domain.interactor.implementation.data;
 
-import com.zygne.stockalyze.domain.MainThread;
+import com.zygne.stockalyze.domain.executor.MainThread;
 import com.zygne.stockalyze.domain.executor.Executor;
 import com.zygne.stockalyze.domain.interactor.base.BaseInteractor;
 import com.zygne.stockalyze.domain.interactor.implementation.data.base.VolumePriceGroupInteractor;
+import com.zygne.stockalyze.domain.model.VolumePrice;
 import com.zygne.stockalyze.domain.model.VolumePriceGroup;
-import com.zygne.stockalyze.domain.model.VolumePriceLevel;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VolumePriceGroupInteractorImpl extends BaseInteractor implements VolumePriceGroupInteractor {
 
     private final Callback callback;
-    private final List<VolumePriceLevel> data;
+    private final List<VolumePrice> data;
 
-    public VolumePriceGroupInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<VolumePriceLevel> data) {
+    public VolumePriceGroupInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<VolumePrice> data) {
         super(executor, mainThread);
         this.callback = callback;
         this.data = data;
@@ -25,7 +28,7 @@ public class VolumePriceGroupInteractorImpl extends BaseInteractor implements Vo
     public void run() {
         Map<String, VolumePriceGroup> map = new HashMap<>();
 
-        for (VolumePriceLevel e : data) {
+        for (VolumePrice e : data) {
 
             String tag = "p" + e.price;
 
@@ -39,15 +42,7 @@ public class VolumePriceGroupInteractorImpl extends BaseInteractor implements Vo
 
         List<VolumePriceGroup> groups = new ArrayList<>(map.values());
 
-        Collections.sort(groups);
-        Collections.reverse(groups);
-
-        mainThread.post(new Runnable() {
-            @Override
-            public void run() {
-                callback.onVolumePriceGroupCreated(groups);
-            }
-        });
+        mainThread.post(() -> callback.onVolumePriceGroupCreated(groups));
 
     }
 }

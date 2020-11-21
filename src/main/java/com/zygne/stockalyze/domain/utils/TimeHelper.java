@@ -1,6 +1,7 @@
 package com.zygne.stockalyze.domain.utils;
 
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -12,15 +13,9 @@ public class TimeHelper {
 
     private static final int SEC_IN_DAY = 86400;
 
-    private static final String timeFormat = "yyyy-MM-dd";
+    private static final String dateFormat = "yyyy-MM-dd";
 
-    public static int getDaysDifference(String start, String end) {
-
-        long time1 = getTimeStamp(start);
-        long time2 = getTimeStamp(end);
-
-        return getDaysDifference(time1, time2);
-    }
+    private static final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
     public static int getDaysDifference(long start, long end) {
 
@@ -32,7 +27,13 @@ public class TimeHelper {
     }
 
     public static long getTimeStamp(String dateString) {
-        DateFormat df = new SimpleDateFormat(timeFormat);
+
+        DateFormat df;
+        if(dateString.length() > 11) {
+            df = new SimpleDateFormat(dateTimeFormat);
+        } else {
+            df = new SimpleDateFormat(dateFormat);
+        }
 
         Date date;
         try {
@@ -44,9 +45,14 @@ public class TimeHelper {
         return date.getTime();
     }
 
-    public static int getDayOfYear(){
-        Calendar calendar = Calendar.getInstance();
-        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-        return dayOfYear;
+    public static String getDateFromTimeStamp(long timeStamp){
+        // 2020-10-19 18:30:00
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timeStamp);
+
+        Format format = new SimpleDateFormat(dateTimeFormat);
+        return format.format(c.getTime());
     }
+
 }

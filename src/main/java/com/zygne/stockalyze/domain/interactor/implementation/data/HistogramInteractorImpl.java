@@ -1,16 +1,14 @@
 package com.zygne.stockalyze.domain.interactor.implementation.data;
 
-import com.sun.xml.internal.rngom.parse.host.Base;
-import com.zygne.stockalyze.domain.MainThread;
+import com.zygne.stockalyze.domain.executor.MainThread;
 import com.zygne.stockalyze.domain.executor.Executor;
 import com.zygne.stockalyze.domain.interactor.base.BaseInteractor;
 import com.zygne.stockalyze.domain.interactor.implementation.data.base.HistogramInteractor;
 import com.zygne.stockalyze.domain.model.Histogram;
-import com.zygne.stockalyze.domain.model.enums.TimeFrame;
+import com.zygne.stockalyze.domain.utils.NumberHelper;
 import com.zygne.stockalyze.domain.utils.TimeHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class HistogramInteractorImpl extends BaseInteractor implements HistogramInteractor {
@@ -28,6 +26,8 @@ public class HistogramInteractorImpl extends BaseInteractor implements Histogram
 
     @Override
     public void run() {
+
+        System.out.println("HistogramInteractorImpl");
         String[] tempArr;
         List<Histogram> data = new ArrayList<>();
         int count = 0;
@@ -37,23 +37,25 @@ public class HistogramInteractorImpl extends BaseInteractor implements Histogram
 
             try {
 
-                long volume = Long.parseLong(tempArr[5]);
+                long timeStamp = TimeHelper.getTimeStamp(tempArr[0]);
                 double open = Double.parseDouble(tempArr[1]);
                 double high = Double.parseDouble(tempArr[2]);
                 double low = Double.parseDouble(tempArr[3]);
                 double close = Double.parseDouble(tempArr[4]);
+                long volume = Long.parseLong(tempArr[5]);
 
                 Histogram histogram = new Histogram();
-                histogram.open = (int) (open * 100);
-                histogram.high = (int) (high * 100);
-                histogram.low = (int) (low * 100);
-                histogram.close = (int) (close * 100);
+                histogram.open = NumberHelper.round2Decimals(open);
+                histogram.high = NumberHelper.round2Decimals(high);
+                histogram.low = NumberHelper.round2Decimals(low);
+                histogram.close = NumberHelper.round2Decimals(close);
                 histogram.volume = volume;
-                histogram.timeStamp = count+1;
+                histogram.timeStamp = timeStamp;
                 data.add(histogram);
 
             } catch (Exception e) {
-                System.out.println("Error at line " + count + " : " + e.getMessage());
+                System.out.println("Error at line " + count + ", data :" + line );
+                e.printStackTrace();
             }
 
             count++;

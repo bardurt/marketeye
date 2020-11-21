@@ -2,18 +2,19 @@ package com.zygne.stockalyze.domain.model;
 
 public class CandleStick {
 
-    public boolean bullish;
-    public int bodySize;
-    public int lowerWick;
-    public int upperWick;
-    public int top;
-    public int bottom;
-    public int bodyTop;
-    public int bodyBottom;
-    public long timeStamp;
+    public final boolean bullish;
+    public final double bodySize;
+    public final double lowerWick;
+    public final double upperWick;
+    public final double top;
+    public final double bottom;
+    public final double bodyTop;
+    public final double bodyBottom;
+    public final long timeStamp;
+    public final long volume;
 
     public CandleStick(Histogram histogram){
-        bullish = histogram.close > histogram.open;;
+        bullish = histogram.close > histogram.open;
         bodySize = Math.abs(histogram.close - histogram.open);
         top = histogram.high;
         bottom = histogram.low;
@@ -31,6 +32,7 @@ public class CandleStick {
         }
 
         timeStamp = histogram.timeStamp;
+        volume = histogram.volume;
     }
 
 }

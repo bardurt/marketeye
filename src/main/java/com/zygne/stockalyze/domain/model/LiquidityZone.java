@@ -4,8 +4,8 @@ import java.util.Comparator;
 
 public class LiquidityZone implements Comparable {
 
-    public final int price;
-    public final long volume;
+    public final double price;
+    public long volume;
     public final int orderCount;
     public double relativeVolume;
     public double volumePercentage;
@@ -13,10 +13,11 @@ public class LiquidityZone implements Comparable {
     public boolean origin = false;
     public int rank = 0;
     public double percentile = 0.0d;
+    public double breakPoint;
 
     public final String note = "";
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -80,7 +81,19 @@ public class LiquidityZone implements Comparable {
         return note;
     }
 
-    public LiquidityZone(int price, long volume, int orderCount) {
+    public void setVolume(long volume) {
+        this.volume = volume;
+    }
+
+    public double getBreakPoint() {
+        return breakPoint;
+    }
+
+    public void setBreakPoint(double breakPoint) {
+        this.breakPoint = breakPoint;
+    }
+
+    public LiquidityZone(double price, long volume, int orderCount) {
         this.price = price;
         this.volume = volume;
         this.orderCount = orderCount;
@@ -88,15 +101,9 @@ public class LiquidityZone implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        int priceB = ((LiquidityZone)o).price;
+        double priceB = ((LiquidityZone)o).price;
 
-        if(price < priceB){
-            return 1;
-        } else if(price == priceB){
-            return 0;
-        }
-
-        return -1;
+        return Double.compare(price, priceB);
     }
 
     public static final class VolumeComparator implements Comparator<LiquidityZone> {
@@ -111,7 +118,7 @@ public class LiquidityZone implements Comparable {
 
         @Override
         public int compare(LiquidityZone o1, LiquidityZone o2) {
-            return Integer.compare(o1.price, o2.price);
+            return Double.compare(o1.price, o2.price);
         }
     }
 

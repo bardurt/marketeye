@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ChartZoneInteractor extends Interactor {
 
-    public interface Callback{
+    interface Callback{
         void onChartZoneCreated(List<ChartObject> zones);
     }
 }

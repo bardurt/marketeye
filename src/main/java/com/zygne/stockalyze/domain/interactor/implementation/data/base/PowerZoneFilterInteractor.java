@@ -8,6 +8,7 @@ import java.util.List;
 public interface PowerZoneFilterInteractor extends Interactor {
 
     interface Callback{
-        void onPowerZoneFiltered(List<PowerZone> data);
+        void onPowerZonesFiltered(List<PowerZone> data);
     }
+
 }

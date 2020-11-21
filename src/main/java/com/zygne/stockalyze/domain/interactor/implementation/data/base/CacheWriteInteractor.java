@@ -7,7 +7,7 @@ import java.util.List;
 public interface CacheWriteInteractor extends Interactor {
 
     interface Callback{
-        void inDataCached(List<String> lines);
+        void onDataCached(List<String> lines);
     }
 }
 

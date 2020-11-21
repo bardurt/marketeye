@@ -1,12 +1,9 @@
 package com.zygne.stockalyze.domain.interactor.implementation.data;
 
-import com.zygne.stockalyze.domain.MainThread;
+import com.zygne.stockalyze.domain.executor.MainThread;
 import com.zygne.stockalyze.domain.executor.Executor;
 import com.zygne.stockalyze.domain.interactor.base.BaseInteractor;
 import com.zygne.stockalyze.domain.interactor.implementation.data.base.CacheWriteInteractor;
-import com.zygne.stockalyze.domain.utils.Constants;
-import com.zygne.stockalyze.domain.utils.FolderHelper;
-import com.zygne.stockalyze.domain.utils.TimeHelper;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,13 +12,15 @@ import java.util.List;
 
 public class CacheWriteInteractorImpl extends BaseInteractor implements CacheWriteInteractor {
 
-    private Callback callback;
-    private String ticker;
-    private List<String> lines;
+    private final Callback callback;
+    private final String folder;
+    private final String ticker;
+    private final List<String> lines;
 
-    public CacheWriteInteractorImpl(Executor executor, MainThread mainThread, Callback callback, String ticker, List<String> lines) {
+    public CacheWriteInteractorImpl(Executor executor, MainThread mainThread, Callback callback, String folder, String ticker, List<String> lines) {
         super(executor, mainThread);
         this.callback = callback;
+        this.folder = folder;
         this.ticker = ticker;
         this.lines = lines;
     }
@@ -29,28 +28,28 @@ public class CacheWriteInteractorImpl extends BaseInteractor implements CacheWri
     @Override
     public void run() {
 
-        String root = FolderHelper.getLatestCachedFolder();
+        String root = folder;
 
         File folder = new File(root);
+
+        String timeStamp = "" + System.currentTimeMillis();
 
         folder.mkdirs();
 
         String fileName = folder.getAbsolutePath() + "/" + ticker.toUpperCase() +".csv";
 
-
         try {
             FileWriter myWriter = new FileWriter(fileName);
-
+            myWriter.append(timeStamp);
+            myWriter.append("\n");
             for(String line : lines){
                 myWriter.append(line);
                 myWriter.append("\n");
             }
             myWriter.close();
-        } catch (IOException ignored) {
-            ignored.printStackTrace();
-        }
+        } catch (IOException ignored) { }
 
-        mainThread.post(() -> callback.inDataCached(lines));
+        mainThread.post(() -> callback.onDataCached(lines));
 
     }
 }

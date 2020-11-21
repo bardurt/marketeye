@@ -5,14 +5,14 @@ import com.zygne.stockalyze.domain.model.enums.TimeFrame;
 import java.util.Comparator;
 
 public class Histogram {
-    public int timeStamp;
-    public int open;
-    public int high;
-    public int low;
-    public int close;
+    public long timeStamp;
+    public double open;
+    public double high;
+    public double low;
+    public double close;
     public long volume;
     public TimeFrame timeFrame;
-    public double decay = 1;
+    public final double decay = 1;
 
     public Direction getDirection() {
         if (open < close) {
@@ -23,25 +23,54 @@ public class Histogram {
     }
 
     public double getTotalRange(){
-        return ((high - low) / (double)low)*100;
+        return ((high - low) / low)*100;
     }
 
     public double getBodyRange(){
-        return ((close - open) / (double)open)*100;
+        return ((close - open) / open)*100;
     }
 
     public double getOpenHighRange(){
-        return ((high - open) / (double)open)*100;
+        return ((high - open) / open)*100;
     }
 
     public enum Direction {Up, Down}
 
+    public boolean intersects(double value){
+        if(value <= high){
+            return value >= low;
+        }
+
+        return false;
+    }
+
+    public boolean inBody(double value){
+        if(getDirection() == Direction.Up){
+            if(value <= close){
+                return value >= open;
+            }
+        } else {
+            if(value >= close){
+                return value <= open;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        long timeStamp1 = ((Histogram)obj).timeStamp;
+        return timeStamp == timeStamp1;
+    }
 
     public static class TimeComparator implements Comparator<Histogram>{
 
         @Override
         public int compare(Histogram o1, Histogram o2) {
-            return Integer.compare(o1.timeStamp, o2.timeStamp);
+            return Long.compare(o1.timeStamp, o2.timeStamp);
         }
     }
+
+
 }

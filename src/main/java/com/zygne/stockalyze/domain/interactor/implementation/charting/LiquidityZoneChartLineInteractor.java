@@ -9,7 +9,7 @@ import java.util.List;
 
 public class LiquidityZoneChartLineInteractor implements ChartLineInteractor {
 
-    private Callback callback;
+    private final Callback callback;
     private final List<LiquidityZone> data;
 
     public LiquidityZoneChartLineInteractor(Callback callback, List<LiquidityZone> data) {
@@ -20,8 +20,7 @@ public class LiquidityZoneChartLineInteractor implements ChartLineInteractor {
     @Override
     public void execute() {
 
-        List<LiquidityZone> zones = new ArrayList<>();
-        zones.addAll(data);
+        List<LiquidityZone> zones = new ArrayList<>(data);
 
         List<ChartObject> lines = new ArrayList<>();
 

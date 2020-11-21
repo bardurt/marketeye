@@ -1,5 +1,8 @@
 package com.zygne.stockalyze.domain.interactor.implementation.scripting;
 
+import com.zygne.stockalyze.domain.executor.MainThread;
+import com.zygne.stockalyze.domain.executor.Executor;
+import com.zygne.stockalyze.domain.interactor.base.BaseInteractor;
 import com.zygne.stockalyze.domain.model.graphics.ChartLine;
 import com.zygne.stockalyze.domain.model.graphics.ChartObject;
 import com.zygne.stockalyze.domain.model.graphics.ChartZone;
@@ -7,7 +10,7 @@ import com.zygne.stockalyze.domain.model.graphics.ChartZone;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class PineScript2Interactor implements ScriptInteractor {
+public class PineScript2Interactor extends BaseInteractor implements ScriptInteractor {
 
     private static final String COLOR_GREEN = "color=color.green";
     private static final String COLOR_RED = "color=color.red";
@@ -25,16 +28,17 @@ public class PineScript2Interactor implements ScriptInteractor {
     private final String ticker;
     private final List<ChartObject> data;
 
-    public PineScript2Interactor(Callback callback, String name, String ticker, List<ChartObject> data) {
+    public PineScript2Interactor(Executor executor, MainThread mainThread, Callback callback, String name, String ticker, List<ChartObject> data) {
+        super(executor, mainThread);
         this.callback = callback;
         this.name = name;
         this.ticker = ticker;
         this.data = data;
     }
 
-    @Override
-    public void execute() {
 
+    @Override
+    public void run() {
         String scriptName = name + "_" + ticker + EXTENSION;
 
         String time = simpleDateFormat.format(System.currentTimeMillis());
@@ -44,7 +48,7 @@ public class PineScript2Interactor implements ScriptInteractor {
         stringBuilder.append("\n");
         stringBuilder.append("// Ticker : ").append(ticker);
         stringBuilder.append("\n");
-        stringBuilder.append("// Author : Barthur").append(" - ").append(time);
+        stringBuilder.append("// Author : Misty's Boyfriend").append(" - ").append(time);
         stringBuilder.append("\n");
         stringBuilder.append("study(\"").append(name).append(" -  ").append(ticker).append("\",").append(" overlay=true)");
 
@@ -66,7 +70,8 @@ public class PineScript2Interactor implements ScriptInteractor {
 
         stringBuilder.append("plot(close)");
 
-        callback.onScriptCreated(stringBuilder.toString(), scriptName);
+        mainThread.post(() -> callback.onScriptCreated(stringBuilder.toString(), scriptName));
+
 
     }
 

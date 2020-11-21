@@ -19,7 +19,8 @@ public class ResourceLoader {
     private Scene scene;
 
     public void setContent(String source) throws IOException {
-        scene = new Scene(getView(source));
+        Parent root = getView(source);
+        scene = new Scene(root);
     }
 
     public void setStyle(String name) {

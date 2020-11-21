@@ -31,8 +31,8 @@ public class ChartZoneInteractorImpl implements ChartZoneInteractor {
                 zone.color = ChartObject.Color.GREEN;
             }
 
-            zone.top = (double) powerZone.end / 100;
-            zone.bottom = (double) powerZone.start / 100;
+            zone.top = powerZone.end;
+            zone.bottom = powerZone.start;
             zone.transparency = 95;
 
             zones.add(zone);

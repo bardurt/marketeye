@@ -1,44 +1,37 @@
 package com.zygne.stockalyze.domain.interactor.implementation.data;
 
-import com.zygne.stockalyze.domain.MainThread;
+import com.zygne.stockalyze.domain.executor.MainThread;
 import com.zygne.stockalyze.domain.executor.Executor;
 import com.zygne.stockalyze.domain.interactor.base.BaseInteractor;
 import com.zygne.stockalyze.domain.interactor.implementation.data.base.LiquidityZoneInteractor;
 import com.zygne.stockalyze.domain.model.LiquidityZone;
-import com.zygne.stockalyze.domain.model.Statistics;
 import com.zygne.stockalyze.domain.model.VolumePriceGroup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class LiquidityZoneInteractorImpl extends BaseInteractor implements LiquidityZoneInteractor {
 
     private final Callback callback;
     private final List<VolumePriceGroup> data;
-    private final Statistics statistics;
 
-    public LiquidityZoneInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<VolumePriceGroup> data, Statistics statistics) {
+    public LiquidityZoneInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<VolumePriceGroup> data) {
         super(executor, mainThread);
         this.callback = callback;
         this.data = data;
-        this.statistics = statistics;
     }
 
     @Override
     public void run() {
-
+        System.out.println("LiquidityZoneInteractorImpl");
         List<LiquidityZone> formatted = new ArrayList<>();
 
         for (VolumePriceGroup e : data) {
             LiquidityZone s = new LiquidityZone(e.price, e.totalSize, e.orderCount);
-            s.relativeVolume = e.totalSize / statistics.mean;
-            s.volumePercentage = (e.totalSize / (double) statistics.cumulativeVolume) * 100;
             formatted.add(s);
         }
 
         formatted.sort(new LiquidityZone.VolumeComparator());
-        Collections.reverse(formatted);
 
         int size = formatted.size();
 
@@ -47,12 +40,7 @@ public class LiquidityZoneInteractorImpl extends BaseInteractor implements Liqui
             formatted.get(i).percentile = ((i + 1) / (double) size) * 100;
         }
 
-        mainThread.post(new Runnable() {
-            @Override
-            public void run() {
-                callback.onLiquidityZonesCreated(formatted);
-            }
-        });
+        mainThread.post(() -> callback.onLiquidityZonesCreated(formatted));
 
     }
 }

@@ -4,7 +4,7 @@ import com.zygne.stockalyze.domain.interactor.base.Interactor;
 
 public interface CacheCheckerInteractor extends Interactor {
 
-    public interface Callback{
+    interface Callback{
         void onCachedDataFound(String location);
         void onCachedDataError();
     }

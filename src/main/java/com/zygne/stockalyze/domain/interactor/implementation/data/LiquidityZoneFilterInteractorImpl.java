@@ -1,11 +1,10 @@
 package com.zygne.stockalyze.domain.interactor.implementation.data;
 
-import com.zygne.stockalyze.domain.MainThread;
+import com.zygne.stockalyze.domain.executor.MainThread;
 import com.zygne.stockalyze.domain.executor.Executor;
 import com.zygne.stockalyze.domain.interactor.base.BaseInteractor;
 import com.zygne.stockalyze.domain.interactor.implementation.data.base.LiquidityZoneFilterInteractor;
 import com.zygne.stockalyze.domain.model.LiquidityZone;
-import com.zygne.stockalyze.domain.model.Statistics;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,14 +14,12 @@ public class LiquidityZoneFilterInteractorImpl extends BaseInteractor implements
 
     private final Callback callback;
     private final List<LiquidityZone> data;
-    private final Statistics statistics;
     private final double limit;
 
-    public LiquidityZoneFilterInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<LiquidityZone> data, Statistics statistics, double limit) {
+    public LiquidityZoneFilterInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<LiquidityZone> data, double limit) {
         super(executor, mainThread);
         this.callback = callback;
         this.data = data;
-        this.statistics = statistics;
         this.limit = limit;
     }
 
@@ -38,7 +35,7 @@ public class LiquidityZoneFilterInteractorImpl extends BaseInteractor implements
         for (int i = 1; i < data.size(); i++) {
             LiquidityZone e = data.get(i);
 
-            if (e.percentile < limit) {
+            if (e.percentile > limit) {
                 filtered.add(e);
             }
         }
@@ -46,12 +43,7 @@ public class LiquidityZoneFilterInteractorImpl extends BaseInteractor implements
         filtered.sort(new LiquidityZone.PriceComparator());
         Collections.reverse(filtered);
 
-        mainThread.post(new Runnable() {
-            @Override
-            public void run() {
-                callback.onLiquidityZonesFiltered(filtered);
-            }
-        });
+        mainThread.post(() -> callback.onLiquidityZonesFiltered(filtered));
 
     }
 }
