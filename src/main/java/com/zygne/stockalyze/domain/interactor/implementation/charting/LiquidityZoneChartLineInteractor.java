@@ -1,6 +1,6 @@
 package com.zygne.stockalyze.domain.interactor.implementation.charting;
 
-import com.zygne.stockalyze.domain.model.LiquidityZone;
+import com.zygne.stockalyze.domain.model.LiquidityLevel;
 import com.zygne.stockalyze.domain.model.graphics.ChartLine;
 import com.zygne.stockalyze.domain.model.graphics.ChartObject;
 
@@ -10,9 +10,9 @@ import java.util.List;
 public class LiquidityZoneChartLineInteractor implements ChartLineInteractor {
 
     private final Callback callback;
-    private final List<LiquidityZone> data;
+    private final List<LiquidityLevel> data;
 
-    public LiquidityZoneChartLineInteractor(Callback callback, List<LiquidityZone> data) {
+    public LiquidityZoneChartLineInteractor(Callback callback, List<LiquidityLevel> data) {
         this.callback = callback;
         this.data = data;
     }
@@ -20,12 +20,12 @@ public class LiquidityZoneChartLineInteractor implements ChartLineInteractor {
     @Override
     public void execute() {
 
-        List<LiquidityZone> zones = new ArrayList<>(data);
+        List<LiquidityLevel> zones = new ArrayList<>(data);
 
         List<ChartObject> lines = new ArrayList<>();
 
         if (zones.size() > 1) {
-            LiquidityZone n = zones.get(0);
+            LiquidityLevel n = zones.get(0);
             ChartLine line = new ChartLine();
             line.level = n.price / (double) 100;
             line.size = 3;
@@ -34,7 +34,7 @@ public class LiquidityZoneChartLineInteractor implements ChartLineInteractor {
         }
 
         if (zones.size() >= 2) {
-            LiquidityZone n = zones.get(1);
+            LiquidityLevel n = zones.get(1);
             ChartLine line = new ChartLine();
             line.level = n.price / (double) 100;
             line.size = 2;
@@ -43,7 +43,7 @@ public class LiquidityZoneChartLineInteractor implements ChartLineInteractor {
         }
 
         if (zones.size() >= 3) {
-            LiquidityZone n = zones.get(2);
+            LiquidityLevel n = zones.get(2);
             ChartLine line = new ChartLine();
             line.level = n.price / (double) 100;
             line.size = 2;
@@ -52,7 +52,7 @@ public class LiquidityZoneChartLineInteractor implements ChartLineInteractor {
         }
 
         if (zones.size() >= 4) {
-            LiquidityZone n = zones.get(3);
+            LiquidityLevel n = zones.get(3);
             ChartLine line = new ChartLine();
             line.level = n.price / (double) 100;
             line.size = 1;
@@ -61,7 +61,7 @@ public class LiquidityZoneChartLineInteractor implements ChartLineInteractor {
         }
 
         if (zones.size() >= 5) {
-            LiquidityZone n = zones.get(4);
+            LiquidityLevel n = zones.get(4);
             ChartLine line = new ChartLine();
             line.level = n.price / (double) 100;
             line.size = 1;
@@ -72,7 +72,7 @@ public class LiquidityZoneChartLineInteractor implements ChartLineInteractor {
         if (zones.size() >= 6) {
 
             for (int i = 5; i < zones.size(); i++) {
-                LiquidityZone e = zones.get(i);
+                LiquidityLevel e = zones.get(i);
 
                 ChartLine line = new ChartLine();
                 line.level = e.price / (double) 100;

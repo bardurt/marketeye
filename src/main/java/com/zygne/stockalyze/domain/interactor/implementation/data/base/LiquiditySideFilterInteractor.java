@@ -1,14 +1,14 @@
 package com.zygne.stockalyze.domain.interactor.implementation.data.base;
 
 import com.zygne.stockalyze.domain.interactor.base.Interactor;
-import com.zygne.stockalyze.domain.model.PowerZone;
+import com.zygne.stockalyze.domain.model.LiquiditySide;
 
 import java.util.List;
 
-public interface PowerZoneFilterInteractor extends Interactor {
+public interface LiquiditySideFilterInteractor extends Interactor {
 
     interface Callback{
-        void onPowerZonesFiltered(List<PowerZone> data);
+        void onLiquiditySidesFiltered(List<LiquiditySide> data);
     }
 
 }

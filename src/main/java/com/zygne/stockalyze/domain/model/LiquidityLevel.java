@@ -2,18 +2,17 @@ package com.zygne.stockalyze.domain.model;
 
 import java.util.Comparator;
 
-public class LiquidityZone implements Comparable {
+public class LiquidityLevel {
 
     public final double price;
-    public long volume;
-    public final int orderCount;
-    public double relativeVolume;
-    public double volumePercentage;
-    public double powerRatio;
-    public boolean origin = false;
-    public int rank = 0;
-    public double percentile = 0.0d;
-    public double breakPoint;
+    private long volume;
+    private double relativeVolume;
+    private double volumePercentage;
+    private double powerRatio;
+    private boolean origin = false;
+    private int rank = 0;
+    private double percentile = 0.0d;
+    private double breakPoint;
 
     public final String note = "";
 
@@ -23,10 +22,6 @@ public class LiquidityZone implements Comparable {
 
     public long getVolume() {
         return volume;
-    }
-
-    public int getOrderCount() {
-        return orderCount;
     }
 
     public double getRelativeVolume() {
@@ -93,39 +88,31 @@ public class LiquidityZone implements Comparable {
         this.breakPoint = breakPoint;
     }
 
-    public LiquidityZone(double price, long volume, int orderCount) {
+    public LiquidityLevel(double price, long volume) {
         this.price = price;
         this.volume = volume;
-        this.orderCount = orderCount;
     }
 
-    @Override
-    public int compareTo(Object o) {
-        double priceB = ((LiquidityZone)o).price;
-
-        return Double.compare(price, priceB);
-    }
-
-    public static final class VolumeComparator implements Comparator<LiquidityZone> {
+    public static final class VolumeComparator implements Comparator<LiquidityLevel> {
 
         @Override
-        public int compare(LiquidityZone o1, LiquidityZone o2) {
+        public int compare(LiquidityLevel o1, LiquidityLevel o2) {
             return Long.compare(o1.volume, o2.volume);
         }
     }
 
-    public static final class PriceComparator implements Comparator<LiquidityZone> {
+    public static final class PriceComparator implements Comparator<LiquidityLevel> {
 
         @Override
-        public int compare(LiquidityZone o1, LiquidityZone o2) {
+        public int compare(LiquidityLevel o1, LiquidityLevel o2) {
             return Double.compare(o1.price, o2.price);
         }
     }
 
-    public static final class RankComparator implements Comparator<LiquidityZone> {
+    public static final class RankComparator implements Comparator<LiquidityLevel> {
 
         @Override
-        public int compare(LiquidityZone o1, LiquidityZone o2) {
+        public int compare(LiquidityLevel o1, LiquidityLevel o2) {
             return Integer.compare(o1.rank, o2.rank);
         }
     }

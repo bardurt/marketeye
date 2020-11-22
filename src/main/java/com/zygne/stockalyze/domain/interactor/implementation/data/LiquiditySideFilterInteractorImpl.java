@@ -3,19 +3,19 @@ package com.zygne.stockalyze.domain.interactor.implementation.data;
 import com.zygne.stockalyze.domain.executor.MainThread;
 import com.zygne.stockalyze.domain.executor.Executor;
 import com.zygne.stockalyze.domain.interactor.base.BaseInteractor;
-import com.zygne.stockalyze.domain.interactor.implementation.data.base.PowerZoneFilterInteractor;
-import com.zygne.stockalyze.domain.model.PowerZone;
+import com.zygne.stockalyze.domain.interactor.implementation.data.base.LiquiditySideFilterInteractor;
+import com.zygne.stockalyze.domain.model.LiquiditySide;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PowerZoneFilterInteractorImpl extends BaseInteractor implements PowerZoneFilterInteractor {
+public class LiquiditySideFilterInteractorImpl extends BaseInteractor implements LiquiditySideFilterInteractor {
 
     private final Callback callback;
-    private final List<PowerZone> data;
+    private final List<LiquiditySide> data;
     private final double percentile;
 
-    public PowerZoneFilterInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<PowerZone> data, double percentile) {
+    public LiquiditySideFilterInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<LiquiditySide> data, double percentile) {
         super(executor, mainThread);
         this.callback = callback;
         this.data = data;
@@ -25,17 +25,17 @@ public class PowerZoneFilterInteractorImpl extends BaseInteractor implements Pow
     @Override
     public void run() {
 
-        List<PowerZone> filtered = new ArrayList<>();
+        List<LiquiditySide> filtered = new ArrayList<>();
 
         for (int i = 1; i < data.size(); i++) {
-            PowerZone e = data.get(i);
+            LiquiditySide e = data.get(i);
 
             if (e.perecentile > percentile) {
                 filtered.add(e);
             }
         }
 
-        mainThread.post(() -> callback.onPowerZonesFiltered(filtered));
+        mainThread.post(() -> callback.onLiquiditySidesFiltered(filtered));
 
 
     }

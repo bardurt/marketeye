@@ -1,10 +1,8 @@
 package com.zygne.stockalyze.domain.interactor.implementation.data;
 
 import com.google.gson.Gson;
-import com.zygne.stockalyze.JavaFxThread;
 import com.zygne.stockalyze.domain.executor.MainThread;
 import com.zygne.stockalyze.domain.executor.Executor;
-import com.zygne.stockalyze.domain.executor.ThreadExecutor;
 import com.zygne.stockalyze.domain.interactor.base.BaseInteractor;
 import com.zygne.stockalyze.domain.interactor.implementation.data.base.FundamentalsInteractor;
 import com.zygne.stockalyze.domain.model.Fundamentals;

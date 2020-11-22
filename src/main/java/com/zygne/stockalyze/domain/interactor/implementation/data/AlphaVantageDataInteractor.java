@@ -16,7 +16,7 @@ import java.util.List;
 
 public class AlphaVantageDataInteractor extends BaseInteractor implements DataFetchInteractor {
 
-    private Callback callback;
+    private final Callback callback;
     private final String ticker;
     private final TimeFrame timeFrame;
     private final int monthsToFetch;
@@ -64,7 +64,7 @@ public class AlphaVantageDataInteractor extends BaseInteractor implements DataFe
             mainThread.post(() -> callback.onDataFetchError("Unable to download data for " + ticker));
         }
 
-        mainThread.post(() -> callback.onDataFetched(lines, ticker, timeFrame));
+        mainThread.post(() -> callback.onDataFetched(lines));
     }
 
     /**

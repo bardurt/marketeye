@@ -9,9 +9,9 @@ import com.zygne.stockalyze.domain.model.*;
 import java.util.List;
 
 public class SupportFlow implements VolumePriceInteractor.Callback,
-        VolumePriceGroupInteractor.Callback,
-        LiquidityZoneInteractor.Callback,
-        LiquidityZoneFilterInteractor.Callback,
+        VolumePriceSumInteractor.Callback,
+        LiquidityLevelInteractor.Callback,
+        LiquidityLevelFilterInteractor.Callback,
         FundamentalsInteractor.Callback,
         BreakPointInteractor.Callback {
 
@@ -35,7 +35,7 @@ public class SupportFlow implements VolumePriceInteractor.Callback,
     }
 
     @Override
-    public void onBreakPointsCalculated(List<LiquidityZone> data) {
+    public void onBreakPointsCalculated(List<LiquidityLevel> data) {
         callback.onSupportCompleted(data);
     }
 
@@ -43,27 +43,27 @@ public class SupportFlow implements VolumePriceInteractor.Callback,
     public void onFundamentalsFetched(Fundamentals fundamentals) { }
 
     @Override
-    public void onLiquidityZonesFiltered(List<LiquidityZone> data) {
+    public void onLiquidityLevelsFiltered(List<LiquidityLevel> data) {
         new BreakPointInteractorImpl(executor, mainThread, this, histogramList, data).execute();
     }
 
     @Override
-    public void onLiquidityZonesCreated(List<LiquidityZone> data) {
-        new LiquidityZoneFilterInteractorImpl(executor, mainThread, this, data, percentile).execute();
+    public void onLiquidityLevelsCreated(List<LiquidityLevel> data) {
+        new LiquidityLevelFilterInteractorImpl(executor, mainThread, this, data, percentile).execute();
     }
 
     @Override
-    public void onVolumePriceGroupCreated(List<VolumePriceGroup> data) {
-        new LiquidityZoneInteractorImpl(executor, mainThread, this, data).execute();
+    public void onVolumePriceSumCreated(List<VolumePriceSum> data) {
+        new LiquidityLevelInteractorImpl(executor, mainThread, this, data).execute();
     }
 
     @Override
     public void onVolumePriceCreated(List<VolumePrice> data) {
-        new VolumePriceGroupInteractorImpl(executor, mainThread, this, data).execute();
+        new VolumePriceSumInteractorImpl(executor, mainThread, this, data).execute();
     }
 
     public interface Callback {
-        void onSupportCompleted(List<LiquidityZone> data);
+        void onSupportCompleted(List<LiquidityLevel> data);
     }
 }
 

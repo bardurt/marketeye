@@ -1,4 +1,4 @@
-package com.zygne.stockalyze.utils;
+package com.zygne.stockalyze.domain.utils;
 
 public class StringUtils {
 

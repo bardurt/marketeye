@@ -6,6 +6,7 @@ import com.zygne.stockalyze.domain.executor.Executor;
 import com.zygne.stockalyze.domain.executor.ThreadExecutor;
 import com.zygne.stockalyze.domain.interactor.base.BaseInteractor;
 import com.zygne.stockalyze.domain.model.Settings;
+import com.zygne.stockalyze.domain.utils.TagHelper;
 
 import java.io.*;
 
@@ -62,8 +63,8 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
             mainThread.post(() -> callback.onSettingsError(SETTINGS_FILE));
         } else {
 
-            String apiKey = getValueFromTagName(TAG_API, content.toString());
-            String cache = getValueFromTagName(TAG_CACHE, content.toString());
+            String apiKey = TagHelper.getValueFromTagName(TAG_API, content.toString());
+            String cache = TagHelper.getValueFromTagName(TAG_CACHE, content.toString());
 
             if(apiKey.isEmpty()){
                 mainThread.post(() -> callback.onSettingsError(SETTINGS_FILE));
@@ -89,69 +90,14 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
     private String getSettingsContent(){
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("<!-- Configuratiin file -->");
+        stringBuilder.append("<!-- Configuration file -->");
         stringBuilder.append("\n");
-        stringBuilder.append(createTag(TAG_API, "MY_ALPHA_VANTAGE_API_KEY"));
         stringBuilder.append("\n");
-        stringBuilder.append(createTag(TAG_CACHE, "cache_data"));
+        stringBuilder.append("<!-- API Key for https://www.alphavantage.co/ -->");
+        stringBuilder.append("\n");
+        stringBuilder.append(TagHelper.createTag(TAG_API, "MY_ALPHA_VANTAGE_API_KEY"));
+        stringBuilder.append("\n");
+        stringBuilder.append(TagHelper.createTag(TAG_CACHE, "cache_data"));
         return stringBuilder.toString();
-    }
-
-    protected String getValueFromTagName(String name, String raw) {
-
-        if (raw.isEmpty()) {
-            return "";
-        }
-
-        String startTag = "<" + name + ">";
-        String endTarget = "</" + name + ">";
-
-        String[] firstParts = raw.split(endTarget, -1);
-
-        // if size is not 2, then one of the following error has happened
-        // 1 : end tag does not exists in the raw data
-        // 2 : end tag appears more than 1 time.
-        // both of these cases makes the XML invalid, so return empty
-        if (firstParts.length != 2) {
-            return "";
-        }
-
-        String[]  secondParts = firstParts[0].split(startTag, -1);
-
-        // if size is not 2, then one of the following error has happened
-        // 1 : start tag does not exists in the raw data
-        // 2 : start tag appears more than 1 time.
-        // both of these cases makes the XML invalid, so return empty
-        if (secondParts.length != 2) {
-            return "";
-        }
-
-        return secondParts[1];
-    }
-
-    private String createTag(String name, String value){
-        String startTag = "<" + name + ">";
-        String endTag = "</" + name + ">";
-
-        return startTag+value+endTag;
-    }
-
-
-    public static void main(String[] args) {
-
-        new SettingsInteractorImpl(ThreadExecutor.getInstance(),
-                new JavaFxThread(),
-                new Callback() {
-            @Override
-            public void onSettingsLoaded(Settings settings) {
-
-            }
-
-            @Override
-            public void onSettingsError(String filename) {
-
-            }
-        }).execute();
-
     }
 }

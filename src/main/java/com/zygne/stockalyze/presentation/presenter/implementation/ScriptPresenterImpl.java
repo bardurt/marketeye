@@ -9,8 +9,8 @@ import com.zygne.stockalyze.domain.interactor.implementation.charting.ChartZoneI
 import com.zygne.stockalyze.domain.interactor.implementation.charting.ResistanceChartLineInteractor;
 import com.zygne.stockalyze.domain.interactor.implementation.scripting.PineScript2Interactor;
 import com.zygne.stockalyze.domain.interactor.implementation.scripting.ScriptInteractor;
-import com.zygne.stockalyze.domain.model.LiquidityZone;
-import com.zygne.stockalyze.domain.model.PowerZone;
+import com.zygne.stockalyze.domain.model.LiquidityLevel;
+import com.zygne.stockalyze.domain.model.LiquiditySide;
 import com.zygne.stockalyze.domain.model.graphics.ChartObject;
 import com.zygne.stockalyze.presentation.presenter.base.BasePresenter;
 import com.zygne.stockalyze.presentation.presenter.base.ScriptPresenter;
@@ -25,14 +25,15 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
 
     private final View view;
 
-    private List<LiquidityZone> resistance;
-    private List<LiquidityZone> support;
-    private List<PowerZone> powerZones;
+    private List<LiquidityLevel> resistance;
+    private List<LiquidityLevel> support;
+    private List<LiquiditySide> liquiditySides;
     private final List<ChartObject> chartObjects = new ArrayList<>();
     private String symbol;
 
     private boolean createResistance = false;
     private boolean createSides = false;
+    private String scriptTitle = "";
 
     public ScriptPresenterImpl(Executor executor, MainThread mainThread, View view) {
         super(executor, mainThread);
@@ -40,13 +41,13 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
     }
 
     @Override
-    public void setResistance(List<LiquidityZone> liquidityZones) {
-        this.resistance = liquidityZones;
+    public void setResistance(List<LiquidityLevel> liquidityLevels) {
+        this.resistance = liquidityLevels;
     }
 
     @Override
-    public void setZones(List<PowerZone> zones) {
-        this.powerZones = zones;
+    public void setZones(List<LiquiditySide> zones) {
+        this.liquiditySides = zones;
     }
 
     @Override
@@ -59,6 +60,7 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
         this.createResistance = resistance;
         this.createSides = zones;
         this.chartObjects.clear();
+        this.scriptTitle = "";
 
         if(!createResistance && !createSides){
             view.showError("Resistance or Sides must be added to script!");
@@ -68,16 +70,18 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
         Interactor interactor;
 
         if(createSides){
-            if(powerZones == null){
+            if(liquiditySides == null){
                 view.showError("Sides not calculated");
                 return;
             }
-            interactor = new ChartZoneInteractorImpl(this, powerZones);
+            scriptTitle += "Sides";
+            interactor = new ChartZoneInteractorImpl(this, liquiditySides);
         } else {
             if(this.resistance == null){
                 view.showError("Resistance not calculated");
                 return;
             }
+            scriptTitle += "Resistance";
             interactor = new ResistanceChartLineInteractor(executor, mainThread, this, this.resistance);
         }
 
@@ -95,7 +99,7 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
         if(this.createResistance) {
             interactor = new ResistanceChartLineInteractor(executor, mainThread, this, resistance);
         } else {
-            interactor = new PineScript2Interactor(executor, mainThread, this, symbol, symbol, chartObjects);
+            interactor = new PineScript2Interactor(executor, mainThread, this, scriptTitle, symbol, chartObjects);
         }
 
         interactor.execute();
@@ -110,6 +114,6 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
     @Override
     public void onChartLineCreated(List<ChartObject> lines) {
         chartObjects.addAll(lines);
-        new PineScript2Interactor(executor, mainThread, this, symbol, symbol, chartObjects).execute();
+        new PineScript2Interactor(executor, mainThread, this, scriptTitle, symbol, chartObjects).execute();
     }
 }

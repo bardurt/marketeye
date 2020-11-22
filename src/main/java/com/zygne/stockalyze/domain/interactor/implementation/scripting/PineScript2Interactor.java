@@ -46,6 +46,8 @@ public class PineScript2Interactor extends BaseInteractor implements ScriptInter
 
         stringBuilder.append("//@version=4");
         stringBuilder.append("\n");
+        stringBuilder.append("// Script for TradingView PineScript Editor");
+        stringBuilder.append("\n");
         stringBuilder.append("// Ticker : ").append(ticker);
         stringBuilder.append("\n");
         stringBuilder.append("// Author : Misty's Boyfriend").append(" - ").append(time);

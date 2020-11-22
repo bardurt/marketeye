@@ -6,7 +6,7 @@ import com.zygne.stockalyze.domain.interactor.implementation.data.*;
 import com.zygne.stockalyze.domain.interactor.implementation.data.base.*;
 import com.zygne.stockalyze.domain.model.Fundamentals;
 import com.zygne.stockalyze.domain.model.Histogram;
-import com.zygne.stockalyze.domain.model.LiquidityZone;
+import com.zygne.stockalyze.domain.model.LiquidityLevel;
 import com.zygne.stockalyze.domain.model.Settings;
 import com.zygne.stockalyze.domain.model.enums.TimeFrame;
 import com.zygne.stockalyze.presentation.presenter.base.MainPresenter;
@@ -102,7 +102,7 @@ public class AlphaVantageDelegate implements MainPresenter,
     }
 
     @Override
-    public void onDataFetched(List<String> entries, String ticker, TimeFrame timeFrame) {
+    public void onDataFetched(List<String> entries) {
         downloadingData = false;
         downloadedData.addAll(entries);
 
@@ -132,7 +132,6 @@ public class AlphaVantageDelegate implements MainPresenter,
     @Override
     public void onCachedDataFound(String location) {
         view.showLoading("Reading cached data...");
-        System.out.println("Reading cached data...");
         new CacheReadInteractorImpl(executor, mainThread, this, location).execute();
     }
 
@@ -176,7 +175,7 @@ public class AlphaVantageDelegate implements MainPresenter,
     }
 
     @Override
-    public void onResistanceCompleted(List<LiquidityZone> data) {
+    public void onResistanceCompleted(List<LiquidityLevel> data) {
         view.onResistanceFound(data);
         view.showLoading("Finding Support");
         pivotFlow.setResistance(data);
@@ -184,7 +183,7 @@ public class AlphaVantageDelegate implements MainPresenter,
     }
 
     @Override
-    public void onSupportCompleted(List<LiquidityZone> data) {
+    public void onSupportCompleted(List<LiquidityLevel> data) {
         downloadingData = false;
 
         view.onSupportFound(data);
@@ -195,7 +194,7 @@ public class AlphaVantageDelegate implements MainPresenter,
     }
 
     @Override
-    public void onPivotCompleted(List<LiquidityZone> pivots) {
+    public void onPivotCompleted(List<LiquidityLevel> pivots) {
         view.hideLoading();
         view.onPivotFound(pivots);
 
@@ -210,7 +209,7 @@ public class AlphaVantageDelegate implements MainPresenter,
     public void onFundamentalsFetched(Fundamentals fundamentals) {
         view.hideLoading();
         view.onFundamentalsLoaded(fundamentals);
-        view.onComplete(ticker);
+        view.onComplete(ticker + " - " + fundamentals.getCompanyName());
     }
 
     private void notifySettingsError(){

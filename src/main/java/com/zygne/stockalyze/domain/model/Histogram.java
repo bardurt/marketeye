@@ -1,9 +1,5 @@
 package com.zygne.stockalyze.domain.model;
 
-import com.zygne.stockalyze.domain.model.enums.TimeFrame;
-
-import java.util.Comparator;
-
 public class Histogram {
     public long timeStamp;
     public double open;
@@ -11,8 +7,6 @@ public class Histogram {
     public double low;
     public double close;
     public long volume;
-    public TimeFrame timeFrame;
-    public final double decay = 1;
 
     public Direction getDirection() {
         if (open < close) {
@@ -63,14 +57,5 @@ public class Histogram {
         long timeStamp1 = ((Histogram)obj).timeStamp;
         return timeStamp == timeStamp1;
     }
-
-    public static class TimeComparator implements Comparator<Histogram>{
-
-        @Override
-        public int compare(Histogram o1, Histogram o2) {
-            return Long.compare(o1.timeStamp, o2.timeStamp);
-        }
-    }
-
 
 }

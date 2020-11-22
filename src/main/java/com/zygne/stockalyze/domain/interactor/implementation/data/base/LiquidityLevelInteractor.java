@@ -1,13 +1,13 @@
 package com.zygne.stockalyze.domain.interactor.implementation.data.base;
 
 import com.zygne.stockalyze.domain.interactor.base.Interactor;
-import com.zygne.stockalyze.domain.model.LiquidityZone;
+import com.zygne.stockalyze.domain.model.LiquidityLevel;
 
 import java.util.List;
 
-public interface LiquidityZoneInteractor extends Interactor {
+public interface LiquidityLevelInteractor extends Interactor {
 
     interface Callback{
-        void onLiquidityZonesCreated(List<LiquidityZone> data);
+        void onLiquidityLevelsCreated(List<LiquidityLevel> data);
     }
 }

@@ -2,7 +2,7 @@ package com.zygne.stockalyze.domain.model;
 
 import java.util.Comparator;
 
-public class PowerZone {
+public class LiquiditySide {
 
     public static final int RECJECT = 0;
     public static final int ACCEPT = 1;
@@ -90,18 +90,18 @@ public class PowerZone {
         return value + " " + start + " " + end + " " + timeStamp;
     }
 
-    public static final class TimeComparator implements Comparator<PowerZone> {
+    public static final class TimeComparator implements Comparator<LiquiditySide> {
 
         @Override
-        public int compare(PowerZone o1, PowerZone o2) {
+        public int compare(LiquiditySide o1, LiquiditySide o2) {
             return Long.compare(o1.timeStamp, o2.timeStamp);
         }
     }
 
-    public static final class VolumeComparator implements Comparator<PowerZone> {
+    public static final class VolumeComparator implements Comparator<LiquiditySide> {
 
         @Override
-        public int compare(PowerZone o1, PowerZone o2) {
+        public int compare(LiquiditySide o1, LiquiditySide o2) {
             return Long.compare(o1.volume, o2.volume);
         }
     }

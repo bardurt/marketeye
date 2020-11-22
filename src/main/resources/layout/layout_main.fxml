@@ -179,14 +179,17 @@
 
                     <VBox GridPane.columnIndex="0"
                           GridPane.rowIndex="0"
-                          GridPane.columnSpan="2">
+                          prefHeight="128"
+                          GridPane.vgrow="ALWAYS"
+                          GridPane.columnSpan="3">
 
                         <Label text="Fundamentals"
                                styleClass="header_label"/>
 
-                        <TableView prefHeight="320"
+                        <TableView prefHeight="128"
+                                   prefWidth="1000"
                                    GridPane.hgrow="ALWAYS"
-                                   GridPane.vgrow="NEVER"
+                                   GridPane.vgrow="ALWAYS"
                                    fx:id="table_fundamentals"/>
 
                     </VBox>
@@ -194,7 +197,7 @@
 
                     <VBox spacing="10"
                           GridPane.columnIndex="0"
-                          GridPane.rowIndex="1">
+                          GridPane.rowIndex="2">
 
                         <padding>
                             <Insets top="5"
@@ -204,7 +207,7 @@
                         <Label text="Resistance"
                                styleClass="header_label"/>
 
-                        <TableView prefHeight="720.0"
+                        <TableView prefHeight="480.0"
                                    prefWidth="400"
                                    GridPane.hgrow="ALWAYS"
                                    GridPane.vgrow="ALWAYS"
@@ -216,7 +219,7 @@
 
                     <VBox spacing="10"
                           GridPane.columnIndex="1"
-                          GridPane.rowIndex="1">
+                          GridPane.rowIndex="2">
 
                         <padding>
                             <Insets top="5"
@@ -228,7 +231,7 @@
                         <Label text="Support"
                                styleClass="header_label"/>
 
-                        <TableView prefHeight="720.0"
+                        <TableView prefHeight="480.0"
                                    prefWidth="400"
                                    GridPane.hgrow="ALWAYS"
                                    GridPane.vgrow="ALWAYS"
@@ -239,7 +242,7 @@
 
                     <VBox spacing="10"
                           GridPane.columnIndex="2"
-                          GridPane.rowIndex="1">
+                          GridPane.rowIndex="2">
 
                         <padding>
                             <Insets top="5"
@@ -251,7 +254,7 @@
                         <Label text="Intersection"
                                styleClass="header_label"/>
 
-                        <TableView prefHeight="720.0"
+                        <TableView prefHeight="480.0"
                                    prefWidth="200"
                                    GridPane.hgrow="ALWAYS"
                                    GridPane.vgrow="ALWAYS"
@@ -360,7 +363,7 @@
 
 
                         <TableView prefHeight="720.0"
-                                   prefWidth="800.0"
+                                   prefWidth="1000"
                                    GridPane.hgrow="ALWAYS"
                                    GridPane.vgrow="ALWAYS"
                                    GridPane.columnIndex="2"

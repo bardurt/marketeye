@@ -16,6 +16,9 @@ public class Fundamentals {
     @SerializedName("52WeekHigh")
     private double high;
 
+    @SerializedName("Name")
+    private String companyName;
+
     public int getSharesOutstanding() {
         return sharesOutstanding;
     }
@@ -46,5 +49,13 @@ public class Fundamentals {
 
     public void setHigh(double high) {
         this.high = high;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 }

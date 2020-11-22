@@ -4,7 +4,7 @@ import com.zygne.stockalyze.domain.executor.MainThread;
 import com.zygne.stockalyze.domain.executor.Executor;
 import com.zygne.stockalyze.domain.interactor.base.BaseInteractor;
 import com.zygne.stockalyze.domain.interactor.implementation.data.base.PivotInteractor;
-import com.zygne.stockalyze.domain.model.LiquidityZone;
+import com.zygne.stockalyze.domain.model.LiquidityLevel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +12,10 @@ import java.util.List;
 public class PivotInteractorImpl extends BaseInteractor implements PivotInteractor {
 
     private final Callback callback;
-    private final List<LiquidityZone> resistance;
-    private final List<LiquidityZone> support;
+    private final List<LiquidityLevel> resistance;
+    private final List<LiquidityLevel> support;
 
-    public PivotInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<LiquidityZone> resistance, List<LiquidityZone> support) {
+    public PivotInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<LiquidityLevel> resistance, List<LiquidityLevel> support) {
         super(executor, mainThread);
         this.callback = callback;
         this.resistance = resistance;
@@ -25,10 +25,10 @@ public class PivotInteractorImpl extends BaseInteractor implements PivotInteract
     @Override
     public void run() {
 
-        List<LiquidityZone> pivots = new ArrayList<>();
+        List<LiquidityLevel> pivots = new ArrayList<>();
 
-        for(LiquidityZone r : resistance){
-            for(LiquidityZone s : support){
+        for(LiquidityLevel r : resistance){
+            for(LiquidityLevel s : support){
                 if(r.price == s.price){
                     pivots.add(r);
                 }

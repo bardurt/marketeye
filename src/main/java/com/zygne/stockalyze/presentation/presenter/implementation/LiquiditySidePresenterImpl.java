@@ -5,7 +5,7 @@ import com.zygne.stockalyze.domain.executor.Executor;
 import com.zygne.stockalyze.domain.interactor.implementation.data.*;
 import com.zygne.stockalyze.domain.interactor.implementation.data.base.*;
 import com.zygne.stockalyze.domain.model.Histogram;
-import com.zygne.stockalyze.domain.model.PowerZone;
+import com.zygne.stockalyze.domain.model.LiquiditySide;
 import com.zygne.stockalyze.domain.model.Settings;
 import com.zygne.stockalyze.domain.model.enums.TimeFrame;
 import com.zygne.stockalyze.presentation.presenter.base.BasePresenter;
@@ -18,8 +18,8 @@ public class LiquiditySidePresenterImpl extends BasePresenter implements Liquidi
         CacheWriteInteractor.Callback,
         CacheReadInteractor.Callback,
         HistogramInteractor.Callback,
-        PowerZoneInteractor.Callback,
-        PowerZoneFilterInteractor.Callback {
+        LiquiditySideInteractor.Callback,
+        LiquiditySideFilterInteractor.Callback {
 
     private final View view;
     private final Settings settings;
@@ -41,12 +41,12 @@ public class LiquiditySidePresenterImpl extends BasePresenter implements Liquidi
     @Override
     public void onHistogramCreated(List<Histogram> data) {
         view.showLoading("Analyzing sides...");
-        new PowerZoneInteractorImpl(executor, mainThread, this, data).execute();
+        new LiquiditySideInteractorImpl(executor, mainThread, this, data).execute();
     }
 
     @Override
-    public void onPowerZonesCreated(List<PowerZone> data) {
-        new PowerZoneFilterInteractorImpl(executor, mainThread, this, data, percentile).execute();
+    public void onLiquiditySidesCreated(List<LiquiditySide> data) {
+        new LiquiditySideFilterInteractorImpl(executor, mainThread, this, data, percentile).execute();
     }
 
     @Override
@@ -72,7 +72,7 @@ public class LiquiditySidePresenterImpl extends BasePresenter implements Liquidi
     }
 
     @Override
-    public void onPowerZonesFiltered(List<PowerZone> data) {
+    public void onLiquiditySidesFiltered(List<LiquiditySide> data) {
         view.hideLoading();
         view.onLiquiditySidesGenerated(data);
     }

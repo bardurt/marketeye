@@ -25,7 +25,6 @@ public class DataMergeInteractorImpl extends BaseInteractor implements DataMerge
     @Override
     public void run() {
         if(dataOld.isEmpty()){
-            System.out.println("Merging data, old is empty");
             mainThread.post(() -> callback.onDataMerged(dataNew));
             return;
         }

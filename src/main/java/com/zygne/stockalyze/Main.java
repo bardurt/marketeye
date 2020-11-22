@@ -12,8 +12,8 @@ import com.zygne.stockalyze.presentation.presenter.implementation.LiquiditySideP
 import com.zygne.stockalyze.presentation.presenter.implementation.MainPresenterImpl;
 import com.zygne.stockalyze.presentation.presenter.implementation.ScriptPresenterImpl;
 import com.zygne.stockalyze.presentation.presenter.implementation.SettingsPresenterImpl;
-import com.zygne.stockalyze.utils.ColorHelper;
-import com.zygne.stockalyze.utils.StringUtils;
+import com.zygne.stockalyze.domain.utils.ColorHelper;
+import com.zygne.stockalyze.domain.utils.StringUtils;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -38,10 +38,6 @@ public class Main extends Application implements MainPresenter.View,
     private TextField tfZonesTopPercent;
     private TextArea taScript;
 
-    private Button btnCreateReport;
-    private Button btnPowerZones;
-    private Button btnCreateScript;
-
     private RadioButton rbFundamentals;
     private RadioButton rbSidesScript;
     private RadioButton rbResistanceScript;
@@ -49,7 +45,6 @@ public class Main extends Application implements MainPresenter.View,
     private Label labelLoading;
     private ProgressIndicator piLoading;
     private Label labelError;
-    private Label labelVersion;
 
     private ChoiceBox cbPowerZoneTimeFrame;
     private ChoiceBox cbReportTimeFrame;
@@ -65,7 +60,6 @@ public class Main extends Application implements MainPresenter.View,
     private String ticker;
     private MainPresenter mainPresenter;
     private LiquiditySidePresenter liquiditySidePresenter;
-    private SettingsPresenter settingsPresenter;
     private ScriptPresenter scriptPresenter;
 
     @Override
@@ -90,7 +84,7 @@ public class Main extends Application implements MainPresenter.View,
         labelError = (Label) resourceLoader.findView("label_error");
         labelLoading = (Label) resourceLoader.findView("label_loading");
         piLoading = (ProgressIndicator) resourceLoader.findView("pi_loading");
-        labelVersion = (Label) resourceLoader.findView("label_version");
+        Label labelVersion = (Label) resourceLoader.findView("label_version");
         labelVersion.setText(Constants.VERSION_NAME);
 
         tableViewResistance = (TableView) resourceLoader.findView("table_supply_zones");
@@ -99,13 +93,13 @@ public class Main extends Application implements MainPresenter.View,
         tableViewPowerZones = (TableView) resourceLoader.findView("table_power_zones");
         tableFundamentals = (TableView) resourceLoader.findView("table_fundamentals");
 
-        btnCreateReport = (Button) resourceLoader.findView("btn_create_report");
+        Button btnCreateReport = (Button) resourceLoader.findView("btn_create_report");
         btnCreateReport.setOnAction((ActionEvent event) -> createReport());
 
-        btnPowerZones = (Button) resourceLoader.findView("btn_power_zones");
+        Button btnPowerZones = (Button) resourceLoader.findView("btn_power_zones");
         btnPowerZones.setOnAction((ActionEvent event) -> createPowerZones());
 
-        btnCreateScript = (Button) resourceLoader.findView("btn_create_script");
+        Button btnCreateScript = (Button) resourceLoader.findView("btn_create_script");
         btnCreateScript.setOnAction((ActionEvent event) -> createScript());
 
         rbFundamentals = (RadioButton) resourceLoader.findView("rb_fundamentals");
@@ -131,25 +125,22 @@ public class Main extends Application implements MainPresenter.View,
         prepareTableFundamentals();
         preparePowerZoneTable();
 
-        settingsPresenter = new SettingsPresenterImpl(ThreadExecutor.getInstance(), new JavaFxThread(), this);
+        SettingsPresenter settingsPresenter = new SettingsPresenterImpl(ThreadExecutor.getInstance(), new JavaFxThread(), this);
         settingsPresenter.start();
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 
-    private void populateResistanceZones(List<LiquidityZone> data) {
+    private void populateResistanceZones(List<LiquidityLevel> data) {
         tableViewResistance.getItems().clear();
         tableViewResistance.getItems().addAll(data);
     }
 
-    private void populateSupportTable(List<LiquidityZone> data) {
+    private void populateSupportTable(List<LiquidityLevel> data) {
         tableViewSupport.getItems().clear();
         tableViewSupport.getItems().addAll(data);
     }
 
-    private void populatePivotTable(List<LiquidityZone> data) {
+    private void populatePivotTable(List<LiquidityLevel> data) {
         tableViewPivot.getItems().clear();
         tableViewPivot.getItems().addAll(data);
     }
@@ -160,12 +151,12 @@ public class Main extends Application implements MainPresenter.View,
         if (fundamentals != null) {
             tableFundamentals.getItems().add(fundamentals);
         }
-        tableFundamentals.setFixedCellSize(30);
-        tableFundamentals.prefHeightProperty().bind(Bindings.size(tableFundamentals.getItems()).multiply(tableFundamentals.getFixedCellSize()).add(30));
+        tableFundamentals.setFixedCellSize(45);
+        tableFundamentals.prefHeightProperty().bind(Bindings.size(tableFundamentals.getItems()).multiply(tableFundamentals.getFixedCellSize()).add(45));
 
     }
 
-    private void populatePowerZone(List<PowerZone> data) {
+    private void populatePowerZone(List<LiquiditySide> data) {
         tableViewPowerZones.getItems().clear();
         tableViewPowerZones.getItems().addAll(data);
     }
@@ -175,7 +166,7 @@ public class Main extends Application implements MainPresenter.View,
 
         TableColumn headerPrice = new TableColumn("Price");
         headerPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
-        headerPrice.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerPrice.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -189,7 +180,7 @@ public class Main extends Application implements MainPresenter.View,
 
         TableColumn headerVol = new TableColumn("Vol");
         headerVol.setCellValueFactory(new PropertyValueFactory<>("volume"));
-        headerVol.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerVol.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -204,7 +195,7 @@ public class Main extends Application implements MainPresenter.View,
 
         TableColumn headerPercentile = new TableColumn("Pctl");
         headerPercentile.setCellValueFactory(new PropertyValueFactory<>("percentile"));
-        headerPercentile.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerPercentile.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -218,7 +209,7 @@ public class Main extends Application implements MainPresenter.View,
 
         TableColumn headerBreakPoint = new TableColumn("Break");
         headerBreakPoint.setCellValueFactory(new PropertyValueFactory<>("breakPoint"));
-        headerBreakPoint.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerBreakPoint.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -232,25 +223,20 @@ public class Main extends Application implements MainPresenter.View,
 
         tableViewResistance.getColumns().addAll(headerPrice, headerVol, headerPercentile, headerBreakPoint);
 
-        tableViewResistance.setRowFactory(tv -> new TableRow<LiquidityZone>() {
+        tableViewResistance.setRowFactory(tv -> new TableRow<LiquidityLevel>() {
             @Override
-            protected void updateItem(LiquidityZone item, boolean empty) {
+            protected void updateItem(LiquidityLevel item, boolean empty) {
                 super.updateItem(item, empty);
 
                 if (item != null) {
-                    if (!item.origin) {
+                    String color = ColorHelper.getColorForPercentile(item.getPercentile());
 
-                        String color = ColorHelper.getColorForPercentile(item.percentile);
-
-                        if (color != null) {
-                            setStyle("-fx-background-color: -fx-table-cell-border-color, " + color + ";");
-                        } else {
-                            setStyle("");
-                        }
-
+                    if (color != null) {
+                        setStyle("-fx-background-color: -fx-table-cell-border-color, " + color + ";");
                     } else {
                         setStyle("");
                     }
+
                 } else {
                     setStyle("");
                 }
@@ -263,7 +249,7 @@ public class Main extends Application implements MainPresenter.View,
 
         TableColumn headerPrice = new TableColumn("Price");
         headerPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
-        headerPrice.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerPrice.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -283,7 +269,7 @@ public class Main extends Application implements MainPresenter.View,
 
         TableColumn headerPrice = new TableColumn("Price");
         headerPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
-        headerPrice.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerPrice.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -297,7 +283,7 @@ public class Main extends Application implements MainPresenter.View,
 
         TableColumn headerVol = new TableColumn("Vol");
         headerVol.setCellValueFactory(new PropertyValueFactory<>("volume"));
-        headerVol.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerVol.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -312,7 +298,7 @@ public class Main extends Application implements MainPresenter.View,
 
         TableColumn headerPercentile = new TableColumn("Pctl");
         headerPercentile.setCellValueFactory(new PropertyValueFactory<>("percentile"));
-        headerPercentile.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerPercentile.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -326,7 +312,7 @@ public class Main extends Application implements MainPresenter.View,
 
         TableColumn headerBreakPoint = new TableColumn("Break");
         headerBreakPoint.setCellValueFactory(new PropertyValueFactory<>("breakPoint"));
-        headerBreakPoint.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerBreakPoint.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -340,25 +326,21 @@ public class Main extends Application implements MainPresenter.View,
 
         tableViewSupport.getColumns().addAll(headerPrice, headerVol, headerPercentile, headerBreakPoint);
 
-        tableViewSupport.setRowFactory(tv -> new TableRow<LiquidityZone>() {
+        tableViewSupport.setRowFactory(tv -> new TableRow<LiquidityLevel>() {
             @Override
-            protected void updateItem(LiquidityZone item, boolean empty) {
+            protected void updateItem(LiquidityLevel item, boolean empty) {
                 super.updateItem(item, empty);
 
                 if (item != null) {
-                    if (!item.origin) {
 
-                        String color = ColorHelper.getColorForPercentile(item.percentile);
+                    String color = ColorHelper.getColorForPercentile(item.getPercentile());
 
-                        if (color != null) {
-                            setStyle("-fx-background-color: -fx-table-cell-border-color, " + color + ";");
-                        } else {
-                            setStyle("");
-                        }
-
+                    if (color != null) {
+                        setStyle("-fx-background-color: -fx-table-cell-border-color, " + color + ";");
                     } else {
                         setStyle("");
                     }
+
                 } else {
                     setStyle("");
                 }
@@ -371,7 +353,7 @@ public class Main extends Application implements MainPresenter.View,
 
         TableColumn headerFloat = new TableColumn("Float");
         headerFloat.setCellValueFactory(new PropertyValueFactory<>("sharesFloat"));
-        headerFloat.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerFloat.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -385,10 +367,10 @@ public class Main extends Application implements MainPresenter.View,
             }
         });
 
-        TableColumn headerHigh = new TableColumn("52 Week High");
+        TableColumn headerHigh = new TableColumn("52w High");
         headerHigh.setCellValueFactory(new PropertyValueFactory<>("high"));
 
-        TableColumn headerLow = new TableColumn("52 Week Low");
+        TableColumn headerLow = new TableColumn("52w Low");
         headerLow.setCellValueFactory(new PropertyValueFactory<>("low"));
 
         tableFundamentals.getColumns().addAll(headerFloat, headerHigh, headerLow);
@@ -398,17 +380,39 @@ public class Main extends Application implements MainPresenter.View,
     private void preparePowerZoneTable() {
         TableColumn headerStart = new TableColumn("Start");
         headerStart.setCellValueFactory(new PropertyValueFactory<>("start"));
+        headerStart.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
+            @Override
+            protected void updateItem(Number value, boolean empty) {
+                super.updateItem(value, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(String.format("%.2f", value.doubleValue()));
+                }
+            }
+        });
 
 
         TableColumn headerEnd = new TableColumn("End");
         headerEnd.setCellValueFactory(new PropertyValueFactory<>("end"));
+        headerEnd.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
+            @Override
+            protected void updateItem(Number value, boolean empty) {
+                super.updateItem(value, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(String.format("%.2f", value.doubleValue()));
+                }
+            }
+        });
 
         TableColumn headerSide = new TableColumn("Side");
         headerSide.setCellValueFactory(new PropertyValueFactory<>("side"));
 
         TableColumn headerVolume = new TableColumn("Vol");
         headerVolume.setCellValueFactory(new PropertyValueFactory<>("volume"));
-        headerVolume.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerVolume.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -425,7 +429,7 @@ public class Main extends Application implements MainPresenter.View,
 
         TableColumn headerDay = new TableColumn("Time");
         headerDay.setCellValueFactory(new PropertyValueFactory<>("timeStamp"));
-        headerDay.setCellFactory(tc -> new TableCell<LiquidityZone, Number>() {
+        headerDay.setCellFactory(tc -> new TableCell<LiquidityLevel, Number>() {
             @Override
             protected void updateItem(Number value, boolean empty) {
                 super.updateItem(value, empty);
@@ -439,16 +443,16 @@ public class Main extends Application implements MainPresenter.View,
 
         tableViewPowerZones.getColumns().addAll(headerStart, headerEnd, headerVolume, headerVolumeRank, headerSide, headerDay);
 
-        tableViewPowerZones.setRowFactory(tv -> new TableRow<PowerZone>() {
+        tableViewPowerZones.setRowFactory(tv -> new TableRow<LiquiditySide>() {
             @Override
-            protected void updateItem(PowerZone item, boolean empty) {
+            protected void updateItem(LiquiditySide item, boolean empty) {
                 super.updateItem(item, empty);
 
                 if (item != null) {
 
                     String color = "#9E0000";
 
-                    if (item.type == PowerZone.ACCEPT) {
+                    if (item.type == LiquiditySide.ACCEPT) {
                         color = "#079E00";
                     }
 
@@ -505,8 +509,8 @@ public class Main extends Application implements MainPresenter.View,
         }
     }
 
-    private void createScript(){
-        if(scriptPresenter == null){
+    private void createScript() {
+        if (scriptPresenter == null) {
             return;
         }
 
@@ -549,23 +553,23 @@ public class Main extends Application implements MainPresenter.View,
     }
 
     @Override
-    public void onResistanceFound(List<LiquidityZone> zones) {
+    public void onResistanceFound(List<LiquidityLevel> zones) {
         populateResistanceZones(zones);
         scriptPresenter.setResistance(zones);
     }
 
     @Override
-    public void onSupportFound(List<LiquidityZone> zones) {
+    public void onSupportFound(List<LiquidityLevel> zones) {
         populateSupportTable(zones);
     }
 
     @Override
-    public void onPivotFound(List<LiquidityZone> zones) {
+    public void onPivotFound(List<LiquidityLevel> zones) {
         populatePivotTable(zones);
     }
 
     @Override
-    public void onLiquiditySidesGenerated(List<PowerZone> data) {
+    public void onLiquiditySidesGenerated(List<LiquiditySide> data) {
         populatePowerZone(data);
         scriptPresenter.setZones(data);
     }
@@ -613,4 +617,10 @@ public class Main extends Application implements MainPresenter.View,
         liquiditySidePresenter = new LiquiditySidePresenterImpl(ThreadExecutor.getInstance(), new JavaFxThread(), this, settings);
         scriptPresenter = new ScriptPresenterImpl(ThreadExecutor.getInstance(), new JavaFxThread(), this);
     }
+
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
 }

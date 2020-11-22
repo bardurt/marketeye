@@ -1,15 +1,15 @@
 package com.zygne.stockalyze.presentation.presenter.base;
 
-import com.zygne.stockalyze.domain.model.LiquidityZone;
-import com.zygne.stockalyze.domain.model.PowerZone;
+import com.zygne.stockalyze.domain.model.LiquidityLevel;
+import com.zygne.stockalyze.domain.model.LiquiditySide;
 import com.zygne.stockalyze.presentation.view.BaseView;
 
 import java.util.List;
 
 public interface ScriptPresenter {
 
-    void setResistance(List<LiquidityZone> liquidityZones);
-    void setZones(List<PowerZone> zones);
+    void setResistance(List<LiquidityLevel> liquidityLevels);
+    void setZones(List<LiquiditySide> zones);
     void setSymbol(String symbol);
 
     void createScript(boolean resistance, boolean zones);

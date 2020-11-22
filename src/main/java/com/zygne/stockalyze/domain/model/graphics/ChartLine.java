@@ -6,7 +6,6 @@ public class ChartLine extends ChartObject {
     public int size;
     public int color;
 
-
     public static class Color{
         public static final int BLUE = 0;
         public static final int RED = 1;

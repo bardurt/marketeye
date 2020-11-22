@@ -26,8 +26,6 @@ public class HistogramInteractorImpl extends BaseInteractor implements Histogram
 
     @Override
     public void run() {
-
-        System.out.println("HistogramInteractorImpl");
         String[] tempArr;
         List<Histogram> data = new ArrayList<>();
         int count = 0;
@@ -54,7 +52,6 @@ public class HistogramInteractorImpl extends BaseInteractor implements Histogram
                 data.add(histogram);
 
             } catch (Exception e) {
-                System.out.println("Error at line " + count + ", data :" + line );
                 e.printStackTrace();
             }
 
