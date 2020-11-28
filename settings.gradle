@@ -1,0 +1,3 @@
+rootProject.name = 'StockAnalyzer'
+include 'core'
+include 'client'
