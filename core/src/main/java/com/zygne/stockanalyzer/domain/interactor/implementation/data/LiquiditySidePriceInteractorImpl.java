@@ -35,7 +35,7 @@ public class LiquiditySidePriceInteractorImpl extends BaseInteractor implements 
             }
         }
 
-        mainThread.post(() -> callback.onLiquidtySideForPriceFound(filtered));
+        mainThread.post(() -> callback.onLiquiditySideForPriceFound(filtered));
 
     }
 }

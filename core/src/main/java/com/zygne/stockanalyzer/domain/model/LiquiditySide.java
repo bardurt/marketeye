@@ -4,15 +4,19 @@ import java.util.Comparator;
 
 public class LiquiditySide {
 
-    public static final int RECJECT = 0;
+    public static final int REJECT = 0;
     public static final int ACCEPT = 1;
 
+    public static final int WEAK = 2;
+    public static final int STRONG = 3;
+
     public double type;
+    public double strength;
     public double start;
     public double end;
     public long volume;
     public int volumeRank;
-    public double perecentile;
+    public double percentile;
 
     public long timeStamp;
 
@@ -24,11 +28,19 @@ public class LiquiditySide {
         this.type = type;
     }
 
-    public String getSide(){
-        if(type == RECJECT){
-           return "Sell";
+    public String getSide() {
+        if (type == REJECT) {
+            return "Sell";
         } else {
-           return "Buy";
+            return "Buy";
+        }
+    }
+
+    public String getStrength() {
+        if (strength == STRONG) {
+            return "Strong";
+        } else {
+            return "Weak";
         }
     }
 
@@ -72,7 +84,7 @@ public class LiquiditySide {
         this.volumeRank = volumeRank;
     }
 
-    public boolean inZone(double value){
+    public boolean inZone(double value) {
 
         return value <= end && value >= start;
     }
@@ -81,7 +93,7 @@ public class LiquiditySide {
     public String toString() {
         String value;
 
-        if(type == RECJECT){
+        if (type == REJECT) {
             value = "Reject";
         } else {
             value = "Accept";

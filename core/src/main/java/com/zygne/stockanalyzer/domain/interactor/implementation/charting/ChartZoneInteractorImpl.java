@@ -25,7 +25,7 @@ public class ChartZoneInteractorImpl implements ChartZoneInteractor {
         for(LiquiditySide liquiditySide : data){
             ChartZone zone = new ChartZone();
 
-            if(liquiditySide.type == LiquiditySide.RECJECT){
+            if(liquiditySide.type == LiquiditySide.REJECT){
                 zone.color = ChartObject.Color.RED;
             } else {
                 zone.color = ChartObject.Color.GREEN;

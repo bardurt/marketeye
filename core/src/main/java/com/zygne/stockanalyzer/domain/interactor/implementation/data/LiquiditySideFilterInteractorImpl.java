@@ -7,6 +7,7 @@ import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.Liquid
 import com.zygne.stockanalyzer.domain.model.LiquiditySide;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LiquiditySideFilterInteractorImpl extends BaseInteractor implements LiquiditySideFilterInteractor {
@@ -30,10 +31,13 @@ public class LiquiditySideFilterInteractorImpl extends BaseInteractor implements
         for (int i = 1; i < data.size(); i++) {
             LiquiditySide e = data.get(i);
 
-            if (e.perecentile > percentile) {
+            if (e.percentile > percentile) {
                 filtered.add(e);
             }
         }
+
+        filtered.sort(new LiquiditySide.TimeComparator());
+        Collections.reverse(filtered);
 
         mainThread.post(() -> callback.onLiquiditySidesFiltered(filtered));
 

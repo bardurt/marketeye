@@ -13,7 +13,7 @@ import java.util.List;
 
 public class LiquiditySideInteractorImpl extends BaseInteractor implements LiquiditySideInteractor {
 
-    private static final double MIN_SIZE = 0.05;
+    private static final double MIN_CHANGE = 3.0;
 
     private final Callback callback;
     private final List<Histogram> data;
@@ -23,7 +23,7 @@ public class LiquiditySideInteractorImpl extends BaseInteractor implements Liqui
         super(executor, mainThread);
         this.callback = callback;
         this.data = data;
-        this.minSize = minSize/100;
+        this.minSize = minSize / 100;
     }
 
 
@@ -37,26 +37,45 @@ public class LiquiditySideInteractorImpl extends BaseInteractor implements Liqui
 
         List<LiquiditySide> zones = new ArrayList<>();
 
+
         for (CandleStick e : sticks) {
+            double change = ((e.top - e.bottom) / e.bottom) * 100;
 
-            if (e.upperWick / e.getSize() >=  minSize) {
-                LiquiditySide p = new LiquiditySide();
-                p.start = e.bodyTop;
-                p.end = e.top;
-                p.type = LiquiditySide.RECJECT;
-                p.timeStamp = e.timeStamp;
-                p.volume = e.volume;
-                zones.add(p);
-            }
+            if (change > MIN_CHANGE) {
 
-            if (e.lowerWick / e.getSize() >= minSize) {
-                LiquiditySide p = new LiquiditySide();
-                p.start = e.bottom;
-                p.end = e.bodyBottom;
-                p.type = LiquiditySide.ACCEPT;
-                p.timeStamp = e.timeStamp;
-                p.volume = e.volume;
-                zones.add(p);
+                if (e.upperWick / e.getSize() >= minSize) {
+                    LiquiditySide p = new LiquiditySide();
+                    p.start = e.bodyTop;
+                    p.end = e.top;
+                    p.type = LiquiditySide.REJECT;
+                    p.timeStamp = e.timeStamp;
+                    p.volume = e.volume;
+
+                    if(e.bullish){
+                        p.strength = LiquiditySide.WEAK;
+                    } else {
+                        p.strength = LiquiditySide.STRONG;
+                    }
+
+                    zones.add(p);
+                }
+
+                if (e.lowerWick / e.getSize() >= minSize) {
+                    LiquiditySide p = new LiquiditySide();
+                    p.start = e.bottom;
+                    p.end = e.bodyBottom;
+                    p.type = LiquiditySide.ACCEPT;
+                    p.timeStamp = e.timeStamp;
+                    p.volume = e.volume;
+
+                    if(e.bullish){
+                        p.strength = LiquiditySide.STRONG;
+                    } else {
+                        p.strength = LiquiditySide.WEAK;
+                    }
+
+                    zones.add(p);
+                }
             }
         }
 
@@ -66,7 +85,7 @@ public class LiquiditySideInteractorImpl extends BaseInteractor implements Liqui
 
         for (int i = 0; i < zones.size(); i++) {
             zones.get(i).volumeRank = size - i;
-            zones.get(i).perecentile = ((i + 1) / (double) size) * 100;
+            zones.get(i).percentile = ((i + 1) / (double) size) * 100;
         }
 
         mainThread.post(() -> callback.onLiquiditySidesCreated(zones));

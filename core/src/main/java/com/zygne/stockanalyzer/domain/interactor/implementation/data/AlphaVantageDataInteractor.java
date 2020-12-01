@@ -101,12 +101,13 @@ public class AlphaVantageDataInteractor extends BaseInteractor implements DataFe
         int currentCount = 0;
 
         while (year < 3) {
-
             // start with download the latest month of year
             int month = 1;
 
             // loop through all the month for the year
             while (month < 13) {
+                String status = "Fetching " + (currentCount+1) + " / " + monthsToFetch;
+                mainThread.post(() -> callback.onStatusUpdate(status));
 
                 String time = "year" + year + "month" + month;
                 List<String> data = null;
@@ -146,7 +147,6 @@ public class AlphaVantageDataInteractor extends BaseInteractor implements DataFe
                 }
 
                 try {
-                    mainThread.post(() -> callback.onStatusUpdate("Waiting " + TIME_TO_SLEEP + " ms for next."));
                     Thread.sleep(TIME_TO_SLEEP);
                 } catch (InterruptedException ignored) {
                 }
@@ -182,9 +182,6 @@ public class AlphaVantageDataInteractor extends BaseInteractor implements DataFe
 
 
         String url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY_EXTENDED&symbol=" + symbol.toUpperCase() + "&interval=" + interval + "&slice=" + time + "&apikey=" + apiKey;
-
-        mainThread.post(() -> callback.onStatusUpdate("Downloading : " + url));
-
         try {
             // prepare the url for Alpha Vantage
             URL content = new URL(url);
@@ -256,8 +253,6 @@ public class AlphaVantageDataInteractor extends BaseInteractor implements DataFe
             }
         }
 
-        mainThread.post(() -> callback.onStatusUpdate("Download finished"));
-
         return lines;
     }
 
@@ -267,8 +262,8 @@ public class AlphaVantageDataInteractor extends BaseInteractor implements DataFe
 
         String url = "https://www.alphavantage.co/query?function=" + series + "&symbol=" + symbol + "&outputsize=full&apikey=" + apiKey + "&datatype=csv";
 
-        mainThread.post(() -> callback.onStatusUpdate("Downloading : " + url));
-
+        String status = "Fetching 1/1";
+        mainThread.post(() -> callback.onStatusUpdate(status));
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
         URLConnection urlConnection = null;
@@ -310,8 +305,6 @@ public class AlphaVantageDataInteractor extends BaseInteractor implements DataFe
                 }
             }
         }
-
-        mainThread.post(() -> callback.onStatusUpdate("Download finished"));
 
         return lines;
     }

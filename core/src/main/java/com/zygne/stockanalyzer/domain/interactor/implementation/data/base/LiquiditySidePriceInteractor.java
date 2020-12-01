@@ -8,6 +8,6 @@ import java.util.List;
 public interface LiquiditySidePriceInteractor extends Interactor {
 
     public interface Callback{
-        void onLiquidtySideForPriceFound(List<LiquiditySide> data);
+        void onLiquiditySideForPriceFound(List<LiquiditySide> data);
     }
 }

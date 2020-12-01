@@ -89,7 +89,7 @@ public class LiquiditySidePresenterImpl extends BasePresenter implements Liquidi
     }
 
     @Override
-    public void onLiquidtySideForPriceFound(List<LiquiditySide> data) {
+    public void onLiquiditySideForPriceFound(List<LiquiditySide> data) {
         view.hideLoading();
         view.onLiquiditySidesGenerated(data);
     }

@@ -1,12 +1,13 @@
 plugins {
     id 'java'
-}
-
-repositories {
-    mavenCentral()
+    id 'org.openjfx.javafxplugin' version '0.0.9'
 }
 
 
-dependencies {
-    compile 'com.google.code.gson:gson:2.8.6'
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'client.Launcher'
+        )
+    }
 }
