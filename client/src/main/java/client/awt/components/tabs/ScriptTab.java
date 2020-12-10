@@ -1,5 +1,7 @@
 package client.awt.components.tabs;
 
+import javafx.scene.control.CheckBox;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -11,6 +13,7 @@ public class ScriptTab extends JPanel {
 
     private Checkbox checkboxResistance;
     private Checkbox checkboxSides;
+    private Checkbox checkBoxGaps;
     private JButton btnCreateScript;
     private TextArea textAreaScript;
 
@@ -20,25 +23,33 @@ public class ScriptTab extends JPanel {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.NORTHWEST;
 
-        JPanel panel1 = new JPanel(new GridBagLayout());
+        JPanel controlPanel = new JPanel();
 
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        panel1.add(new JLabel("Resistance"), constraints);
+        JPanel panelResistance = new JPanel();
 
-        constraints.gridx = 0;
-        constraints.gridy = 1;
+
+        panelResistance.add(new JLabel("Resistance"));
+
         checkboxResistance = new Checkbox();
-        panel1.add(checkboxResistance, constraints);
+        panelResistance.add(checkboxResistance);
 
-        constraints.gridx = 2;
-        constraints.gridy = 0;
-        panel1.add(new JLabel("Sides"), constraints);
+        controlPanel.add(panelResistance);
 
-        constraints.gridx = 2;
-        constraints.gridy = 1;
+        JPanel panelSides = new JPanel();
+        panelSides.add(new JLabel("Sides"));
+
         checkboxSides = new Checkbox();
-        panel1.add(checkboxSides, constraints);
+        panelSides.add(checkboxSides);
+
+        controlPanel.add(panelSides);
+
+        JPanel paneGaps = new JPanel();
+        paneGaps.add(new JLabel("Gaps"), constraints);
+
+        checkBoxGaps = new Checkbox();
+        paneGaps.add(checkBoxGaps);
+
+        controlPanel.add(paneGaps);
 
         btnCreateScript = new JButton("Create Script");
         btnCreateScript.addActionListener(new ActionListener() {
@@ -47,15 +58,13 @@ public class ScriptTab extends JPanel {
             }
         });
 
-        constraints.gridx = 0;
-        constraints.gridy = 3;
-        panel1.add(btnCreateScript, constraints);
+        controlPanel.add(btnCreateScript, constraints);
 
-        add(panel1, BorderLayout.NORTH);
+        add(controlPanel, BorderLayout.NORTH);
 
         constraints.gridx = 0;
         constraints.gridy = 2;
-        constraints.gridwidth = 2;
+        constraints.gridwidth = 3;
         constraints.weightx = 1;
         constraints.weighty = 1;
 
@@ -68,7 +77,8 @@ public class ScriptTab extends JPanel {
         if(callback != null){
             boolean resistance = checkboxResistance.getState();
             boolean sides = checkboxSides.getState();
-            callback.generateScript(resistance, sides);
+            boolean gaps = checkBoxGaps.getState();
+            callback.generateScript(resistance, sides, gaps);
         }
     }
 
@@ -81,6 +91,6 @@ public class ScriptTab extends JPanel {
     }
 
     public interface Callback{
-        void generateScript(boolean resistance, boolean sides);
+        void generateScript(boolean resistance, boolean sides, boolean gaps);
     }
 }

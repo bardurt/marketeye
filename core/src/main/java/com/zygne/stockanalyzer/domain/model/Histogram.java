@@ -1,5 +1,7 @@
 package com.zygne.stockanalyzer.domain.model;
 
+import java.util.Comparator;
+
 public class Histogram {
     public long timeStamp;
     public double open;
@@ -56,6 +58,14 @@ public class Histogram {
     public boolean equals(Object obj) {
         long timeStamp1 = ((Histogram)obj).timeStamp;
         return timeStamp == timeStamp1;
+    }
+
+    public static final class TimeComparator implements Comparator<Histogram> {
+
+        @Override
+        public int compare(Histogram o1, Histogram o2) {
+            return Long.compare(o1.timeStamp, o2.timeStamp);
+        }
     }
 
 }

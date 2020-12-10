@@ -1,4 +1,4 @@
-package com.zygne.stockanalyzer.domain.interactor.implementation.data;
+package com.zygne.stockanalyzer.domain.interactor.implementation.data.av;
 
 import com.google.gson.Gson;
 import com.zygne.stockanalyzer.domain.executor.Executor;

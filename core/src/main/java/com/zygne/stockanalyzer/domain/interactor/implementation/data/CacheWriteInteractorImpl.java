@@ -4,6 +4,7 @@ import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.interactor.base.BaseInteractor;
 import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.CacheWriteInteractor;
+import com.zygne.stockanalyzer.domain.model.BarData;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,9 +16,9 @@ public class CacheWriteInteractorImpl extends BaseInteractor implements CacheWri
     private final Callback callback;
     private final String folder;
     private final String ticker;
-    private final List<String> lines;
+    private final List<BarData> lines;
 
-    public CacheWriteInteractorImpl(Executor executor, MainThread mainThread, Callback callback, String folder, String ticker, List<String> lines) {
+    public CacheWriteInteractorImpl(Executor executor, MainThread mainThread, Callback callback, String folder, String ticker, List<BarData> lines) {
         super(executor, mainThread);
         this.callback = callback;
         this.folder = folder;
@@ -42,8 +43,8 @@ public class CacheWriteInteractorImpl extends BaseInteractor implements CacheWri
             FileWriter myWriter = new FileWriter(fileName);
             myWriter.append(timeStamp);
             myWriter.append("\n");
-            for(String line : lines){
-                myWriter.append(line);
+            for(BarData line : lines){
+                myWriter.append(BarData.toStream(line));
                 myWriter.append("\n");
             }
             myWriter.close();

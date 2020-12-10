@@ -1,4 +1,4 @@
-package com.zygne.stockanalyzer.domain.interactor.implementation.data;
+package com.zygne.stockanalyzer.domain.interactor.implementation.data.av;
 
 import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
@@ -11,18 +11,17 @@ import com.zygne.stockanalyzer.domain.utils.TimeHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HistogramInteractorImpl extends BaseInteractor implements HistogramInteractor {
+public class AlphaVantageHistogramInteractorImpl extends BaseInteractor implements HistogramInteractor {
     private static final String DELIM = ",";
 
     private final Callback callback;
     private final List<String> entries;
 
-    public HistogramInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<String> entries) {
+    public AlphaVantageHistogramInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<String> entries) {
         super(executor, mainThread);
         this.callback = callback;
         this.entries = entries;
     }
-
 
     @Override
     public void run() {

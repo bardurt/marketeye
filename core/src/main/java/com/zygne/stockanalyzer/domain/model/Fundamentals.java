@@ -22,6 +22,8 @@ public class Fundamentals {
     @SerializedName("Exchange")
     private String exchange;
 
+    private long avgVol;
+
     public int getSharesOutstanding() {
         return sharesOutstanding;
     }
@@ -68,5 +70,13 @@ public class Fundamentals {
 
     public void setExchange(String exchange) {
         this.exchange = exchange;
+    }
+
+    public long getAvgVol() {
+        return avgVol;
+    }
+
+    public void setAvgVol(long avgVol) {
+        this.avgVol = avgVol;
     }
 }

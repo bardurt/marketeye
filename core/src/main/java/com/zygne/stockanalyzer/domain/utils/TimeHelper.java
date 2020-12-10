@@ -17,6 +17,8 @@ public class TimeHelper {
 
     private static final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
+    private static final String dateFormatSimple = "yyyyMMdd HH:mm:ss";
+
     public static int getDaysDifference(long start, long end) {
 
         long diff = start - end;
@@ -36,6 +38,21 @@ public class TimeHelper {
         }
 
         Date date;
+        try {
+            date = df.parse(dateString);
+        } catch (ParseException e) {
+            return 0;
+        }
+
+        return date.getTime();
+    }
+
+    public static long getTimeStamp(String dateFormat, String dateString) {
+
+        DateFormat df = new SimpleDateFormat(dateFormat);
+
+        Date date;
+
         try {
             date = df.parse(dateString);
         } catch (ParseException e) {

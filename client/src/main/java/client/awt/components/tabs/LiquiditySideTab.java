@@ -3,10 +3,12 @@ package client.awt.components.tabs;
 import client.awt.components.tables.LiquiditySideRenderer;
 import client.awt.components.tables.LiquiditySideTableModel;
 import com.zygne.stockanalyzer.domain.model.LiquiditySide;
-import com.zygne.stockanalyzer.domain.model.enums.TimeFrame;
+import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 import com.zygne.stockanalyzer.domain.utils.StringUtils;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,12 +22,13 @@ public class LiquiditySideTab extends JPanel {
     private Callback callback;
     private LiquiditySideTableModel liquiditySideTableModel;
     private JComboBox comboTimeFrame;
-    private TextField textFieldPrice;
+    private TextField textFieldPriceMin;
+    private TextField textFieldPriceMax;
     private TextField textFieldPercentile;
     private JSlider sliderWickSize;
     private JTable table;
 
-    private List<TimeFrame> timeFrameList = new ArrayList<>();
+    private List<TimeInterval> timeIntervalList = new ArrayList<>();
 
     public LiquiditySideTab() {
 
@@ -51,31 +54,37 @@ public class LiquiditySideTab extends JPanel {
 
         JLabel labelSymbol = new JLabel("Price");
 
-        textFieldPrice = new TextField();
-        textFieldPrice.setColumns(12);
+        textFieldPriceMin = new TextField();
+        textFieldPriceMin.setColumns(12);
 
         constraints.gridx = 1;
         constraints.gridy = 0;
-        controlPanel.add(labelSymbol, constraints);
+        controlPanel.add(new JLabel("Price Min"), constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 1;
-        controlPanel.add(textFieldPrice, constraints);
+        controlPanel.add(textFieldPriceMin, constraints);
+
+        textFieldPriceMax = new TextField();
+        textFieldPriceMax.setColumns(12);
+
+        constraints.gridx = 2;
+        constraints.gridy = 0;
+        controlPanel.add(new JLabel("Price Max"), constraints);
+
+        constraints.gridx = 2;
+        constraints.gridy = 1;
+        controlPanel.add(textFieldPriceMax, constraints);
 
         JLabel labelTimeFrame = new JLabel("Time Frame");
-        constraints.gridx = 2;
+        constraints.gridx = 3;
         constraints.gridy = 0;
         controlPanel.add(labelTimeFrame, constraints);
 
         comboTimeFrame = new JComboBox();
-        constraints.gridx = 2;
+        constraints.gridx = 3;
         constraints.gridy = 1;
         controlPanel.add(comboTimeFrame, constraints);
-
-        JLabel labelWickSize = new JLabel("Min Wick Size (%)");
-        constraints.gridx = 3;
-        constraints.gridy = 0;
-        controlPanel.add(labelWickSize, constraints);
 
         sliderWickSize = new JSlider(5, 55, 15);
         sliderWickSize.setPaintTrack(true);
@@ -84,7 +93,18 @@ public class LiquiditySideTab extends JPanel {
         sliderWickSize.setMajorTickSpacing(10);
         sliderWickSize.setMinorTickSpacing(5);
 
-        constraints.gridx = 3;
+        final JLabel labelWickSize = new JLabel("Min Wick Size : " + sliderWickSize.getValue() + "%");
+        constraints.gridx = 4;
+        constraints.gridy = 0;
+        controlPanel.add(labelWickSize, constraints);
+
+        sliderWickSize.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent ce) {
+                labelWickSize.setText("Min Wick Size : " + sliderWickSize.getValue() + "%");
+            }
+        });
+
+        constraints.gridx = 4;
         constraints.gridy = 1;
         controlPanel.add(sliderWickSize, constraints);
 
@@ -113,11 +133,11 @@ public class LiquiditySideTab extends JPanel {
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
 
-    public void setTimeFrames(List<TimeFrame> data, int defaultSelection) {
-        timeFrameList.clear();
-        timeFrameList.addAll(data);
+    public void setTimeFrames(List<TimeInterval> data, int defaultSelection) {
+        timeIntervalList.clear();
+        timeIntervalList.addAll(data);
         if (comboTimeFrame != null) {
-            for (TimeFrame e : timeFrameList) {
+            for (TimeInterval e : timeIntervalList) {
                 comboTimeFrame.addItem(e);
             }
             comboTimeFrame.setSelectedIndex(defaultSelection);
@@ -128,6 +148,13 @@ public class LiquiditySideTab extends JPanel {
         liquiditySideTableModel.clear();
         liquiditySideTableModel.addItems(data);
         liquiditySideTableModel.fireTableDataChanged();
+        table.invalidate();
+    }
+
+    public void clear(){
+        liquiditySideTableModel.clear();
+        liquiditySideTableModel.fireTableDataChanged();
+        table.invalidate();
     }
 
     public void setCallback(Callback callback){
@@ -145,21 +172,27 @@ public class LiquiditySideTab extends JPanel {
                 percentile = Double.parseDouble(textFieldPercentile.getText());
             }
 
-            double price = -1;
+            double priceMin = -1;
 
-            if (StringUtils.idDouble(textFieldPrice.getText())) {
-                price = Double.parseDouble(textFieldPrice.getText());
+            if (StringUtils.idDouble(textFieldPriceMin.getText())) {
+                priceMin = Double.parseDouble(textFieldPriceMin.getText());
+            }
+
+            double priceMax = -1;
+
+            if (StringUtils.idDouble(textFieldPriceMax.getText())) {
+                priceMax = Double.parseDouble(textFieldPriceMax.getText());
             }
 
             double size = sliderWickSize.getValue();
 
-            TimeFrame timeFrame = timeFrameList.get(comboTimeFrame.getSelectedIndex());
+            TimeInterval timeInterval = timeIntervalList.get(comboTimeFrame.getSelectedIndex());
 
-            callback.findLiquiditySides(timeFrame, size, percentile, price);
+            callback.findLiquiditySides(timeInterval, size, percentile, priceMin, priceMax);
         }
     }
 
     public interface Callback{
-        void findLiquiditySides(TimeFrame timeFrame, double size, double percentile, double price);
+        void findLiquiditySides(TimeInterval timeInterval, double size, double percentile, double priceMin, double priceMax);
     }
 }

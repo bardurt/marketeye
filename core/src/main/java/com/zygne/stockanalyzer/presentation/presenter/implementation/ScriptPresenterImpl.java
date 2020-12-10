@@ -3,14 +3,12 @@ package com.zygne.stockanalyzer.presentation.presenter.implementation;
 import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.interactor.base.Interactor;
-import com.zygne.stockanalyzer.domain.interactor.implementation.charting.ChartLineInteractor;
-import com.zygne.stockanalyzer.domain.interactor.implementation.charting.ChartZoneInteractor;
-import com.zygne.stockanalyzer.domain.interactor.implementation.charting.ChartZoneInteractorImpl;
-import com.zygne.stockanalyzer.domain.interactor.implementation.charting.ResistanceChartLineInteractor;
+import com.zygne.stockanalyzer.domain.interactor.implementation.charting.*;
 import com.zygne.stockanalyzer.domain.interactor.implementation.scripting.PineScript2Interactor;
 import com.zygne.stockanalyzer.domain.interactor.implementation.scripting.ScriptInteractor;
 import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
 import com.zygne.stockanalyzer.domain.model.LiquiditySide;
+import com.zygne.stockanalyzer.domain.model.PriceGap;
 import com.zygne.stockanalyzer.domain.model.graphics.ChartObject;
 import com.zygne.stockanalyzer.presentation.presenter.base.BasePresenter;
 import com.zygne.stockanalyzer.presentation.presenter.base.ScriptPresenter;
@@ -28,11 +26,10 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
     private List<LiquidityLevel> resistance;
     private List<LiquidityLevel> support;
     private List<LiquiditySide> liquiditySides;
+    private List<PriceGap> gapList;
     private final List<ChartObject> chartObjects = new ArrayList<>();
     private String symbol;
 
-    private boolean createResistance = false;
-    private boolean createSides = false;
     private String scriptTitle = "";
 
     public ScriptPresenterImpl(Executor executor, MainThread mainThread, View view) {
@@ -51,58 +48,57 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
     }
 
     @Override
+    public void setGaps(List<PriceGap> gaps) {
+        this.gapList = gaps;
+    }
+
+    @Override
     public void setSymbol(String symbol) {
         this.symbol = symbol;
     }
 
     @Override
-    public void createScript(boolean resistance, boolean zones) {
-        this.createResistance = resistance;
-        this.createSides = zones;
+    public void createScript(boolean resistance, boolean zones, boolean gaps) {
         this.chartObjects.clear();
         this.scriptTitle = "";
 
-        if(!createResistance && !createSides){
-            view.showError("Resistance or Sides must be added to script!");
-            return;
-        }
+        Interactor interactor = null;
 
-        Interactor interactor;
-
-        if(createSides){
-            if(liquiditySides == null){
+        if (zones) {
+            if (liquiditySides == null) {
                 view.showError("Sides not calculated");
                 return;
             }
             scriptTitle += "Sides";
-            interactor = new ChartZoneInteractorImpl(this, liquiditySides);
-        } else {
-            if(this.resistance == null){
+            interactor = new ChartZoneInteractorImpl(executor, mainThread, this, liquiditySides);
+        } else if (resistance) {
+            if (this.resistance == null) {
                 view.showError("Resistance not calculated");
                 return;
             }
             scriptTitle += "Resistance";
             interactor = new ResistanceChartLineInteractor(executor, mainThread, this, this.resistance);
+        } else if (gaps) {
+            if (this.gapList == null) {
+                view.showError("Resistance not calculated");
+                return;
+            }
+            scriptTitle += "Gaps";
+            interactor = new PriceGapZoneInteractor(executor, mainThread, this, this.gapList);
+
         }
 
-        view.showError("");
-        view.showLoading("Creating Script...");
-
-        interactor.execute();
+        if (interactor != null) {
+            view.showError("");
+            view.showLoading("Creating Script...");
+            interactor.execute();
+        }
     }
 
     @Override
     public void onChartZoneCreated(List<ChartObject> zones) {
         chartObjects.addAll(zones);
-
-        Interactor interactor;
-        if(this.createResistance) {
-            interactor = new ResistanceChartLineInteractor(executor, mainThread, this, resistance);
-        } else {
-            interactor = new PineScript2Interactor(executor, mainThread, this, scriptTitle, symbol, chartObjects);
-        }
-
-        interactor.execute();
+        new PineScript2Interactor(executor, mainThread, this, scriptTitle, symbol, chartObjects).execute();
     }
 
     @Override

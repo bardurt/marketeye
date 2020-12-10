@@ -57,7 +57,11 @@ public class PineScript2Interactor extends BaseInteractor implements ScriptInter
         int id = 0;
         for (ChartObject o : data) {
             stringBuilder.append("\n");
+
             id++;
+
+            stringBuilder.append("// --- " + id  + " ---");
+            stringBuilder.append("\n");
             if (o instanceof ChartLine) {
                 stringBuilder.append(plotLine((ChartLine) o));
             }
@@ -101,7 +105,6 @@ public class PineScript2Interactor extends BaseInteractor implements ScriptInter
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        String script = "";
         String name1 = "h" + id + "_1";
         String name2 = "h" + id + "_2";
 

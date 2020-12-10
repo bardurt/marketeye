@@ -4,6 +4,7 @@ import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.interactor.base.BaseInteractor;
 import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.DataMergeInteractor;
+import com.zygne.stockanalyzer.domain.model.BarData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,11 +12,11 @@ import java.util.List;
 public class DataMergeInteractorImpl extends BaseInteractor implements DataMergeInteractor {
 
     private final Callback callback;
-    private final List<String> dataNew;
-    private final List<String > dataOld;
+    private final List<BarData> dataNew;
+    private final List<BarData > dataOld;
 
 
-    public DataMergeInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<String> dataNew, List<String> dataOld) {
+    public DataMergeInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<BarData> dataNew, List<BarData> dataOld) {
         super(executor, mainThread);
         this.callback = callback;
         this.dataNew = dataNew;
@@ -29,34 +30,12 @@ public class DataMergeInteractorImpl extends BaseInteractor implements DataMerge
             return;
         }
 
-
-        String latestEntry = dataOld.get(0);
-
-        String timeStamp1 = latestEntry.split(",",-1)[0];
-
-        int splitPoint = -1;
-
-        for(int i = 0; i < dataNew.size(); i++){
-            String timeStamp2 = dataNew.get(i).split(",",-1)[0];
-
-            if(timeStamp1.equalsIgnoreCase(timeStamp2)){
-                splitPoint = i;
-                break;
-            }
+        for(BarData d : dataNew){
+           if(!dataOld.contains(d)){
+               dataOld.add(d);
+           }
         }
 
-        List<String> mergedData = new ArrayList<>();
-
-        if(splitPoint > -1){
-
-            for(int i = 0; i < splitPoint; i++){
-
-                mergedData.add(dataNew.get(i));
-            }
-        }
-
-        mergedData.addAll(dataOld);
-
-        mainThread.post(() -> callback.onDataMerged(mergedData));
+        mainThread.post(() -> callback.onDataMerged(dataOld));
     }
 }

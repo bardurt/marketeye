@@ -2,6 +2,8 @@ package client.awt.components.tabs;
 
 import client.awt.components.tables.LiquidityLevelRenderer;
 import client.awt.components.tables.LiquidityLevelTableModel;
+import client.awt.components.views.FundamentalsView;
+import com.zygne.stockanalyzer.domain.model.Fundamentals;
 import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
 
 import javax.swing.*;
@@ -12,15 +14,18 @@ import java.util.List;
 public class PriceAnalysisTab extends JPanel {
 
     private LiquidityLevelTableModel tableModelResistance;
-    private LiquidityLevelTableModel tableModelSupport;
     private JTable tableResistance;
-    private JTable tableSupport;
     private JScrollPane scrollResistance;
-    private JScrollPane scrollSupport;
+    private FundamentalsView fundamentalsView;
 
     public PriceAnalysisTab(){
-        setLayout(new GridLayout(1,1));
+        setLayout(new BorderLayout());
 
+        fundamentalsView = new FundamentalsView();
+
+        add(fundamentalsView, BorderLayout.NORTH);
+
+        JPanel tablesPanel = new JPanel(new GridLayout(1,1));
         JPanel resistancePanel = new JPanel(new BorderLayout());
 
         resistancePanel.add(new JLabel("Resistance"), BorderLayout.NORTH);
@@ -33,43 +38,32 @@ public class PriceAnalysisTab extends JPanel {
         scrollResistance = new JScrollPane(tableResistance);
         scrollResistance.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         resistancePanel.add(scrollResistance, BorderLayout.CENTER);
-        add(resistancePanel);
+        tablesPanel.add(resistancePanel);
 
-        JPanel supportPanel = new JPanel(new BorderLayout());
-        supportPanel.add(new JLabel("Support"), BorderLayout.NORTH);
-
-        tableModelSupport = new LiquidityLevelTableModel();
-        tableSupport = new JTable(tableModelSupport);
-        tableSupport.setDefaultRenderer(LiquidityLevel.class, new LiquidityLevelRenderer());
-        tableSupport.setDefaultRenderer(String.class, new LiquidityLevelRenderer());
-
-        scrollSupport = new JScrollPane(tableSupport);
-        scrollSupport.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        supportPanel.add(scrollSupport, BorderLayout.CENTER);
-
-        add(supportPanel);
+        add(tablesPanel, BorderLayout.CENTER);
     }
 
     public void addResistance(List<LiquidityLevel> data){
+        fundamentalsView.clear();
         if (tableResistance != null) {
             tableModelResistance.clear();
             tableModelResistance.addItems(data);
             tableModelResistance.fireTableDataChanged();
             scrollResistance.invalidate();
+            tableResistance.invalidate();
         }
     }
 
     public void addSupport(List<LiquidityLevel> data){
-        if (tableSupport != null) {
-            tableModelSupport.clear();
-            tableModelSupport.addItems(data);
-            tableModelSupport.fireTableDataChanged();
-            scrollSupport.invalidate();
-        }
+    }
+
+    public void addFundamentals(Fundamentals fundamentals){
+        fundamentalsView.populateFrom(fundamentals);
     }
 
     public void reset(){
-
+        fundamentalsView.clear();
     }
+
 
 }

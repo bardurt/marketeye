@@ -13,27 +13,47 @@ public class LiquiditySidePriceInteractorImpl extends BaseInteractor implements 
 
     private Callback callback;
     private List<LiquiditySide> data;
-    private double price;
+    private double priceMin;
+    private double priceMax;
 
-    public LiquiditySidePriceInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<LiquiditySide> data, double price) {
+
+    public LiquiditySidePriceInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<LiquiditySide> data, double priceMin, double priceMax) {
         super(executor, mainThread);
         this.callback = callback;
         this.data = data;
-        this.price = price;
+        this.priceMin = priceMin;
+        this.priceMax = priceMax;
     }
 
     @Override
     public void run() {
+
+        if (priceMax <= 0) {
+            priceMax = Double.MAX_VALUE;
+        }
 
         List<LiquiditySide> filtered = new ArrayList<>();
 
         for (int i = 0; i < data.size(); i++) {
             LiquiditySide e = data.get(i);
 
-            if (e.inZone(price)){
+            boolean added = false;
+            if (e.inZone(priceMin) || e.inZone(priceMax)) {
                 filtered.add(e);
+                added = true;
             }
+
+            if (!added) {
+                if (e.start > priceMin) {
+                    if (e.end <= priceMax) {
+                        filtered.add(e);
+                        added = true;
+                    }
+                }
+            }
+
         }
+
 
         mainThread.post(() -> callback.onLiquiditySideForPriceFound(filtered));
 

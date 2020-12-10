@@ -4,6 +4,7 @@ import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.interactor.base.BaseInteractor;
 import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.CacheReadInteractor;
+import com.zygne.stockanalyzer.domain.model.BarData;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,7 +25,7 @@ public class CacheReadInteractorImpl extends BaseInteractor implements CacheRead
 
     @Override
     public void run() {
-        List<String> data = new ArrayList<>();
+        List<BarData> data = new ArrayList<>();
 
         File file;
         FileReader fileReader = null;
@@ -42,15 +43,20 @@ public class CacheReadInteractorImpl extends BaseInteractor implements CacheRead
                 String line;
                 int count = 0;
                 while ((line = br.readLine()) != null) {
-                    if(count == 0){
+                    if (count == 0) {
                         try {
                             timeStamp = Long.parseLong(line);
-                        } catch (Exception ignored){}
+                        } catch (Exception ignored) {
+                        }
 
                     }
 
-                    if(count > 0) {
-                        data.add(line);
+                    if (count > 0) {
+                        BarData barData = BarData.fromStream(line);
+
+                        if (barData != null) {
+                            data.add(barData);
+                        }
                     }
                     count++;
                 }

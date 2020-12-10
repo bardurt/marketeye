@@ -1,6 +1,6 @@
 package com.zygne.stockanalyzer.domain.model.enums;
 
-public enum TimeFrame {
+public enum TimeInterval {
     One_Minute("1 Minute"),
     Three_Minutes("3 Minutes"),
     Five_Minutes("5 Minutes"),
@@ -13,7 +13,7 @@ public enum TimeFrame {
 
     private final String label;
 
-    TimeFrame(String label) {
+    TimeInterval(String label) {
         this.label = label;
     }
 

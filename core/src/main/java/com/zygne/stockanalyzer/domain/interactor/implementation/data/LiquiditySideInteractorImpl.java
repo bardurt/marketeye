@@ -39,6 +39,8 @@ public class LiquiditySideInteractorImpl extends BaseInteractor implements Liqui
 
 
         for (CandleStick e : sticks) {
+
+
             double change = ((e.top - e.bottom) / e.bottom) * 100;
 
             if (change > MIN_CHANGE) {

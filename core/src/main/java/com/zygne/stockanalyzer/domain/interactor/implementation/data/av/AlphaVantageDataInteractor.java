@@ -1,11 +1,11 @@
-package com.zygne.stockanalyzer.domain.interactor.implementation.data;
+package com.zygne.stockanalyzer.domain.interactor.implementation.data.av;
 
 import com.zygne.stockanalyzer.domain.exceptions.ApiCallExceededException;
 import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.interactor.base.BaseInteractor;
 import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.DataFetchInteractor;
-import com.zygne.stockanalyzer.domain.model.enums.TimeFrame;
+import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,16 +28,16 @@ public class AlphaVantageDataInteractor extends BaseInteractor implements DataFe
     private static final long TIME_TO_SLEEP = 15000;
     private final Callback callback;
     private final String ticker;
-    private final TimeFrame timeFrame;
+    private final TimeInterval timeInterval;
     private final int monthsToFetch;
     private final String apiKey;
     private int failures = 0;
 
-    public AlphaVantageDataInteractor(Executor executor, MainThread mainThread, Callback callback, String ticker, TimeFrame timeFrame, int monthsToFetch, String apiKey) {
+    public AlphaVantageDataInteractor(Executor executor, MainThread mainThread, Callback callback, String ticker, TimeInterval timeInterval, int monthsToFetch, String apiKey) {
         super(executor, mainThread);
         this.callback = callback;
         this.ticker = ticker;
-        this.timeFrame = timeFrame;
+        this.timeInterval = timeInterval;
         this.monthsToFetch = monthsToFetch;
         this.apiKey = apiKey;
     }
@@ -47,19 +47,19 @@ public class AlphaVantageDataInteractor extends BaseInteractor implements DataFe
 
         String interval = null;
 
-        if (timeFrame == TimeFrame.One_Minute) {
+        if (timeInterval == TimeInterval.One_Minute) {
             interval = "1min";
-        } else if (timeFrame == TimeFrame.Three_Minutes) {
+        } else if (timeInterval == TimeInterval.Three_Minutes) {
             interval = "3min";
-        } else if (timeFrame == TimeFrame.Five_Minutes) {
+        } else if (timeInterval == TimeInterval.Five_Minutes) {
             interval = "5min";
-        } else if (timeFrame == TimeFrame.Fifteen_Minutes) {
+        } else if (timeInterval == TimeInterval.Fifteen_Minutes) {
             interval = "15min";
-        } else if (timeFrame == TimeFrame.Thirty_Minutes) {
+        } else if (timeInterval == TimeInterval.Thirty_Minutes) {
             interval = "30min";
-        } else if (timeFrame == TimeFrame.Hour) {
+        } else if (timeInterval == TimeInterval.Hour) {
             interval = "60min";
-        } else if (timeFrame == TimeFrame.Day) {
+        } else if (timeInterval == TimeInterval.Day) {
             interval = null;
         }
 
@@ -72,9 +72,9 @@ public class AlphaVantageDataInteractor extends BaseInteractor implements DataFe
 
             String timeSeries = TIME_SERIES_DAILY;
 
-            if (timeFrame == TimeFrame.Week) {
+            if (timeInterval == TimeInterval.Week) {
                 timeSeries = TIME_SERIES_WEEKLY;
-            } else if(timeFrame == TimeFrame.Month){
+            } else if(timeInterval == TimeInterval.Month){
                 timeSeries = TIME_SERIES_MONTHLY;
             }
 
@@ -84,7 +84,7 @@ public class AlphaVantageDataInteractor extends BaseInteractor implements DataFe
         if (lines.isEmpty()) {
             mainThread.post(() -> callback.onDataFetchError("Unable to download data for " + ticker));
         } else {
-            mainThread.post(() -> callback.onDataFetched(lines));
+            mainThread.post(() -> callback.onDataFetched(lines, ""));
         }
     }
 

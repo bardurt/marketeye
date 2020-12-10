@@ -27,6 +27,7 @@ public class LiquiditySideRenderer extends JLabel implements TableCellRenderer {
         setText((String) value);
 
         setForeground(Color.BLACK);
+        setBackground(Color.WHITE);
         if(buy){
             if(strong){
                 setBackground(Color.decode(Colors.COLOR_GREEN_DARK));

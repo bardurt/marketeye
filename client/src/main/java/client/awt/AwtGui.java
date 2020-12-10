@@ -3,25 +3,19 @@ package client.awt;
 import client.Constants;
 import client.awt.components.LoadingView;
 import client.awt.components.tabs.*;
+import com.zygne.stockanalyzer.domain.DataBroker;
 import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.executor.ThreadExecutor;
-import com.zygne.stockanalyzer.domain.model.Fundamentals;
-import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
-import com.zygne.stockanalyzer.domain.model.LiquiditySide;
-import com.zygne.stockanalyzer.domain.model.Settings;
-import com.zygne.stockanalyzer.domain.model.enums.TimeFrame;
-import com.zygne.stockanalyzer.presentation.presenter.base.LiquiditySidePresenter;
-import com.zygne.stockanalyzer.presentation.presenter.base.MainPresenter;
-import com.zygne.stockanalyzer.presentation.presenter.base.ScriptPresenter;
-import com.zygne.stockanalyzer.presentation.presenter.base.SettingsPresenter;
-import com.zygne.stockanalyzer.presentation.presenter.implementation.LiquiditySidePresenterImpl;
-import com.zygne.stockanalyzer.presentation.presenter.implementation.MainPresenterImpl;
-import com.zygne.stockanalyzer.presentation.presenter.implementation.ScriptPresenterImpl;
-import com.zygne.stockanalyzer.presentation.presenter.implementation.SettingsPresenterImpl;
+import com.zygne.stockanalyzer.domain.model.*;
+import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
+import com.zygne.stockanalyzer.presentation.presenter.base.*;
+import com.zygne.stockanalyzer.presentation.presenter.implementation.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
@@ -33,10 +27,14 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         LiquiditySideTab.Callback,
         ScriptTab.Callback {
 
+    private DataBroker dataBroker;
+
     private JLabel labelSymbol;
     private JLabel labelStatus;
     private JLabel labelLoading;
     private LoadingView loadingView;
+
+    private JButton jButtonConnect;
 
     private String symbol;
 
@@ -50,6 +48,7 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     private MainTab mainTab;
     private LiquiditySideTab liquiditySideTab;
     private FundamentalsTab fundamentalsTab;
+    private PriceGapTab priceGapTab;
     private ScriptTab scriptTab;
 
     public AwtGui() {
@@ -62,6 +61,7 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         mainTab.setCallback(this);
         liquiditySideTab = new LiquiditySideTab();
         liquiditySideTab.setCallback(this);
+        priceGapTab = new PriceGapTab();
         fundamentalsTab = new FundamentalsTab();
         scriptTab = new ScriptTab();
         scriptTab.setCallback(this);
@@ -77,8 +77,11 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         tabbedPane.addTab("Buy / Sell Side", liquiditySideTab);
         tabbedPane.setMnemonicAt(2, KeyEvent.VK_4);
 
-        tabbedPane.addTab("Script", scriptTab);
+        tabbedPane.addTab("Price Gaps", priceGapTab);
         tabbedPane.setMnemonicAt(3, KeyEvent.VK_5);
+
+        tabbedPane.addTab("Script", scriptTab);
+        tabbedPane.setMnemonicAt(4, KeyEvent.VK_6);
 
         JPanel infoPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -109,6 +112,14 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         statusPanel.add(labelStatus, BorderLayout.WEST);
         statusPanel.add(new JLabel(Constants.VERSION_NAME), BorderLayout.EAST);
 
+        jButtonConnect = new JButton("Connect");
+        jButtonConnect.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                connect();
+            }
+        });
+
+        statusPanel.add(jButtonConnect, BorderLayout.SOUTH);
         add(statusPanel, BorderLayout.SOUTH);
 
         new SettingsPresenterImpl(executor, mainThread, this).start();
@@ -122,9 +133,9 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onResistanceFound(List<LiquidityLevel> zones) {
-        if (priceAnalysisTab != null) {
-            priceAnalysisTab.addResistance(zones);
-        }
+        priceAnalysisTab.addResistance(zones);
+        liquiditySideTab.clear();
+        priceGapTab.clear();
 
         scriptPresenter.setResistance(zones);
     }
@@ -143,7 +154,7 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onFundamentalsLoaded(Fundamentals fundamentals) {
-
+        priceAnalysisTab.addFundamentals(fundamentals);
     }
 
     @Override
@@ -156,19 +167,29 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     }
 
     @Override
-    public void onTimeFramesPrepared(List<TimeFrame> timeFrames, int defaultSelection) {
-        mainTab.setTimeFrames(timeFrames, defaultSelection);
-        liquiditySideTab.setTimeFrames(timeFrames, defaultSelection);
+    public void onTimeFramesPrepared(List<TimeInterval> timeIntervals, int defaultSelection) {
+        mainTab.setTimeFrames(timeIntervals, defaultSelection);
+        liquiditySideTab.setTimeFrames(timeIntervals, defaultSelection);
     }
 
     @Override
-    public void onDataSizePrepared(List<Integer> data, int defaultSelection) {
+    public void onDataSizePrepared(List<DataLength> data, int defaultSelection) {
         mainTab.setDataSize(data, defaultSelection);
     }
 
     @Override
     public void onStatusUpdate(String status) {
         labelStatus.setText(status);
+    }
+
+    @Override
+    public void onConnected() {
+        jButtonConnect.setText("Disconnect");
+    }
+
+    @Override
+    public void onDisconnected() {
+        jButtonConnect.setText("Connect");
     }
 
     @Override
@@ -179,8 +200,9 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     @Override
     public void onSettingsLoaded(Settings settings) {
         if (mainTab != null) {
-            mainTab.setApiKey(settings.getApiKey());
+            mainTab.setSettings(settings);
         }
+
         mainPresenter = new MainPresenterImpl(executor, mainThread, this, settings);
         liquiditySidePresenter = new LiquiditySidePresenterImpl(executor, mainThread, this, settings);
         scriptPresenter = new ScriptPresenterImpl(executor, mainThread, this);
@@ -202,25 +224,26 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     }
 
     @Override
-    public void generateReport(String symbol, double percentile, TimeFrame timeFrame, int dataSize, boolean fundamentals) {
+    public void generateReport(String symbol, double percentile, TimeInterval timeInterval, int dataSize, boolean fundamentals) {
         if (mainPresenter != null) {
-            mainPresenter.getZones(symbol, percentile, timeFrame, dataSize, fundamentals);
+            mainPresenter.getZones(symbol, percentile, timeInterval, dataSize, fundamentals);
         }
     }
 
     @Override
-    public void findLiquiditySides(TimeFrame timeFrame, double size, double percentile, double price) {
+    public void findLiquiditySides(TimeInterval timeInterval, double size, double percentile, double priceMin, double priceMax) {
         if (liquiditySidePresenter != null) {
-            liquiditySidePresenter.getSides(symbol, timeFrame, size, percentile, price);
+            liquiditySidePresenter.getSides(symbol, timeInterval, size, percentile, priceMin, priceMax);
         }
     }
 
     @Override
-    public void generateScript(boolean resistance, boolean sides) {
+    public void generateScript(boolean resistance, boolean sides, boolean gaps) {
         if (scriptPresenter != null) {
-            scriptPresenter.createScript(resistance, sides);
+            scriptPresenter.createScript(resistance, sides, gaps);
         }
     }
+
 
     public void launch(String args[]) {
         JFrame frame = new JFrame(Constants.APP_NAME);
@@ -230,5 +253,20 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
         frame.pack();
         frame.setVisible(true);
+    }
+
+    @Override
+    public void onPriceGapsFound(List<PriceGap> data) {
+        if(priceGapTab != null){
+            priceGapTab.addPriceGaps(data);
+        }
+
+        scriptPresenter.setGaps(data);
+    }
+
+    private void connect(){
+        if(mainPresenter != null) {
+            mainPresenter.toggleConnection();
+        }
     }
 }
