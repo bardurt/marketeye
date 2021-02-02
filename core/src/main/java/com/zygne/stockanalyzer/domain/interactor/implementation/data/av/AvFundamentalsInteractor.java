@@ -13,12 +13,12 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class AlphaVantageFundamentalsInteractor extends BaseInteractor implements FundamentalsInteractor {
+public class AvFundamentalsInteractor extends BaseInteractor implements FundamentalsInteractor {
     private final Callback callback;
     private final String ticker;
     private final String apiKey;
 
-    public AlphaVantageFundamentalsInteractor(Executor executor, MainThread mainThread, Callback callback, String ticker, String apiKey) {
+    public AvFundamentalsInteractor(Executor executor, MainThread mainThread, Callback callback, String ticker, String apiKey) {
         super(executor, mainThread);
         this.callback = callback;
         this.ticker = ticker;
@@ -74,6 +74,8 @@ public class AlphaVantageFundamentalsInteractor extends BaseInteractor implement
         Gson gson = new Gson();
 
         Fundamentals fundamentals = gson.fromJson(body.toString(), Fundamentals.class);
+
+        fundamentals.calculate();
 
         mainThread.post(() -> callback.onFundamentalsFetched(fundamentals));
 

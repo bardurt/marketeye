@@ -5,6 +5,7 @@ import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.interactor.implementation.SettingsInteractor;
 import com.zygne.stockanalyzer.domain.interactor.implementation.SettingsInteractorImpl;
 import com.zygne.stockanalyzer.domain.model.Settings;
+import com.zygne.stockanalyzer.domain.model.enums.DataProvider;
 import com.zygne.stockanalyzer.presentation.presenter.base.BasePresenter;
 import com.zygne.stockanalyzer.presentation.presenter.base.SettingsPresenter;
 
@@ -22,6 +23,12 @@ public class SettingsPresenterImpl extends BasePresenter implements SettingsPres
     public void start() {
         view.showLoading("Loading Settings");
         new SettingsInteractorImpl(executor, mainThread, this).execute();
+    }
+
+    @Override
+    public void loadSettings(DataProvider dataProvider) {
+        view.showLoading("Loading Settings");
+        new SettingsInteractorImpl(executor, mainThread, this, dataProvider).execute();
     }
 
     @Override

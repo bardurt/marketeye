@@ -6,7 +6,6 @@ import com.zygne.stockanalyzer.domain.interactor.base.BaseInteractor;
 import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.DataMergeInteractor;
 import com.zygne.stockanalyzer.domain.model.BarData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DataMergeInteractorImpl extends BaseInteractor implements DataMergeInteractor {

@@ -1,38 +1,52 @@
 package com.zygne.stockanalyzer;
 
 import com.ib.client.*;
-import com.zygne.stockanalyzer.domain.DataBroker;
+import com.zygne.stockanalyzer.domain.api.DataBroker;
 import com.zygne.stockanalyzer.domain.model.BarData;
+import com.zygne.stockanalyzer.domain.model.DataSize;
+import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class IbDataBroker implements DataBroker, EWrapper {
 
+    private static final class Identifiers {
+        private static final int HISTORICAL_BAR_DATA = 4001;
+    }
+
+    private static final class Host {
+        private static final String IP = "127.0.0.1";
+        private static final int PORT = 7497;
+    }
+
+    private static final class Equity {
+        private static final String TYPE = "STK";
+        private static final String CURRENCY = "USD";
+        private static final String EXCHANGE = "ISLAND";
+    }
+
+    private static final class Format {
+        private static final int TRADING_HOURS = 0; // 0 for extending, 1 for regular
+        private static final int TIME_FORMAT = 1; // 1 for yyyyMMDD HH:mm:ss, 0 for UNIX
+        private static final String PRICES = "TRADES";
+        private static final boolean REAL_TIME = false;
+    }
+
+    private static final class ErrorCodes {
+        private static final int BAD_MESSAGE = 507;
+        private static final int CONNECTION_ERROR = 502;
+    }
+
+    private static final int SCALAR = 100;
     private EReaderSignal readerSignal;
     private EClientSocket clientSocket;
     private EReader reader;
-    protected int currentOrderId = -1;
 
-    private List<BarData> barDataList = new ArrayList<>();
+    private final List<BarData> barDataList = new ArrayList<>();
 
     private ConnectionListener connectionListener;
     private Callback callback;
-
-    //! [socket_init]
-    public EClientSocket getClient() {
-        return clientSocket;
-    }
-
-    public EReaderSignal getSignal() {
-        return readerSignal;
-    }
-
-    public int getCurrentOrderId() {
-        return currentOrderId;
-    }
 
     @Override
     public void setConnectionListener(ConnectionListener connectionListener) {
@@ -46,23 +60,20 @@ public class IbDataBroker implements DataBroker, EWrapper {
 
     @Override
     public void connect() {
-        System.out.println("Connecting");
         readerSignal = new EJavaSignal();
         clientSocket = new EClientSocket(this, readerSignal);
-        clientSocket.eConnect("127.0.0.1", 7497, 2);
+        clientSocket.eConnect(Host.IP, Host.PORT, 2);
 
         reader = new EReader(clientSocket, readerSignal);
 
         reader.start();
 
-        //An additional thread is created in this program design to empty the messaging queue
         new Thread(() -> {
             while (clientSocket.isConnected()) {
                 readerSignal.waitForSignal();
                 try {
                     reader.processMsgs();
-                } catch (Exception e) {
-                    System.out.println("Exception: " + e.getMessage());
+                } catch (Exception ignored) {
                 }
             }
         }).start();
@@ -88,25 +99,143 @@ public class IbDataBroker implements DataBroker, EWrapper {
     }
 
     @Override
-    public void downloadData(String symbol, String length, String interval) {
+    public void downloadHistoricalBarData(String symbol, DataSize dataSize, TimeInterval timeInterval) {
         barDataList.clear();
         Contract contract = new Contract();
-        contract.symbol(symbol.toUpperCase());
-        contract.secType("STK");
-        contract.currency("USD");
-        contract.exchange("ISLAND");
+        contract.symbol(symbol);
+        contract.secType(Equity.TYPE);
+        contract.currency(Equity.CURRENCY);
+        contract.exchange(Equity.EXCHANGE);
 
-        System.out.println(symbol + " " + interval + " " + length);
-        clientSocket.reqHistoricalData(4001, contract, "", length, interval, "TRADES", 1, 1, false, null);
+        String interval = "1 min";
 
+        switch (timeInterval) {
+            case One_Minute:
+                interval = "1 min";
+                break;
+            case Three_Minutes:
+                interval = "3 mins";
+                break;
+            case Five_Minutes:
+                interval = "5 mins";
+                break;
+            case Fifteen_Minutes:
+                interval = "15 mins";
+                break;
+            case Thirty_Minutes:
+                interval = "30 mins";
+                break;
+            case Hour:
+                interval = "1 hour";
+                break;
+            case Day:
+                interval = "1 day";
+                break;
+            case Week:
+                interval = "1 week";
+                break;
+            case Month:
+                interval = "1 month";
+                break;
+        }
+
+
+        String length = dataSize.getSize() + "";
+
+        if(dataSize.getUnit() == DataSize.Unit.Year){
+            length += " Y";
+        } else {
+            length += " D";
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        SimpleDateFormat form = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+        String formatted = form.format(cal.getTime());
+
+        System.out.println(formatted);
+
+        clientSocket.reqHistoricalData(Identifiers.HISTORICAL_BAR_DATA, contract, formatted, length, interval, Format.PRICES, Format.TRADING_HOURS, Format.TIME_FORMAT, Format.REAL_TIME, null);
+
+    }
+
+    @Override
+    public void nextValidId(int orderId) {
+        connectionListener.onApiConnected();
+    }
+
+    @Override
+    public void historicalData(int reqId, Bar bar) {
+        BarData b = new BarData(bar.time(), bar.open(), bar.high(), bar.low(), bar.close(), bar.volume() * SCALAR);
+        b.setDataFarm(BarData.DataFarm.INTERACTIVE_BROKERS);
+        barDataList.add(b);
+    }
+
+    @Override
+    public void histogramData(int reqId, List<HistogramEntry> items) {
+        for (HistogramEntry e : items) {
+            BarData b = new BarData("", e.price, e.price, e.price, e.price, e.size);
+            barDataList.add(b);
+        }
+    }
+
+    @Override
+    public void historicalDataEnd(int reqId, String startDateStr, String endDateStr) {
+        if (callback != null) {
+            callback.onDataFinished(barDataList);
+        }
+    }
+
+    @Override
+    public void error(int id, int errorCode, String errorMsg) {
+        System.out.println("Error. Id: " + id + ", Code: " + errorCode + ", Msg: " + errorMsg + "\n");
+
+        if (id == Identifiers.HISTORICAL_BAR_DATA) {
+            if (callback != null) {
+                callback.onDataFinished(barDataList);
+            }
+            return;
+        }
+
+        if (errorCode == ErrorCodes.BAD_MESSAGE) {
+            connectionListener.onApiDisconnected();
+            return;
+        }
+
+        if (errorCode == ErrorCodes.CONNECTION_ERROR) {
+            connectionListener.onApiDisconnected();
+            return;
+        }
+
+    }
+
+    @Override
+    public void error(String str) {
+        System.out.println("Error: " + str);
+    }
+
+    @Override
+    public void connectionClosed() {
+        if (connectionListener != null) {
+            connectionListener.onApiDisconnected();
+        }
+    }
+
+    @Override
+    public void connectAck() {
+        if (clientSocket.isAsyncEConnect()) {
+            clientSocket.startAPI();
+        }
     }
 
     @Override
     public void tickPrice(int tickerId, int field, double price, TickAttrib attribs) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void tickSize(int tickerId, int field, int size) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
@@ -118,10 +247,12 @@ public class IbDataBroker implements DataBroker, EWrapper {
 
     @Override
     public void tickGeneric(int tickerId, int tickType, double value) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void tickString(int tickerId, int tickType, String value) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
@@ -129,110 +260,106 @@ public class IbDataBroker implements DataBroker, EWrapper {
                         String formattedBasisPoints, double impliedFuture, int holdDays,
                         String futureLastTradeDate, double dividendImpact,
                         double dividendsToLastTradeDate) {
+        throw new RuntimeException("Stub");
     }
 
-    //! [orderstatus]
     @Override
     public void orderStatus(int orderId, String status, double filled,
                             double remaining, double avgFillPrice, int permId, int parentId,
                             double lastFillPrice, int clientId, String whyHeld, double mktCapPrice) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void openOrder(int orderId, Contract contract, Order order,
                           OrderState orderState) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void openOrderEnd() {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void updateAccountValue(String key, String value, String currency,
                                    String accountName) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void updatePortfolio(Contract contract, double position,
                                 double marketPrice, double marketValue, double averageCost,
                                 double unrealizedPNL, double realizedPNL, String accountName) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void updateAccountTime(String timeStamp) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void accountDownloadEnd(String accountName) {
-    }
-
-    @Override
-    public void nextValidId(int orderId) {
-        connectionListener.onApiConnected();
-        currentOrderId = orderId;
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void contractDetails(int reqId, ContractDetails contractDetails) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void bondContractDetails(int reqId, ContractDetails contractDetails) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void contractDetailsEnd(int reqId) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void execDetails(int reqId, Contract contract, Execution execution) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void execDetailsEnd(int reqId) {
-        System.out.println("ExecDetailsEnd. " + reqId + "\n");
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void updateMktDepth(int tickerId, int position, int operation,
                                int side, double price, int size) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void updateMktDepthL2(int tickerId, int position,
                                  String marketMaker, int operation, int side, double price, int size, boolean isSmartDepth) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void updateNewsBulletin(int msgId, int msgType, String message,
                                    String origExchange) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void managedAccounts(String accountsList) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void receiveFA(int faDataType, String xml) {
-    }
-
-    @Override
-    public void historicalData(int reqId, Bar bar) {
-        barDataList.add(new BarData(bar.time(), bar.open(), bar.high(), bar.low(), bar.close(), bar.volume()));
-    }
-
-    @Override
-    public void historicalDataEnd(int reqId, String startDateStr, String endDateStr) {
-
-        System.out.println("End    " + startDateStr + "  " + endDateStr);
-        System.out.println("Bars    " + barDataList.size());
-        if (callback != null) {
-            callback.onDataFinished(barDataList);
-        }
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void scannerParameters(String xml) {
+        throw new RuntimeException("Stub");
     }
 
     //! [scannerdata]
@@ -240,322 +367,281 @@ public class IbDataBroker implements DataBroker, EWrapper {
     public void scannerData(int reqId, int rank,
                             ContractDetails contractDetails, String distance, String benchmark,
                             String projection, String legsStr) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void scannerDataEnd(int reqId) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void realtimeBar(int reqId, long time, double open, double high,
                             double low, double close, long volume, double wap, int count) {
+        throw new RuntimeException("Stub");
     }
 
 
     @Override
     public void currentTime(long time) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void fundamentalData(int reqId, String data) {
+        throw new RuntimeException("Stub");
     }
 
-    //! [fundamentaldata]
     @Override
     public void deltaNeutralValidation(int reqId, DeltaNeutralContract deltaNeutralContract) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void tickSnapshotEnd(int reqId) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void marketDataType(int reqId, int marketDataType) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void commissionReport(CommissionReport commissionReport) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void position(String account, Contract contract, double pos,
                          double avgCost) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void positionEnd() {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void accountSummary(int reqId, String account, String tag,
                                String value, String currency) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void accountSummaryEnd(int reqId) {
+        throw new RuntimeException("Stub");
     }
 
-    //! [accountsummaryend]
     @Override
     public void verifyMessageAPI(String apiData) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void verifyCompleted(boolean isSuccessful, String errorText) {
-        System.out.println("verifyCompleted");
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void verifyAndAuthMessageAPI(String apiData, String xyzChallenge) {
-        System.out.println("verifyAndAuthMessageAPI");
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void verifyAndAuthCompleted(boolean isSuccessful, String errorText) {
-        System.out.println("verifyAndAuthCompleted");
+        throw new RuntimeException("Stub");
     }
 
     //! [displaygrouplist]
     @Override
     public void displayGroupList(int reqId, String groups) {
-        System.out.println("Display Group List. ReqId: " + reqId + ", Groups: " + groups + "\n");
+        throw new RuntimeException("Stub");
     }
-    //! [displaygrouplist]
 
-    //! [displaygroupupdated]
     @Override
     public void displayGroupUpdated(int reqId, String contractInfo) {
+        throw new RuntimeException("Stub");
     }
 
-    //! [displaygroupupdated]
     @Override
     public void error(Exception e) {
-        System.out.println("Exception: " + e.getMessage());
+        connectionListener.onApiDisconnected();
     }
 
-    @Override
-    public void error(String str) {
-        System.out.println("Error STR");
-    }
 
-    //! [error]
-    @Override
-    public void error(int id, int errorCode, String errorMsg) {
-        System.out.println("Error. Id: " + id + ", Code: " + errorCode + ", Msg: " + errorMsg + "\n");
-    }
-
-    //! [error]
-    @Override
-    public void connectionClosed() {
-        if (connectionListener != null) {
-            connectionListener.onApiDisconnected();
-        }
-    }
-
-    //! [connectack]
-    @Override
-    public void connectAck() {
-        if (clientSocket.isAsyncEConnect()) {
-            clientSocket.startAPI();
-        }
-    }
-    //! [connectack]
-
-    //! [positionmulti]
     @Override
     public void positionMulti(int reqId, String account, String modelCode,
                               Contract contract, double pos, double avgCost) {
-        System.out.println("Position Multi. Request: " + reqId + ", Account: " + account + ", ModelCode: " + modelCode + ", Symbol: " + contract.symbol() + ", SecType: " + contract.secType() + ", Currency: " + contract.currency() + ", Position: " + pos + ", Avg cost: " + avgCost + "\n");
+        throw new RuntimeException("Stub");
     }
-    //! [positionmulti]
 
-    //! [positionmultiend]
     @Override
     public void positionMultiEnd(int reqId) {
-        System.out.println("Position Multi End. Request: " + reqId + "\n");
+        throw new RuntimeException("Stub");
     }
-    //! [positionmultiend]
 
-    //! [accountupdatemulti]
     @Override
     public void accountUpdateMulti(int reqId, String account, String modelCode,
                                    String key, String value, String currency) {
-        System.out.println("Account Update Multi. Request: " + reqId + ", Account: " + account + ", ModelCode: " + modelCode + ", Key: " + key + ", Value: " + value + ", Currency: " + currency + "\n");
+        throw new RuntimeException("Stub");
     }
-    //! [accountupdatemulti]
 
-    //! [accountupdatemultiend]
     @Override
     public void accountUpdateMultiEnd(int reqId) {
-        System.out.println("Account Update Multi End. Request: " + reqId + "\n");
+        throw new RuntimeException("Stub");
     }
-    //! [accountupdatemultiend]
 
-    //! [securityDefinitionOptionParameter]
     @Override
     public void securityDefinitionOptionalParameter(int reqId, String exchange,
                                                     int underlyingConId, String tradingClass, String multiplier,
                                                     Set<String> expirations, Set<Double> strikes) {
-        System.out.println("Security Definition Optional Parameter. Request: " + reqId + ", Trading Class: " + tradingClass + ", Multiplier: " + multiplier + " \n");
+        throw new RuntimeException("Stub");
     }
-    //! [securityDefinitionOptionParameter]
 
-    //! [securityDefinitionOptionParameterEnd]
     @Override
     public void securityDefinitionOptionalParameterEnd(int reqId) {
+        throw new RuntimeException("Stub");
     }
-    //! [securityDefinitionOptionParameterEnd]
 
-    //! [softDollarTiers]
     @Override
-    public void softDollarTiers(int reqId, SoftDollarTier[] tiers) { }
-    //! [softDollarTiers]
+    public void softDollarTiers(int reqId, SoftDollarTier[] tiers) {
+        throw new RuntimeException("Stub");
+    }
 
-    //! [familyCodes]
     @Override
     public void familyCodes(FamilyCode[] familyCodes) {
+        throw new RuntimeException("Stub");
     }
-    //! [familyCodes]
 
-    //! [symbolSamples]
     @Override
     public void symbolSamples(int reqId, ContractDescription[] contractDescriptions) {
-        System.out.println("Contract Descriptions. Request: " + reqId + "\n");
-        for (ContractDescription cd : contractDescriptions) {
-            Contract c = cd.contract();
-            StringBuilder derivativeSecTypesSB = new StringBuilder();
-            for (String str : cd.derivativeSecTypes()) {
-                derivativeSecTypesSB.append(str);
-                derivativeSecTypesSB.append(",");
-            }
-            System.out.print("Contract. ConId: " + c.conid() + ", Symbol: " + c.symbol() + ", SecType: " + c.secType() +
-                    ", PrimaryExch: " + c.primaryExch() + ", Currency: " + c.currency() +
-                    ", DerivativeSecTypes:[" + derivativeSecTypesSB.toString() + "]");
-        }
-
-        System.out.println();
+        throw new RuntimeException("Stub");
     }
-    //! [symbolSamples]
 
-    //! [mktDepthExchanges]
     @Override
     public void mktDepthExchanges(DepthMktDataDescription[] depthMktDataDescriptions) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void tickNews(int tickerId, long timeStamp, String providerCode, String articleId, String headline, String extraData) {
+        throw new RuntimeException("Stub");
     }
-    //! [tickNews]
 
-    //! [smartcomponents]
     @Override
     public void smartComponents(int reqId, Map<Integer, Map.Entry<String, Character>> theMap) {
-        System.out.println("smart components req id:" + reqId);
-
-        for (Map.Entry<Integer, Map.Entry<String, Character>> item : theMap.entrySet()) {
-            System.out.println("bit number: " + item.getKey() +
-                    ", exchange: " + item.getValue().getKey() + ", exchange letter: " + item.getValue().getValue());
-        }
+        throw new RuntimeException("Stub");
     }
-    //! [smartcomponents]
 
-    //! [tickReqParams]
     @Override
     public void tickReqParams(int tickerId, double minTick, String bboExchange, int snapshotPermissions) {
-        System.out.println("Tick req params. Ticker Id:" + tickerId + ", Min tick: " + minTick + ", bbo exchange: " + bboExchange + ", Snapshot permissions: " + snapshotPermissions);
+        throw new RuntimeException("Stub");
     }
-    //! [tickReqParams]
 
     @Override
     public void newsProviders(NewsProvider[] newsProviders) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void newsArticle(int requestId, int articleType, String articleText) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void historicalNews(int requestId, String time, String providerCode, String articleId, String headline) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void historicalNewsEnd(int requestId, boolean hasMore) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void headTimestamp(int reqId, String headTimestamp) {
-    }
-
-    @Override
-    public void histogramData(int reqId, List<HistogramEntry> items) {
+        throw new RuntimeException("Stub");
     }
 
 
-    //! [historicalDataUpdate]
     @Override
     public void historicalDataUpdate(int reqId, Bar bar) {
-        System.out.println("HistoricalDataUpdate. " + reqId + " - Date: " + bar.time() + ", Open: " + bar.open() + ", High: " + bar.high() + ", Low: " + bar.low() + ", Close: " + bar.close() + ", Volume: " + bar.volume() + ", Count: " + bar.count() + ", WAP: " + bar.wap());
+        throw new RuntimeException("Stub");
     }
 
-    //! [rerouteMktDataReq]
     @Override
     public void rerouteMktDataReq(int reqId, int conId, String exchange) {
+        throw new RuntimeException("Stub");
     }
 
 
     @Override
     public void rerouteMktDepthReq(int reqId, int conId, String exchange) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void marketRule(int marketRuleId, PriceIncrement[] priceIncrements) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void pnl(int reqId, double dailyPnL, double unrealizedPnL, double realizedPnL) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void pnlSingle(int reqId, int pos, double dailyPnL, double unrealizedPnL, double realizedPnL, double value) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void historicalTicks(int reqId, List<HistoricalTick> ticks, boolean done) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void historicalTicksBidAsk(int reqId, List<HistoricalTickBidAsk> ticks, boolean done) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void historicalTicksLast(int reqId, List<HistoricalTickLast> ticks, boolean done) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void tickByTickAllLast(int reqId, int tickType, long time, double price, int size, TickAttribLast tickAttribLast,
                                   String exchange, String specialConditions) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void tickByTickBidAsk(int reqId, long time, double bidPrice, double askPrice, int bidSize, int askSize,
                                  TickAttribBidAsk tickAttribBidAsk) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void tickByTickMidPoint(int reqId, long time, double midPoint) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void orderBound(long orderId, int apiClientId, int apiOrderId) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void completedOrder(Contract contract, Order order, OrderState orderState) {
+        throw new RuntimeException("Stub");
     }
 
     @Override
     public void completedOrdersEnd() {
+        throw new RuntimeException("Stub");
     }
-
 
 }

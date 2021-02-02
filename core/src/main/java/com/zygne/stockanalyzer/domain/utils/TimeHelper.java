@@ -1,11 +1,8 @@
 package com.zygne.stockanalyzer.domain.utils;
 
-import java.text.DateFormat;
 import java.text.Format;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 public class TimeHelper {
 
@@ -17,8 +14,6 @@ public class TimeHelper {
 
     private static final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-    private static final String dateFormatSimple = "yyyyMMdd HH:mm:ss";
-
     public static int getDaysDifference(long start, long end) {
 
         long diff = start - end;
@@ -28,41 +23,7 @@ public class TimeHelper {
         return (int) days;
     }
 
-    public static long getTimeStamp(String dateString) {
-
-        DateFormat df;
-        if(dateString.length() > 11) {
-            df = new SimpleDateFormat(dateTimeFormat);
-        } else {
-            df = new SimpleDateFormat(dateFormat);
-        }
-
-        Date date;
-        try {
-            date = df.parse(dateString);
-        } catch (ParseException e) {
-            return 0;
-        }
-
-        return date.getTime();
-    }
-
-    public static long getTimeStamp(String dateFormat, String dateString) {
-
-        DateFormat df = new SimpleDateFormat(dateFormat);
-
-        Date date;
-
-        try {
-            date = df.parse(dateString);
-        } catch (ParseException e) {
-            return 0;
-        }
-
-        return date.getTime();
-    }
-
-    public static String getDateFromTimeStamp(long timeStamp){
+    public static String getDateTimeFromTimeStamp(long timeStamp){
         // 2020-10-19 18:30:00
 
         Calendar c = Calendar.getInstance();
@@ -72,4 +33,24 @@ public class TimeHelper {
         return format.format(c.getTime());
     }
 
+    public static String getDateFromTimeStamp(long timeStamp){
+        // 2020-10-19 18:30:00
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timeStamp);
+
+        Format format = new SimpleDateFormat(dateFormat);
+        return format.format(c.getTime());
+    }
+
+    public static boolean isSameDay(long timeStamp1, long timeStamp2){
+
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        cal1.setTimeInMillis(timeStamp1);
+        cal2.setTimeInMillis(timeStamp2);
+
+        return cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR) &&
+                cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
+    }
 }

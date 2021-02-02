@@ -22,6 +22,11 @@ public class Fundamentals {
     @SerializedName("Exchange")
     private String exchange;
 
+    @SerializedName("SharesShort")
+    private int sharesShort;
+
+    private double shortPercentage;
+
     private long avgVol;
 
     public int getSharesOutstanding() {
@@ -72,11 +77,31 @@ public class Fundamentals {
         this.exchange = exchange;
     }
 
+    public int getSharesShort() {
+        return sharesShort;
+    }
+
+    public void setSharesShort(int sharesShort) {
+        this.sharesShort = sharesShort;
+    }
+
     public long getAvgVol() {
         return avgVol;
     }
 
     public void setAvgVol(long avgVol) {
         this.avgVol = avgVol;
+    }
+
+    public double getShortPercentage() {
+        return shortPercentage;
+    }
+
+    public void setShortPercentage(double shortPercentage) {
+        this.shortPercentage = shortPercentage;
+    }
+
+    public void calculate() {
+        shortPercentage = (sharesShort / (double) sharesFloat) * 100;
     }
 }

@@ -1,13 +1,13 @@
 package com.zygne.stockanalyzer.domain.interactor.implementation.data.base;
 
 import com.zygne.stockanalyzer.domain.interactor.base.Interactor;
-import com.zygne.stockanalyzer.domain.model.LiquiditySide;
+import com.zygne.stockanalyzer.domain.model.Histogram;
 
 import java.util.List;
 
-public interface LiquiditySidePriceInteractor extends Interactor {
+public interface HistogramDayFilterInteractor extends Interactor {
 
     interface Callback{
-        void onLiquiditySideForPriceFound(List<LiquiditySide> data);
+        void onHistogramFiltered(List<Histogram> data);
     }
 }

@@ -7,16 +7,21 @@ import com.zygne.stockanalyzer.domain.model.Fundamentals;
 import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.util.Collections;
 import java.util.List;
 
 public class PriceAnalysisTab extends JPanel {
 
-    private LiquidityLevelTableModel tableModelResistance;
-    private JTable tableResistance;
-    private JScrollPane scrollResistance;
+    private LiquidityLevelTableModel tableModelPrices;
+    private LiquidityLevelTableModel tableModelVolume;
+
+    private JTable tablePrices;
+    private JTable tableVolume;
+
     private FundamentalsView fundamentalsView;
+
+
 
     public PriceAnalysisTab(){
         setLayout(new BorderLayout());
@@ -25,45 +30,26 @@ public class PriceAnalysisTab extends JPanel {
 
         add(fundamentalsView, BorderLayout.NORTH);
 
-        JPanel tablesPanel = new JPanel(new GridLayout(1,1));
-        JPanel resistancePanel = new JPanel(new BorderLayout());
+        JPanel tablesPanel = new JPanel(new GridLayout(1,2));;
 
-        resistancePanel.add(new JLabel("Resistance"), BorderLayout.NORTH);
+        tableModelPrices = new LiquidityLevelTableModel();
+        tablePrices = new JTable(tableModelPrices);
+        tablePrices.setDefaultRenderer(LiquidityLevel.class, new LiquidityLevelRenderer());
+        tablePrices.setDefaultRenderer(String.class, new LiquidityLevelRenderer());
 
-        tableModelResistance = new LiquidityLevelTableModel();
-        tableResistance = new JTable(tableModelResistance);
-        tableResistance.setDefaultRenderer(LiquidityLevel.class, new LiquidityLevelRenderer());
-        tableResistance.setDefaultRenderer(String.class, new LiquidityLevelRenderer());
 
-        scrollResistance = new JScrollPane(tableResistance);
-        scrollResistance.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        resistancePanel.add(scrollResistance, BorderLayout.CENTER);
-        tablesPanel.add(resistancePanel);
+        tablesPanel.add(new JScrollPane(tablePrices));
+
+        tableModelVolume = new LiquidityLevelTableModel();
+        tableVolume = new JTable(tableModelVolume);
+        tableVolume.setDefaultRenderer(LiquidityLevel.class, new LiquidityLevelRenderer());
+        tableVolume.setDefaultRenderer(String.class, new LiquidityLevelRenderer());
+
+        tablesPanel.add(new JScrollPane(tableVolume));
 
         add(tablesPanel, BorderLayout.CENTER);
     }
 
-    public void addResistance(List<LiquidityLevel> data){
-        fundamentalsView.clear();
-        if (tableResistance != null) {
-            tableModelResistance.clear();
-            tableModelResistance.addItems(data);
-            tableModelResistance.fireTableDataChanged();
-            scrollResistance.invalidate();
-            tableResistance.invalidate();
-        }
-    }
-
-    public void addSupport(List<LiquidityLevel> data){
-    }
-
-    public void addFundamentals(Fundamentals fundamentals){
-        fundamentalsView.populateFrom(fundamentals);
-    }
-
-    public void reset(){
-        fundamentalsView.clear();
-    }
 
 
 }

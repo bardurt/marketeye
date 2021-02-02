@@ -1,9 +1,10 @@
-package com.zygne.stockanalyzer.domain.interactor.implementation.data.av;
+package com.zygne.stockanalyzer.domain.interactor.implementation.data;
 
 import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.interactor.base.BaseInteractor;
 import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.HistogramInteractor;
+import com.zygne.stockanalyzer.domain.model.BarData;
 import com.zygne.stockanalyzer.domain.model.Histogram;
 import com.zygne.stockanalyzer.domain.utils.NumberHelper;
 import com.zygne.stockanalyzer.domain.utils.TimeHelper;
@@ -11,13 +12,13 @@ import com.zygne.stockanalyzer.domain.utils.TimeHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlphaVantageHistogramInteractorImpl extends BaseInteractor implements HistogramInteractor {
+public class HistogramInteractorImpl extends BaseInteractor implements HistogramInteractor {
     private static final String DELIM = ",";
 
     private final Callback callback;
-    private final List<String> entries;
+    private final List<BarData> entries;
 
-    public AlphaVantageHistogramInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<String> entries) {
+    public HistogramInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<BarData> entries) {
         super(executor, mainThread);
         this.callback = callback;
         this.entries = entries;
@@ -25,29 +26,28 @@ public class AlphaVantageHistogramInteractorImpl extends BaseInteractor implemen
 
     @Override
     public void run() {
-        String[] tempArr;
         List<Histogram> data = new ArrayList<>();
 
-        for (String line : entries) {
-
-            tempArr = line.split(DELIM);
+        for (BarData line : entries) {
 
             try {
 
-                long timeStamp = TimeHelper.getTimeStamp(tempArr[0]);
-                double open = Double.parseDouble(tempArr[1]);
-                double high = Double.parseDouble(tempArr[2]);
-                double low = Double.parseDouble(tempArr[3]);
-                double close = Double.parseDouble(tempArr[4]);
-                long volume = Long.parseLong(tempArr[5]);
+                long timeStamp = line.getTimeStamp();
+                double open =  NumberHelper.round2Decimals(line.getOpen());
+                double high = NumberHelper.round2Decimals(line.getHigh());
+                double low = NumberHelper.round2Decimals(line.getLow());
+                double close = NumberHelper.round2Decimals(line.getClose());
+                long volume = line.getVolume();
+                String dateTime = TimeHelper.getDateFromTimeStamp(timeStamp);
 
                 Histogram histogram = new Histogram();
-                histogram.open = NumberHelper.round2Decimals(open);
-                histogram.high = NumberHelper.round2Decimals(high);
-                histogram.low = NumberHelper.round2Decimals(low);
-                histogram.close = NumberHelper.round2Decimals(close);
+                histogram.open = open;
+                histogram.high = high;
+                histogram.low = low;
+                histogram.close = close;
                 histogram.volume = volume;
                 histogram.timeStamp = timeStamp;
+                histogram.dateTime = dateTime;
                 data.add(histogram);
 
             } catch (Exception e) {

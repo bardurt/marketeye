@@ -1,9 +1,9 @@
 package com.zygne.stockanalyzer;
 
-import com.zygne.stockanalyzer.domain.DataBroker;
+import com.zygne.stockanalyzer.domain.api.DataBroker;
 import com.zygne.stockanalyzer.domain.exceptions.ApiCallExceededException;
-import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.DataFetchInteractor;
-import com.zygne.stockanalyzer.domain.model.enums.DataProvider;
+import com.zygne.stockanalyzer.domain.model.BarData;
+import com.zygne.stockanalyzer.domain.model.DataSize;
 import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 
 import java.io.BufferedReader;
@@ -25,25 +25,82 @@ public class AlphaVantageDataBroker implements DataBroker {
     private static final int MAX_FAILURES = 3;
 
     private static final long TIME_TO_SLEEP = 15000;
-    private String ticker;
-    private TimeInterval timeInterval;
-    private int monthsToFetch;
-    private String apiKey;
+    private final String apiKey;
     private int failures = 0;
 
-    @Override
-    public void downloadData(String symbol, String length, String interval) {
+    private Callback callback;
 
+    public AlphaVantageDataBroker(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    @Override
+    public void downloadHistoricalBarData(String symbol, DataSize dataSize, TimeInterval timeInterval) {
+
+        final String interval;
+
+        if (timeInterval == TimeInterval.One_Minute) {
+            interval = "1min";
+        } else if (timeInterval == TimeInterval.Three_Minutes) {
+            interval = "3min";
+        } else if (timeInterval == TimeInterval.Five_Minutes) {
+            interval = "5min";
+        } else if (timeInterval == TimeInterval.Fifteen_Minutes) {
+            interval = "15min";
+        } else if (timeInterval == TimeInterval.Thirty_Minutes) {
+            interval = "30min";
+        } else if (timeInterval == TimeInterval.Hour) {
+            interval = "60min";
+        } else {
+            interval = null;
+        }
+
+
+        final int monthsToFetch = dataSize.getSize();
+
+        if (interval != null) {
+            System.out.println(symbol + " " + interval + " " + dataSize.getSize());
+
+            Thread t = new Thread(() -> {
+                List<BarData> data = fetchIntraDay(symbol, interval, monthsToFetch, apiKey);
+                if(callback != null){
+                    callback.onDataFinished(data);
+                }
+            });
+
+            t.start();
+        } else {
+
+            final String timeSeries;
+
+            if (timeInterval == TimeInterval.Day) {
+                timeSeries = TIME_SERIES_DAILY;
+            } else {
+                timeSeries = TIME_SERIES_WEEKLY;
+            }
+
+            System.out.println(symbol + " " + timeSeries + " " + dataSize.getSize());
+
+
+            Thread t = new Thread(() -> {
+                List<BarData> data = downLoadTimeSeries(symbol, timeSeries, apiKey);
+                if(callback != null){
+                    callback.onDataFinished(data);
+                }
+            });
+
+            t.start();
+        }
     }
 
     @Override
     public void setCallback(Callback callback) {
-
+        this.callback = callback;
     }
 
     @Override
     public void removeCallback() {
-
+        this.callback = null;
     }
 
     @Override
@@ -58,8 +115,8 @@ public class AlphaVantageDataBroker implements DataBroker {
     @Override
     public void removeConnectionListener() { }
 
-    private List<String> fetchIntraDay(String symbol, String interval, int monthsToFetch, String apiKey) {
-        List<String> lines = new ArrayList<>();
+    private List<BarData> fetchIntraDay(String symbol, String interval, int monthsToFetch, String apiKey) {
+        List<BarData> lines = new ArrayList<>();
 
         // Flag to check if downloading data is finished or not
         boolean finished = false;
@@ -78,7 +135,7 @@ public class AlphaVantageDataBroker implements DataBroker {
             while (month < 13) {
 
                 String time = "year" + year + "month" + month;
-                List<String> data = null;
+                List<BarData> data = null;
                 try {
                     data = downloadIntraDay(symbol, interval, apiKey, time);
                     if (data.isEmpty()) {
@@ -102,6 +159,7 @@ public class AlphaVantageDataBroker implements DataBroker {
                 // add this month to total count
                 currentCount++;
 
+                System.out.println("Downloaded page : " + currentCount);
                 // check if we have fetched all the months requested
                 if (currentCount >= monthsToFetch) {
                     finished = true;
@@ -127,6 +185,7 @@ public class AlphaVantageDataBroker implements DataBroker {
             year++;
         }
 
+        System.out.println("Downloaded complete : " + currentCount);
         return lines;
     }
 
@@ -137,10 +196,10 @@ public class AlphaVantageDataBroker implements DataBroker {
      * @param interval : time interval for historical data (1 min, 3 min)
      * @param apiKey   : Api key for AV
      */
-    private List<String> downloadIntraDay(String symbol, String interval, String apiKey, String time) throws ApiCallExceededException {
+    private List<BarData> downloadIntraDay(String symbol, String interval, String apiKey, String time) throws ApiCallExceededException {
 
         // container for the read historical data
-        List<String> lines = new ArrayList<>();
+        List<BarData> lines = new ArrayList<>();
 
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
@@ -191,7 +250,11 @@ public class AlphaVantageDataBroker implements DataBroker {
 
                 // if the read data is null, then it is most likely a header
                 if (data != null) {
-                    lines.add(data);
+                   BarData barData = BarData.fromStream(data);
+                   if(barData != null){
+                       barData.setDataFarm(BarData.DataFarm.ALPHA_VANTAGE);
+                       lines.add(barData);
+                   }
                 }
             }
 
@@ -215,6 +278,62 @@ public class AlphaVantageDataBroker implements DataBroker {
                     inputStreamReader = null;
                 } catch (IOException ex) {
                     ex.printStackTrace();
+                }
+            }
+        }
+
+        return lines;
+    }
+
+    private List<BarData> downLoadTimeSeries(String symbol, String series, String apiKey) {
+
+        List<BarData> lines = new ArrayList<>();
+
+        String url = "https://www.alphavantage.co/query?function=" + series + "&symbol=" + symbol + "&outputsize=full&apikey=" + apiKey + "&datatype=csv";
+
+        InputStreamReader inputStreamReader = null;
+        BufferedReader bufferedReader = null;
+        URLConnection urlConnection = null;
+        try {
+            URL content = new URL(url);
+
+            // establish connection to file in URL
+            urlConnection = content.openConnection();
+
+            inputStreamReader = new InputStreamReader(urlConnection.getInputStream());
+
+            bufferedReader = new BufferedReader(inputStreamReader);
+
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null) {
+                String data = splitString(line);
+                // if the read data is null, then it is most likely a header
+                if (data != null) {
+                    BarData barData = BarData.fromStream(data);
+                    if(barData != null){
+                        barData.setDataFarm(BarData.DataFarm.ALPHA_VANTAGE);
+                        lines.add(barData);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (inputStreamReader != null) {
+                try {
+                    inputStreamReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

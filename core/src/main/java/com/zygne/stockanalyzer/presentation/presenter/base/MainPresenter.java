@@ -1,9 +1,6 @@
 package com.zygne.stockanalyzer.presentation.presenter.base;
 
-import com.zygne.stockanalyzer.domain.model.DataLength;
-import com.zygne.stockanalyzer.domain.model.Fundamentals;
-import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
-import com.zygne.stockanalyzer.domain.model.PriceGap;
+import com.zygne.stockanalyzer.domain.model.*;
 import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 import com.zygne.stockanalyzer.presentation.view.BaseView;
 
@@ -13,6 +10,8 @@ public interface MainPresenter {
     void getZones(String ticker, double percentile, TimeInterval timeInterval, int monthsToFetch, boolean fundamentalData);
 
     void toggleConnection();
+
+    void findHighVolume();
 
     interface View extends BaseView {
         void onResistanceFound(List<LiquidityLevel> zones);
@@ -25,16 +24,30 @@ public interface MainPresenter {
 
         void onPriceGapsFound(List<PriceGap> data);
 
-        void onComplete(String symbol, String timeFrame);
+        void onComplete(String symbol, String timeFrame, String dateRange);
 
         void onTimeFramesPrepared(List<TimeInterval> timeIntervals, int defaultSelection);
 
-        void onDataSizePrepared(List<DataLength> data, int defaultSelection);
+        void onDataSizePrepared(List<DataSize> data, int defaultSelection);
 
         void onStatusUpdate(String status);
+
+        void onHighVolumeBarFound(List<VolumeBarDetails> data);
 
         void onConnected();
 
         void onDisconnected();
+
+        void toggleConnectionSettings(boolean b);
+
+        void prepareView(List<ViewComponent> viewComponents);
+    }
+
+    enum ViewComponent{
+        VPA,
+        PRICE_GAPS,
+        INTRA_DAY,
+        SCRIPT,
+        WICKS
     }
 }

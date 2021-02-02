@@ -6,4 +6,9 @@ public class NumberHelper {
         return Math.round(original * 100d) / 100d;
     }
 
+    public static double roundDecimals(int decimals, double original){
+        double scalar = Math.pow(10, decimals);
+
+        return Math.round(original * scalar) / scalar;
+    }
 }

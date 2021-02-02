@@ -32,7 +32,7 @@ public class LiquidityLevelRenderer extends JLabel implements TableCellRenderer 
             setBackground(Color.decode(Colors.COLOR_RED_DARK));
         } else if (percentile > 99) {
             setBackground(Color.decode(Colors.COLOR_RED));
-        } else if (percentile > 98) {
+        } else if (percentile >= 98) {
             setBackground(Color.decode(Colors.COLOR_ORANGE));
         } else {
             setBackground(Color.WHITE);

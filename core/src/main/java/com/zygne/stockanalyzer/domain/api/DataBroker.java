@@ -1,12 +1,14 @@
-package com.zygne.stockanalyzer.domain;
+package com.zygne.stockanalyzer.domain.api;
 
 import com.zygne.stockanalyzer.domain.model.BarData;
+import com.zygne.stockanalyzer.domain.model.DataSize;
+import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 
 import java.util.List;
 
 public interface DataBroker extends Api {
 
-    void downloadData(String symbol, String length, String interval);
+    void downloadHistoricalBarData(String symbol, DataSize dataSize, TimeInterval timeInterval);
     void setCallback(Callback callback);
     void removeCallback();
 

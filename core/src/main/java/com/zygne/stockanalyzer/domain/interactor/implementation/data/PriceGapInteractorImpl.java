@@ -15,8 +15,8 @@ public class PriceGapInteractorImpl extends BaseInteractor implements PriceGapIn
 
     private static final double MIN_CHANGE = 3d;
 
-    private Callback callback;
-    private List<Histogram> histogramList;
+    private final Callback callback;
+    private final List<Histogram> histogramList;
 
     public PriceGapInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<Histogram> data) {
         super(executor, mainThread);
@@ -56,28 +56,24 @@ public class PriceGapInteractorImpl extends BaseInteractor implements PriceGapIn
             Histogram h2 = data.get(i + 1);
 
             if (h2.low > h1.high) {
-                double change = ((h2.low - h1.high) / h1.low) * 100;
+                double change = ((h2.low - h1.high) / h1.high) * 100;
 
                 if (change > MIN_CHANGE) {
                     PriceGap priceGap = new PriceGap();
-                    priceGap.setOuterStart(h1.close);
-                    priceGap.setOuterEnd(h2.open);
-                    priceGap.setInnerStart(h1.high);
-                    priceGap.setInnerEnd(h2.low);
+                    priceGap.setStart(h1.high);
+                    priceGap.setEnd(h2.low);
                     priceGap.setIndex(i + 1);
                     priceGap.setTimeStamp(h2.timeStamp);
 
                     gaps.add(priceGap);
                 }
-            } else if (h2.high < h1.low) {
+            } else if (h1.low > h2.high) {
                 double change = ((h1.low - h2.high) / h2.low) * 100;
 
                 if (change > MIN_CHANGE) {
                     PriceGap priceGap = new PriceGap();
-                    priceGap.setOuterStart(h2.open);
-                    priceGap.setOuterEnd(h1.close);
-                    priceGap.setInnerStart(h2.high);
-                    priceGap.setInnerEnd(h1.low);
+                    priceGap.setStart(h2.high);
+                    priceGap.setEnd(h1.low);
                     priceGap.setIndex(i + 1);
                     priceGap.setTimeStamp(h2.timeStamp);
 

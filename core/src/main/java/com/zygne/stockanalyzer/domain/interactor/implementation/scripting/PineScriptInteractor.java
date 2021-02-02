@@ -10,7 +10,7 @@ import com.zygne.stockanalyzer.domain.model.graphics.ChartZone;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class PineScript2Interactor extends BaseInteractor implements ScriptInteractor {
+public class PineScriptInteractor extends BaseInteractor implements ScriptInteractor {
 
     private static final String COLOR_GREEN = "color=color.green";
     private static final String COLOR_RED = "color=color.red";
@@ -28,14 +28,13 @@ public class PineScript2Interactor extends BaseInteractor implements ScriptInter
     private final String ticker;
     private final List<ChartObject> data;
 
-    public PineScript2Interactor(Executor executor, MainThread mainThread, Callback callback, String name, String ticker, List<ChartObject> data) {
+    public PineScriptInteractor(Executor executor, MainThread mainThread, Callback callback, String name, String ticker, List<ChartObject> data) {
         super(executor, mainThread);
         this.callback = callback;
         this.name = name;
         this.ticker = ticker;
         this.data = data;
     }
-
 
     @Override
     public void run() {
@@ -77,8 +76,6 @@ public class PineScript2Interactor extends BaseInteractor implements ScriptInter
         stringBuilder.append("plot(close)");
 
         mainThread.post(() -> callback.onScriptCreated(stringBuilder.toString(), scriptName));
-
-
     }
 
     private String plotLine(ChartLine chartLine) {
@@ -156,7 +153,6 @@ public class PineScript2Interactor extends BaseInteractor implements ScriptInter
                 return COLOR_PINK;
             case ChartObject.Color.PURPLE:
                 return COLOR_NAVY;
-
         }
 
         return COLOR_GREEN;

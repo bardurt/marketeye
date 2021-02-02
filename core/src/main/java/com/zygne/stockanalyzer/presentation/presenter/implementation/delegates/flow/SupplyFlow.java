@@ -1,4 +1,4 @@
-package com.zygne.stockanalyzer.presentation.presenter.implementation.delegates.alphavantage.flow;
+package com.zygne.stockanalyzer.presentation.presenter.implementation.delegates.flow;
 
 import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
@@ -8,7 +8,7 @@ import com.zygne.stockanalyzer.domain.model.*;
 
 import java.util.List;
 
-public class ResistanceFlow implements VolumePriceInteractor.Callback,
+public class SupplyFlow implements VolumePriceInteractor.Callback,
         VolumePriceSumInteractor.Callback,
         LiquidityLevelInteractor.Callback,
         LiquidityLevelFilterInteractor.Callback,
@@ -21,7 +21,7 @@ public class ResistanceFlow implements VolumePriceInteractor.Callback,
     private List<Histogram> histogramList;
     private double percentile;
 
-    public ResistanceFlow(Executor executor, MainThread mainThread, Callback callback) {
+    public SupplyFlow(Executor executor, MainThread mainThread, Callback callback) {
         this.executor = executor;
         this.mainThread = mainThread;
         this.callback = callback;
@@ -35,7 +35,7 @@ public class ResistanceFlow implements VolumePriceInteractor.Callback,
 
     @Override
     public void onBreakPointsCalculated(List<LiquidityLevel> data) {
-        callback.onResistanceCompleted(data);
+        callback.onSupplyCompleted(data);
     }
 
     @Override
@@ -62,6 +62,6 @@ public class ResistanceFlow implements VolumePriceInteractor.Callback,
     }
 
     public interface Callback {
-        void onResistanceCompleted(List<LiquidityLevel> data);
+        void onSupplyCompleted(List<LiquidityLevel> data);
     }
 }

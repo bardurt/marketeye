@@ -8,6 +8,7 @@ import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
 import com.zygne.stockanalyzer.domain.model.VolumePriceSum;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LiquidityLevelInteractorImpl extends BaseInteractor implements LiquidityLevelInteractor {
@@ -31,12 +32,15 @@ public class LiquidityLevelInteractorImpl extends BaseInteractor implements Liqu
         }
 
         formatted.sort(new LiquidityLevel.VolumeComparator());
+        Collections.reverse(formatted);
 
         int size = formatted.size();
+        double percentile = 100;
 
         for (int i = 0; i < formatted.size(); i++) {
-            formatted.get(i).setRank(size-1);
-            formatted.get(i).setPercentile(((i + 1) / (double) size) * 100);
+            percentile = ((size-(i)) / (double) size) * 100d;
+            formatted.get(i).setRank(i+1);
+            formatted.get(i).setPercentile(percentile);
         }
 
         mainThread.post(() -> callback.onLiquidityLevelsCreated(formatted));

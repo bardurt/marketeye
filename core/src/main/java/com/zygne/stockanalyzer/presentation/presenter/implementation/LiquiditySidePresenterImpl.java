@@ -3,7 +3,6 @@ package com.zygne.stockanalyzer.presentation.presenter.implementation;
 import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.interactor.implementation.data.*;
-import com.zygne.stockanalyzer.domain.interactor.implementation.data.av.AlphaVantageHistogramInteractorImpl;
 import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.*;
 import com.zygne.stockanalyzer.domain.model.BarData;
 import com.zygne.stockanalyzer.domain.model.Histogram;

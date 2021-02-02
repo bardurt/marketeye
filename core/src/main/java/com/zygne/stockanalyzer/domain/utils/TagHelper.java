@@ -45,14 +45,12 @@ public class TagHelper {
     }
 
     public static String start(String name){
-        String startTag = "<" + name + ">";
 
-        return startTag;
+        return "<" + name + ">";
     }
 
     public static String end(String name){
-        String startTag = "</" + name + ">";
 
-        return startTag;
+        return "</" + name + ">";
     }
 }

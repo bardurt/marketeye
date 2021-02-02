@@ -1,4 +1,4 @@
-package com.zygne.stockanalyzer.domain;
+package com.zygne.stockanalyzer.domain.api;
 
 public interface Api {
 

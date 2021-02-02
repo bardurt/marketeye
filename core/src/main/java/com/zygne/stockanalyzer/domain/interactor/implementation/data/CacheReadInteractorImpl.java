@@ -51,7 +51,7 @@ public class CacheReadInteractorImpl extends BaseInteractor implements CacheRead
 
                     }
 
-                    if (count > 0) {
+                    if (count > 1) {
                         BarData barData = BarData.fromStream(line);
 
                         if (barData != null) {

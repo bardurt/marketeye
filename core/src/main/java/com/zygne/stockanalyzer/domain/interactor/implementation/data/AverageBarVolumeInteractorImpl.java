@@ -10,8 +10,8 @@ import java.util.List;
 
 public class AverageBarVolumeInteractorImpl extends BaseInteractor implements AverageBarVolumeInteractor {
 
-    private Callback callback;
-    private List<Histogram> histogramList;
+    private final Callback callback;
+    private final List<Histogram> histogramList;
 
     public AverageBarVolumeInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<Histogram> histogramList) {
         super(executor, mainThread);
@@ -29,12 +29,11 @@ public class AverageBarVolumeInteractorImpl extends BaseInteractor implements Av
                 volumeSum += h.volume;
             }
 
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
 
         final long avgVol = volumeSum / histogramList.size();
-        ;
         mainThread.post(() -> callback.onAverageBarVolumeCalculated(avgVol));
 
     }

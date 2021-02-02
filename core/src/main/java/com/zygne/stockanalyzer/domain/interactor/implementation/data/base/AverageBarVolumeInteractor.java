@@ -4,7 +4,7 @@ import com.zygne.stockanalyzer.domain.interactor.base.Interactor;
 
 public interface AverageBarVolumeInteractor extends Interactor {
 
-    public interface Callback{
+    interface Callback{
         void onAverageBarVolumeCalculated(long avgVol);
     }
 }

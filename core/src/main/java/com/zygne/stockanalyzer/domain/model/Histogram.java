@@ -3,6 +3,7 @@ package com.zygne.stockanalyzer.domain.model;
 import java.util.Comparator;
 
 public class Histogram {
+    public String dateTime;
     public long timeStamp;
     public double open;
     public double high;
@@ -65,6 +66,14 @@ public class Histogram {
         @Override
         public int compare(Histogram o1, Histogram o2) {
             return Long.compare(o1.timeStamp, o2.timeStamp);
+        }
+    }
+
+    public static final class VolumeComparator implements Comparator<Histogram> {
+
+        @Override
+        public int compare(Histogram o1, Histogram o2) {
+            return Long.compare(o1.volume, o2.volume);
         }
     }
 

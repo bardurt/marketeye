@@ -4,44 +4,26 @@ import java.util.Comparator;
 
 public class PriceGap {
 
-    private double outerStart;
-    private double outerEnd;
-    private double innerStart;
-    private double innerEnd;
+    private double start;
+    private double end;
     private long timeStamp;
     private int index;
     private boolean filled;
 
-    public double getOuterStart() {
-        return outerStart;
+    public double getStart() {
+        return start;
     }
 
-    public void setOuterStart(double outerStart) {
-        this.outerStart = outerStart;
+    public void setStart(double start) {
+        this.start = start;
     }
 
-    public double getOuterEnd() {
-        return outerEnd;
+    public double getEnd() {
+        return end;
     }
 
-    public void setOuterEnd(double outerEnd) {
-        this.outerEnd = outerEnd;
-    }
-
-    public double getInnerStart() {
-        return innerStart;
-    }
-
-    public void setInnerStart(double innerStart) {
-        this.innerStart = innerStart;
-    }
-
-    public double getInnerEnd() {
-        return innerEnd;
-    }
-
-    public void setInnerEnd(double innerEnd) {
-        this.innerEnd = innerEnd;
+    public void setEnd(double end) {
+        this.end = end;
     }
 
     public long getTimeStamp() {
@@ -69,7 +51,7 @@ public class PriceGap {
     }
 
     public double getMidPoint(){
-        return (innerStart + innerEnd)/2;
+        return (start + end)/2;
     }
 
     public static final class TimeComparator implements Comparator<PriceGap> {

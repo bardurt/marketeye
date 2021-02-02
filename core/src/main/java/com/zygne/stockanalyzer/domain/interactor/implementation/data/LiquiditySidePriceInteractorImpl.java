@@ -11,9 +11,9 @@ import java.util.List;
 
 public class LiquiditySidePriceInteractorImpl extends BaseInteractor implements LiquiditySidePriceInteractor {
 
-    private Callback callback;
-    private List<LiquiditySide> data;
-    private double priceMin;
+    private final Callback callback;
+    private final List<LiquiditySide> data;
+    private final double priceMin;
     private double priceMax;
 
 
@@ -34,9 +34,7 @@ public class LiquiditySidePriceInteractorImpl extends BaseInteractor implements 
 
         List<LiquiditySide> filtered = new ArrayList<>();
 
-        for (int i = 0; i < data.size(); i++) {
-            LiquiditySide e = data.get(i);
-
+        for (LiquiditySide e : data) {
             boolean added = false;
             if (e.inZone(priceMin) || e.inZone(priceMax)) {
                 filtered.add(e);

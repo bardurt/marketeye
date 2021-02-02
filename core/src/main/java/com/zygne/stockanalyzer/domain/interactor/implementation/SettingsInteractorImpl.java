@@ -16,14 +16,24 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
     private static final String SETTINGS_FILE = "config.xml";
     private static final String TAG_ALPHA_VANTAGE = "AV";
     private static final String TAG_INTERACTIVE_BROKERS = "IB";
+    private static final String TAG_YAHOO_FINANCE = "YF";
     private static final String TAG_PROVIDER = "DATA_PROVIDER";
 
     private static final String INDENT = "   ";
     private final Callback callback;
+    private DataProvider defaultProvider = null;
+
 
     public SettingsInteractorImpl(Executor executor, MainThread mainThread, Callback callback) {
         super(executor, mainThread);
         this.callback = callback;
+        this.defaultProvider = null;
+    }
+
+    public SettingsInteractorImpl(Executor executor, MainThread mainThread, Callback callback, DataProvider dataProvider) {
+        super(executor, mainThread);
+        this.callback = callback;
+        this.defaultProvider = dataProvider;
     }
 
     @Override
@@ -67,7 +77,19 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
             mainThread.post(() -> callback.onSettingsError(SETTINGS_FILE));
         } else {
 
-            String provider = TagHelper.getValueFromTagName(TAG_PROVIDER, content.toString());
+            String provider;
+
+            if (defaultProvider == null) {
+                provider = TagHelper.getValueFromTagName(TAG_PROVIDER, content.toString());
+            } else {
+                if(defaultProvider == DataProvider.ALPHA_VANTAGE){
+                    provider = TAG_ALPHA_VANTAGE;
+                } else if (defaultProvider == DataProvider.INTERACTIVE_BROKERS) {
+                    provider = TAG_INTERACTIVE_BROKERS;
+                } else {
+                    provider = TAG_YAHOO_FINANCE;
+                }
+            }
 
             if (provider.isEmpty()) {
                 mainThread.post(() -> callback.onSettingsError(SETTINGS_FILE));
@@ -75,8 +97,8 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
 
                 if (provider.equalsIgnoreCase(TAG_ALPHA_VANTAGE)) {
                     String avData = TagHelper.getValueFromTagName(TAG_ALPHA_VANTAGE, content.toString());
-                    String apiKey = TagHelper.getValueFromTagName(TAG_API, avData.toString());
-                    String cache = TagHelper.getValueFromTagName(TAG_CACHE, avData.toString());
+                    String apiKey = TagHelper.getValueFromTagName(TAG_API, avData);
+                    String cache = TagHelper.getValueFromTagName(TAG_CACHE, avData);
 
                     if (apiKey.isEmpty()) {
                         mainThread.post(() -> callback.onSettingsError(SETTINGS_FILE));
@@ -87,10 +109,10 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
                         settings.setDataProvider(DataProvider.ALPHA_VANTAGE);
                         mainThread.post(() -> callback.onSettingsLoaded(settings));
                     }
-                } else {
+                } else if (provider.equalsIgnoreCase(TAG_INTERACTIVE_BROKERS))  {
 
                     String ibData = TagHelper.getValueFromTagName(TAG_INTERACTIVE_BROKERS, content.toString());
-                    String cache = TagHelper.getValueFromTagName(TAG_CACHE, ibData.toString());
+                    String cache = TagHelper.getValueFromTagName(TAG_CACHE, ibData);
 
                     if (cache.isEmpty()) {
                         mainThread.post(() -> callback.onSettingsError(SETTINGS_FILE));
@@ -101,6 +123,12 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
                         settings.setDataProvider(DataProvider.INTERACTIVE_BROKERS);
                         mainThread.post(() -> callback.onSettingsLoaded(settings));
                     }
+                } else {
+                    Settings settings = new Settings();
+                    settings.setApiKey("");
+                    settings.setCache("");
+                    settings.setDataProvider(DataProvider.YAHOO_FINANCE);
+                    mainThread.post(() -> callback.onSettingsLoaded(settings));
                 }
             }
         }

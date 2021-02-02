@@ -1,6 +1,5 @@
 package client.awt.components.tables;
 
-import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
 import com.zygne.stockanalyzer.domain.model.LiquiditySide;
 import com.zygne.stockanalyzer.domain.utils.TimeHelper;
 
@@ -64,7 +63,7 @@ public class LiquiditySideTableModel extends AbstractTableModel {
         } else if (5 == columnIndex) {
             return row.getStrength();
         } else if (6 == columnIndex) {
-            return TimeHelper.getDateFromTimeStamp(row.getTimeStamp());
+            return TimeHelper.getDateTimeFromTimeStamp(row.getTimeStamp());
         }
         return null;
     }

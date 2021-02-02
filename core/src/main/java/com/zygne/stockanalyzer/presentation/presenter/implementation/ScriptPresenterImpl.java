@@ -4,7 +4,7 @@ import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.interactor.base.Interactor;
 import com.zygne.stockanalyzer.domain.interactor.implementation.charting.*;
-import com.zygne.stockanalyzer.domain.interactor.implementation.scripting.PineScript2Interactor;
+import com.zygne.stockanalyzer.domain.interactor.implementation.scripting.PineScriptInteractor;
 import com.zygne.stockanalyzer.domain.interactor.implementation.scripting.ScriptInteractor;
 import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
 import com.zygne.stockanalyzer.domain.model.LiquiditySide;
@@ -76,7 +76,7 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
                 view.showError("Resistance not calculated");
                 return;
             }
-            scriptTitle += "Resistance";
+            scriptTitle += "Supply";
             interactor = new ResistanceChartLineInteractor(executor, mainThread, this, this.resistance);
         } else if (gaps) {
             if (this.gapList == null) {
@@ -98,7 +98,7 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
     @Override
     public void onChartZoneCreated(List<ChartObject> zones) {
         chartObjects.addAll(zones);
-        new PineScript2Interactor(executor, mainThread, this, scriptTitle, symbol, chartObjects).execute();
+        new PineScriptInteractor(executor, mainThread, this, scriptTitle, symbol, chartObjects).execute();
     }
 
     @Override
@@ -110,6 +110,6 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
     @Override
     public void onChartLineCreated(List<ChartObject> lines) {
         chartObjects.addAll(lines);
-        new PineScript2Interactor(executor, mainThread, this, scriptTitle, symbol, chartObjects).execute();
+        new PineScriptInteractor(executor, mainThread, this, scriptTitle, symbol, chartObjects).execute();
     }
 }

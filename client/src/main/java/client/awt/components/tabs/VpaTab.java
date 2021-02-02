@@ -1,7 +1,11 @@
 package client.awt.components.tabs;
 
-import com.zygne.stockanalyzer.domain.model.DataLength;
-import com.zygne.stockanalyzer.domain.model.Settings;
+import client.awt.components.tables.LiquidityLevelRenderer;
+import client.awt.components.tables.LiquidityLevelTableModel;
+import client.awt.components.views.FundamentalsView;
+import com.zygne.stockanalyzer.domain.model.DataSize;
+import com.zygne.stockanalyzer.domain.model.Fundamentals;
+import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
 import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 import com.zygne.stockanalyzer.domain.utils.StringUtils;
 
@@ -10,25 +14,33 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class MainTab extends JPanel {
+public class VpaTab extends JPanel {
 
     private static final int DEFAULT_PERCENTILE = 90;
 
     private Callback callback;
 
-    private TextArea textAreaInfo;
     private JComboBox comboTimeFrame;
     private JComboBox comboDataSize;
     private Checkbox checkBoxFundamentals;
     private TextField textFieldSymbol;
     private TextField textFieldReportPercentile;
 
-    private List<DataLength> dataSizeList = new ArrayList<>();
+    private List<DataSize> dataSizeList = new ArrayList<>();
     private List<TimeInterval> timeIntervalList = new ArrayList<>();
 
-    public MainTab() {
+    private LiquidityLevelTableModel tableModelPrices;
+    private LiquidityLevelTableModel tableModelVolume;
+
+    private JTable tablePrices;
+    private JTable tableVolume;
+
+    private FundamentalsView fundamentalsView;
+
+    public VpaTab() {
         setLayout(new BorderLayout());
 
         JPanel panel = new JPanel(new GridBagLayout());
@@ -73,7 +85,7 @@ public class MainTab extends JPanel {
         panel.add(comboTimeFrame, constraints);
 
         JLabel labelDataSize = new JLabel("Data Size");
-        ;
+
         constraints.gridx = 3;
         constraints.gridy = 0;
         panel.add(labelDataSize, constraints);
@@ -102,19 +114,37 @@ public class MainTab extends JPanel {
             }
         });
 
-        constraints.gridx = 0;
-        constraints.gridy = 2;
+        constraints.gridx = 5;
+        constraints.gridy = 1;
         panel.add(buttonCreateReport, constraints);
 
-        JPanel infoPanel = new JPanel(new BorderLayout());
-
-        textAreaInfo = new TextArea("");
-        textAreaInfo.setEditable(false);
-
-        infoPanel.add(textAreaInfo);
-
         add(panel, BorderLayout.NORTH);
-        add(infoPanel, BorderLayout.SOUTH);
+
+        JPanel contentTable = new JPanel(new BorderLayout());
+
+        fundamentalsView = new FundamentalsView();
+
+        contentTable.add(fundamentalsView, BorderLayout.NORTH);
+
+        JPanel tablesPanel = new JPanel(new GridLayout(1,2));;
+
+        tableModelPrices = new LiquidityLevelTableModel();
+        tablePrices = new JTable(tableModelPrices);
+        tablePrices.setDefaultRenderer(LiquidityLevel.class, new LiquidityLevelRenderer());
+        tablePrices.setDefaultRenderer(String.class, new LiquidityLevelRenderer());
+
+        tablesPanel.add(new JScrollPane(tablePrices));
+
+        tableModelVolume = new LiquidityLevelTableModel();
+        tableVolume = new JTable(tableModelVolume);
+        tableVolume.setDefaultRenderer(LiquidityLevel.class, new LiquidityLevelRenderer());
+        tableVolume.setDefaultRenderer(String.class, new LiquidityLevelRenderer());
+
+        tablesPanel.add(new JScrollPane(tableVolume));
+
+        contentTable.add(tablesPanel, BorderLayout.CENTER);
+
+        add(contentTable, BorderLayout.CENTER);
     }
 
     private void createReport() {
@@ -147,6 +177,7 @@ public class MainTab extends JPanel {
     public void setTimeFrames(List<TimeInterval> data, int defaultSelection) {
         timeIntervalList.clear();
         timeIntervalList.addAll(data);
+        comboTimeFrame.removeAllItems();
         if (comboTimeFrame != null) {
             for (TimeInterval e : timeIntervalList) {
                 comboTimeFrame.addItem(e.toString());
@@ -155,19 +186,45 @@ public class MainTab extends JPanel {
         }
     }
 
-    public void setDataSize(List<DataLength> data, int defaultSelection) {
+    public void setDataSize(List<DataSize> data, int defaultSelection) {
         dataSizeList.clear();
         dataSizeList.addAll(data);
+        comboDataSize.removeAllItems();
         if (comboDataSize != null) {
-            for (DataLength e : dataSizeList) {
-                comboDataSize.addItem(e.getSize() + " " + e.getContext());
+            for (DataSize e : dataSizeList) {
+                comboDataSize.addItem(e.getSize() + " " + e.getUnit());
             }
             comboDataSize.setSelectedIndex(defaultSelection);
         }
     }
 
-    public void setSettings(Settings settngs){
-        textAreaInfo.setText(settngs.toString());
+    public void addResistance(List<LiquidityLevel> data){
+        fundamentalsView.clear();
+        if (tablePrices != null) {
+            tableModelPrices.clear();
+            data.sort(new LiquidityLevel.PriceComparator());
+            Collections.reverse(data);
+            tableModelPrices.addItems(data);
+            tableModelPrices.fireTableDataChanged();
+            tablePrices.invalidate();
+        }
+
+        if (tableModelVolume != null) {
+            tableModelVolume.clear();
+            data.sort(new LiquidityLevel.VolumeComparator());
+            Collections.reverse(data);
+            tableModelVolume.addItems(data);
+            tableModelVolume.fireTableDataChanged();
+            tableVolume.invalidate();
+        }
+    }
+
+    public void addFundamentals(Fundamentals fundamentals){
+        fundamentalsView.populateFrom(fundamentals);
+    }
+
+    public void reset(){
+        fundamentalsView.clear();
     }
 
     public interface Callback {

@@ -9,6 +9,7 @@ import com.zygne.stockanalyzer.domain.model.BarData;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 public class CacheWriteInteractorImpl extends BaseInteractor implements CacheWriteInteractor {
@@ -29,6 +30,10 @@ public class CacheWriteInteractorImpl extends BaseInteractor implements CacheWri
     @Override
     public void run() {
 
+
+        lines.sort(new BarData.TimeComparator());
+        Collections.reverse(lines);
+
         String root = folder;
 
         File folder = new File(root);
@@ -42,6 +47,8 @@ public class CacheWriteInteractorImpl extends BaseInteractor implements CacheWri
         try {
             FileWriter myWriter = new FileWriter(fileName);
             myWriter.append(timeStamp);
+            myWriter.append("\n");
+            myWriter.append(BarData.createHeaders());
             myWriter.append("\n");
             for(BarData line : lines){
                 myWriter.append(BarData.toStream(line));

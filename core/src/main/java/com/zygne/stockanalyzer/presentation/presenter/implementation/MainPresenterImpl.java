@@ -8,21 +8,22 @@ import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 import com.zygne.stockanalyzer.presentation.presenter.base.BasePresenter;
 import com.zygne.stockanalyzer.presentation.presenter.base.MainPresenter;
 import com.zygne.stockanalyzer.presentation.presenter.implementation.delegates.InteractiveBrokersDelegate;
-import com.zygne.stockanalyzer.presentation.presenter.implementation.delegates.alphavantage.AlphaVantageDelegate;
+import com.zygne.stockanalyzer.presentation.presenter.implementation.delegates.YahooFinanceDelegate;
+import com.zygne.stockanalyzer.presentation.presenter.implementation.delegates.AlphaVantageDelegate;
 
 public class MainPresenterImpl extends BasePresenter implements MainPresenter {
 
-    private final View view;
     private final MainPresenter delegate;
 
     public MainPresenterImpl(Executor executor, MainThread mainThread, MainPresenter.View view, Settings settings) {
         super(executor, mainThread);
-        this.view = view;
         this.mainThread = mainThread;
         if(settings.getDataProvider() == DataProvider.INTERACTIVE_BROKERS) {
             delegate = new InteractiveBrokersDelegate(executor, mainThread, view, settings);
-        } else {
+        } else if(settings.getDataProvider() == DataProvider.ALPHA_VANTAGE) {
             delegate = new AlphaVantageDelegate(executor, mainThread, view, settings);
+        } else {
+            delegate = new YahooFinanceDelegate(executor, mainThread, view, settings);
         }
     }
 
@@ -34,6 +35,11 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter {
     @Override
     public void toggleConnection() {
         delegate.toggleConnection();
+    }
+
+    @Override
+    public void findHighVolume() {
+        delegate.findHighVolume();
     }
 
 }

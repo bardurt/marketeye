@@ -51,11 +51,11 @@ public class PriceGapTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         PriceGap row = data.get(rowIndex);
         if (0 == columnIndex) {
-            return String.format("%.2f", row.getInnerStart());
+            return String.format("%.2f", row.getStart());
         } else if (1 == columnIndex) {
-            return String.format("%.2f", row.getInnerEnd());
+            return String.format("%.2f", row.getEnd());
         } else if (2 == columnIndex) {
-            return TimeHelper.getDateFromTimeStamp(row.getTimeStamp());
+            return TimeHelper.getDateTimeFromTimeStamp(row.getTimeStamp());
         }
         return null;
     }

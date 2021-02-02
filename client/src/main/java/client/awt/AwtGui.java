@@ -3,11 +3,11 @@ package client.awt;
 import client.Constants;
 import client.awt.components.LoadingView;
 import client.awt.components.tabs.*;
-import com.zygne.stockanalyzer.domain.DataBroker;
 import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.executor.ThreadExecutor;
 import com.zygne.stockanalyzer.domain.model.*;
+import com.zygne.stockanalyzer.domain.model.enums.DataProvider;
 import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 import com.zygne.stockanalyzer.presentation.presenter.base.*;
 import com.zygne.stockanalyzer.presentation.presenter.implementation.*;
@@ -16,18 +16,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 public class AwtGui extends JPanel implements MainPresenter.View,
         LiquiditySidePresenter.View,
         ScriptPresenter.View,
         SettingsPresenter.View,
-        MainTab.Callback,
+        VpaTab.Callback,
         LiquiditySideTab.Callback,
-        ScriptTab.Callback {
+        ScriptTab.Callback,
+        SettingsTab.Callback {
 
-    private DataBroker dataBroker;
+    private Settings settings;
 
     private JLabel labelSymbol;
     private JLabel labelStatus;
@@ -38,50 +38,47 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     private String symbol;
 
+    private SettingsPresenter settingsPresenter;
     private MainPresenter mainPresenter;
     private LiquiditySidePresenter liquiditySidePresenter;
     private ScriptPresenter scriptPresenter;
     private MainThread mainThread = new JavaAwtThread();
     private Executor executor = ThreadExecutor.getInstance();
 
-    private PriceAnalysisTab priceAnalysisTab;
-    private MainTab mainTab;
+    private SettingsTab settingsTab;
+    private VpaTab vpaTab;
+    private IntradayTab intradayTab;
     private LiquiditySideTab liquiditySideTab;
     private FundamentalsTab fundamentalsTab;
     private PriceGapTab priceGapTab;
+    private WicksTab wicksTab;
     private ScriptTab scriptTab;
+    private HighVolumeBarTab highVolumeBarTab;
+
+    private JTabbedPane tabbedPane = new JTabbedPane();
 
     public AwtGui() {
         super(new BorderLayout());
         setSize(880, 880);
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        priceAnalysisTab = new PriceAnalysisTab();
-        mainTab = new MainTab();
-        mainTab.setCallback(this);
+        settingsTab = new SettingsTab();
+        settingsTab.setCallback(this);
+        vpaTab = new VpaTab();
+        vpaTab.setCallback(this);
+        intradayTab = new IntradayTab();
+        wicksTab = new WicksTab();
         liquiditySideTab = new LiquiditySideTab();
         liquiditySideTab.setCallback(this);
         priceGapTab = new PriceGapTab();
         fundamentalsTab = new FundamentalsTab();
         scriptTab = new ScriptTab();
         scriptTab.setCallback(this);
+        highVolumeBarTab = new HighVolumeBarTab();
 
-        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
 
-        tabbedPane.addTab("Main", mainTab);
-        tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
-
-        tabbedPane.addTab("Price Analysis", priceAnalysisTab);
-        tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
-
-        tabbedPane.addTab("Buy / Sell Side", liquiditySideTab);
-        tabbedPane.setMnemonicAt(2, KeyEvent.VK_4);
-
-        tabbedPane.addTab("Price Gaps", priceGapTab);
-        tabbedPane.setMnemonicAt(3, KeyEvent.VK_5);
-
-        tabbedPane.addTab("Script", scriptTab);
-        tabbedPane.setMnemonicAt(4, KeyEvent.VK_6);
+        tabbedPane.addTab("Settings", settingsTab);
 
         JPanel infoPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -122,7 +119,8 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         statusPanel.add(jButtonConnect, BorderLayout.SOUTH);
         add(statusPanel, BorderLayout.SOUTH);
 
-        new SettingsPresenterImpl(executor, mainThread, this).start();
+        settingsPresenter = new SettingsPresenterImpl(executor, mainThread, this);
+        settingsPresenter.start();
     }
 
     @Override
@@ -133,7 +131,7 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onResistanceFound(List<LiquidityLevel> zones) {
-        priceAnalysisTab.addResistance(zones);
+        vpaTab.addResistance(zones);
         liquiditySideTab.clear();
         priceGapTab.clear();
 
@@ -142,9 +140,6 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onSupportFound(List<LiquidityLevel> zones) {
-        if (priceAnalysisTab != null) {
-            priceAnalysisTab.addSupport(zones);
-        }
     }
 
     @Override
@@ -154,13 +149,13 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onFundamentalsLoaded(Fundamentals fundamentals) {
-        priceAnalysisTab.addFundamentals(fundamentals);
+        vpaTab.addFundamentals(fundamentals);
     }
 
     @Override
-    public void onComplete(String symbol, String timeFrame) {
+    public void onComplete(String symbol, String timeFrame, String dateRange) {
         this.symbol = symbol;
-        labelSymbol.setText("Symbol : " + symbol.toUpperCase() + " " + timeFrame.toString());
+        labelSymbol.setText("Symbol : " + symbol.toUpperCase() + " " + timeFrame.toString() + " - " + dateRange);
         labelStatus.setText("");
         labelLoading.setText("");
         scriptPresenter.setSymbol(symbol);
@@ -168,13 +163,13 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onTimeFramesPrepared(List<TimeInterval> timeIntervals, int defaultSelection) {
-        mainTab.setTimeFrames(timeIntervals, defaultSelection);
+        vpaTab.setTimeFrames(timeIntervals, defaultSelection);
         liquiditySideTab.setTimeFrames(timeIntervals, defaultSelection);
     }
 
     @Override
-    public void onDataSizePrepared(List<DataLength> data, int defaultSelection) {
-        mainTab.setDataSize(data, defaultSelection);
+    public void onDataSizePrepared(List<DataSize> data, int defaultSelection) {
+        vpaTab.setDataSize(data, defaultSelection);
     }
 
     @Override
@@ -199,8 +194,9 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onSettingsLoaded(Settings settings) {
-        if (mainTab != null) {
-            mainTab.setSettings(settings);
+        this.settings = settings;
+        if (settingsTab != null) {
+            settingsTab.setSettings(settings);
         }
 
         mainPresenter = new MainPresenterImpl(executor, mainThread, this, settings);
@@ -257,16 +253,72 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onPriceGapsFound(List<PriceGap> data) {
-        if(priceGapTab != null){
+        if (priceGapTab != null) {
             priceGapTab.addPriceGaps(data);
         }
 
         scriptPresenter.setGaps(data);
     }
 
-    private void connect(){
-        if(mainPresenter != null) {
+    private void connect() {
+        if (mainPresenter != null) {
             mainPresenter.toggleConnection();
         }
     }
+
+    @Override
+    public void onProviderSelected(DataProvider dataProvider) {
+        settingsPresenter.loadSettings(dataProvider);
+    }
+
+    @Override
+    public void toggleConnectionSettings(boolean b) {
+        if (b) {
+            jButtonConnect.setVisible(true);
+        } else {
+            jButtonConnect.setVisible(false);
+        }
+    }
+
+
+    @Override
+    public void onHighVolumeBarFound(List<VolumeBarDetails> data) {
+        highVolumeBarTab.addItems(data);
+    }
+
+    @Override
+    public void prepareView(List<MainPresenter.ViewComponent> viewComponents) {
+        tabbedPane.removeAll();
+
+        tabbedPane.addTab("Settings", settingsTab);
+
+        for (MainPresenter.ViewComponent v : viewComponents) {
+
+            if (v == MainPresenter.ViewComponent.VPA) {
+                tabbedPane.addTab("VPA", vpaTab);
+                tabbedPane.addTab("High Vol Bars", highVolumeBarTab);
+            }
+
+            if (v == MainPresenter.ViewComponent.INTRA_DAY) {
+                tabbedPane.addTab("Intra Day", intradayTab);
+            }
+
+            if (v == MainPresenter.ViewComponent.WICKS) {
+                tabbedPane.addTab("Liquidity", wicksTab);
+            }
+
+            if (v == MainPresenter.ViewComponent.PRICE_GAPS) {
+                tabbedPane.addTab("Price Gaps", priceGapTab);
+            }
+
+            if (v == MainPresenter.ViewComponent.SCRIPT) {
+                tabbedPane.addTab("Script", scriptTab);
+            }
+
+        }
+
+
+
+    }
+
 }
