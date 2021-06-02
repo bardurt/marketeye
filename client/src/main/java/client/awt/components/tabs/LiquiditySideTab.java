@@ -2,197 +2,144 @@ package client.awt.components.tabs;
 
 import client.awt.components.tables.LiquiditySideRenderer;
 import client.awt.components.tables.LiquiditySideTableModel;
+import client.awt.components.tables.PriceGapRenderer;
+import client.awt.components.tables.PriceGapTableModel;
 import com.zygne.stockanalyzer.domain.model.LiquiditySide;
-import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
-import com.zygne.stockanalyzer.domain.utils.StringUtils;
+import com.zygne.stockanalyzer.domain.model.PriceGap;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LiquiditySideTab extends JPanel {
 
-    private static final int DEFAULT_PERCENTILE = 90;
+    private LiquiditySideTableModel dailySellSideModel;
+    private JTable dailySellSideTable;
 
-    private Callback callback;
-    private LiquiditySideTableModel liquiditySideTableModel;
-    private JComboBox comboTimeFrame;
-    private TextField textFieldPriceMin;
-    private TextField textFieldPriceMax;
-    private TextField textFieldPercentile;
-    private JSlider sliderWickSize;
-    private JTable table;
+    private LiquiditySideTableModel dailyBuySideModel;
+    private JTable dailyBuySideTable;
 
-    private List<TimeInterval> timeIntervalList = new ArrayList<>();
+    private JTable priceGapTableDaily;
+    private PriceGapTableModel pricegapTableModelDaily;
+
+    private JTable priceGapTableIntraDay;
+    private PriceGapTableModel pricegapTableModelIntraDay;
 
     public LiquiditySideTab() {
+        setLayout(new GridLayout(2,1));
 
-        setLayout(new BorderLayout());
+        dailySellSideModel = new LiquiditySideTableModel();
+        dailySellSideTable = new JTable(dailySellSideModel);
+        dailySellSideTable.setDefaultRenderer(String.class, new LiquiditySideRenderer());
+        dailySellSideTable.setRowSorter(dailySellSideModel.getSorter(dailySellSideTable.getModel()));
 
-        JPanel controlPanel = new JPanel(new GridBagLayout());
+        dailyBuySideModel = new LiquiditySideTableModel();
+        dailyBuySideTable = new JTable(dailyBuySideModel);
+        dailyBuySideTable.setDefaultRenderer(String.class, new LiquiditySideRenderer());
+        dailyBuySideTable.setRowSorter(dailyBuySideModel.getSorter(dailyBuySideTable.getModel()));
 
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.NORTHWEST;
+        pricegapTableModelDaily = new PriceGapTableModel();
 
-        JLabel labelPercentile = new JLabel("Percentile");
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        controlPanel.add(labelPercentile, constraints);
+        priceGapTableDaily = new JTable(pricegapTableModelDaily);
+        priceGapTableDaily.setDefaultRenderer(String.class, new PriceGapRenderer());
 
-        textFieldPercentile = new TextField();
-        textFieldPercentile.setColumns(12);
-        textFieldPercentile.setText("" + DEFAULT_PERCENTILE);
+        pricegapTableModelIntraDay = new PriceGapTableModel();
 
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        controlPanel.add(textFieldPercentile, constraints);
+        priceGapTableIntraDay = new JTable(pricegapTableModelIntraDay);
+        priceGapTableIntraDay.setDefaultRenderer(String.class, new PriceGapRenderer());
 
-        JLabel labelSymbol = new JLabel("Price");
+        JPanel dailyPanel = new JPanel(new BorderLayout());
 
-        textFieldPriceMin = new TextField();
-        textFieldPriceMin.setColumns(12);
+        JPanel dailyContainer = new JPanel(new GridLayout(0,2));
 
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-        controlPanel.add(new JLabel("Price Min"), constraints);
+        JPanel dailyBuy = new JPanel(new BorderLayout());
+        dailyBuy.add(new JLabel("Buy Side"), BorderLayout.NORTH);
+        dailyBuy.add(new JScrollPane(dailyBuySideTable), BorderLayout.CENTER);
 
-        constraints.gridx = 1;
-        constraints.gridy = 1;
-        controlPanel.add(textFieldPriceMin, constraints);
+        dailyContainer.add(dailyBuy);
 
-        textFieldPriceMax = new TextField();
-        textFieldPriceMax.setColumns(12);
+        JPanel dailySell = new JPanel(new BorderLayout());
+        dailySell.add(new JLabel("Sell Side"), BorderLayout.NORTH);
+        dailySell.add(new JScrollPane(dailySellSideTable), BorderLayout.CENTER);
 
-        constraints.gridx = 2;
-        constraints.gridy = 0;
-        controlPanel.add(new JLabel("Price Max"), constraints);
+        dailyContainer.add(dailySell);
+        dailyPanel.add(dailyContainer);
 
-        constraints.gridx = 2;
-        constraints.gridy = 1;
-        controlPanel.add(textFieldPriceMax, constraints);
+        add(dailyPanel);
 
-        JLabel labelTimeFrame = new JLabel("Time Frame");
-        constraints.gridx = 3;
-        constraints.gridy = 0;
-        controlPanel.add(labelTimeFrame, constraints);
+        JPanel priceGapsPanel = new JPanel(new GridLayout());
 
-        comboTimeFrame = new JComboBox();
-        constraints.gridx = 3;
-        constraints.gridy = 1;
-        controlPanel.add(comboTimeFrame, constraints);
+        JPanel priceGapsDailyPanel = new JPanel(new BorderLayout());
+        priceGapsDailyPanel.add(new JLabel("Price Gaps Daily"), BorderLayout.NORTH);
+        priceGapsDailyPanel.add(new JScrollPane(priceGapTableDaily), BorderLayout.CENTER);
 
-        sliderWickSize = new JSlider(5, 55, 15);
-        sliderWickSize.setPaintTrack(true);
-        sliderWickSize.setPaintTicks(true);
-        sliderWickSize.setPaintLabels(true);
-        sliderWickSize.setMajorTickSpacing(10);
-        sliderWickSize.setMinorTickSpacing(5);
+        JPanel priceGapsIntraDayPanel = new JPanel(new BorderLayout());
+        priceGapsIntraDayPanel.add(new JLabel("Price Gaps Intraday"), BorderLayout.NORTH);
+        priceGapsIntraDayPanel.add(new JScrollPane(priceGapTableIntraDay), BorderLayout.CENTER);
 
-        final JLabel labelWickSize = new JLabel("Min Wick Size : " + sliderWickSize.getValue() + "%");
-        constraints.gridx = 4;
-        constraints.gridy = 0;
-        controlPanel.add(labelWickSize, constraints);
+        priceGapsPanel.add(priceGapsDailyPanel);
+        priceGapsPanel.add(priceGapsIntraDayPanel);
 
-        sliderWickSize.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent ce) {
-                labelWickSize.setText("Min Wick Size : " + sliderWickSize.getValue() + "%");
-            }
-        });
-
-        constraints.gridx = 4;
-        constraints.gridy = 1;
-        controlPanel.add(sliderWickSize, constraints);
-
-        JButton buttonCreateReport = new JButton("Find");
-        buttonCreateReport.setBounds(50, 100, 95, 30);
-        buttonCreateReport.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                findSides();
-            }
-        });
-
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-        controlPanel.add(buttonCreateReport, constraints);
-        add(controlPanel, BorderLayout.NORTH);
-
-        liquiditySideTableModel = new LiquiditySideTableModel();
-
-        table = new JTable(liquiditySideTableModel);
-        table.setDefaultRenderer(String.class, new LiquiditySideRenderer());
-        constraints.gridx = 0;
-        constraints.gridy = 3;
-        constraints.gridwidth = 5;
-        constraints.weightx = 0;
-        constraints.fill = GridBagConstraints.BOTH;
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        add(priceGapsPanel);
     }
 
-    public void setTimeFrames(List<TimeInterval> data, int defaultSelection) {
-        timeIntervalList.clear();
-        timeIntervalList.addAll(data);
-        if (comboTimeFrame != null) {
-            for (TimeInterval e : timeIntervalList) {
-                comboTimeFrame.addItem(e);
+    public void addDaily(List<LiquiditySide> data){
+        data.sort(new LiquiditySide.TimeComparator());
+        Collections.reverse(data);
+
+        dailyBuySideModel.clear();
+        dailySellSideModel.clear();
+
+        for(LiquiditySide e : data){
+            if(e.getSide().equalsIgnoreCase("Buy")){
+                dailyBuySideModel.addItem(e);
+            } else {
+                dailySellSideModel.addItem(e);
             }
-            comboTimeFrame.setSelectedIndex(defaultSelection);
         }
+
+        dailySellSideModel.fireTableDataChanged();
+        dailyBuySideModel.fireTableDataChanged();
+        dailySellSideTable.invalidate();
+        dailyBuySideTable.invalidate();
     }
 
-    public void addSides(List<LiquiditySide> data){
-        liquiditySideTableModel.clear();
-        liquiditySideTableModel.addItems(data);
-        liquiditySideTableModel.fireTableDataChanged();
-        table.invalidate();
+    public void addWeekly(List<LiquiditySide> data){
+        data.sort(new LiquiditySide.TimeComparator());
+        Collections.reverse(data);
     }
 
     public void clear(){
-        liquiditySideTableModel.clear();
-        liquiditySideTableModel.fireTableDataChanged();
-        table.invalidate();
+        dailySellSideModel.clear();
+        dailySellSideModel.fireTableDataChanged();
+        dailySellSideTable.invalidate();
+
+        dailyBuySideModel.clear();
+        dailyBuySideModel.fireTableDataChanged();
+        dailyBuySideTable.invalidate();
+
+        pricegapTableModelDaily.clear();
+        pricegapTableModelDaily.fireTableDataChanged();
+        priceGapTableDaily.invalidate();
+
+        pricegapTableModelIntraDay.clear();
+        pricegapTableModelIntraDay.fireTableDataChanged();
+        priceGapTableIntraDay.invalidate();
     }
 
-    public void setCallback(Callback callback){
-        this.callback = callback;
+    public void addDailyPriceGaps(List<PriceGap> data) {
+        pricegapTableModelDaily.clear();
+        pricegapTableModelDaily.addItems(data);
+        pricegapTableModelDaily.fireTableDataChanged();
+        priceGapTableDaily.invalidate();
     }
 
-    private void findSides() {
-
-        if(callback != null){
-
-            double percentile = 90;
-
-
-            if (StringUtils.idDouble(textFieldPercentile.getText())) {
-                percentile = Double.parseDouble(textFieldPercentile.getText());
-            }
-
-            double priceMin = -1;
-
-            if (StringUtils.idDouble(textFieldPriceMin.getText())) {
-                priceMin = Double.parseDouble(textFieldPriceMin.getText());
-            }
-
-            double priceMax = -1;
-
-            if (StringUtils.idDouble(textFieldPriceMax.getText())) {
-                priceMax = Double.parseDouble(textFieldPriceMax.getText());
-            }
-
-            double size = sliderWickSize.getValue();
-
-            TimeInterval timeInterval = timeIntervalList.get(comboTimeFrame.getSelectedIndex());
-
-            callback.findLiquiditySides(timeInterval, size, percentile, priceMin, priceMax);
-        }
+    public void addIntraDayPriceGaps(List<PriceGap> data) {
+        pricegapTableModelIntraDay.clear();
+        pricegapTableModelIntraDay.addItems(data);
+        pricegapTableModelIntraDay.fireTableDataChanged();
+        priceGapTableIntraDay.invalidate();
     }
 
-    public interface Callback{
-        void findLiquiditySides(TimeInterval timeInterval, double size, double percentile, double priceMin, double priceMax);
-    }
 }

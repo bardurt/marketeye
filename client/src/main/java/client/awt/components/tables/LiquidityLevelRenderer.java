@@ -16,27 +16,38 @@ public class LiquidityLevelRenderer extends JLabel implements TableCellRenderer 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                    boolean hasFocus, int row, int column) {
 
-        String percentileString = (String) table.getModel().getValueAt(row, 2);
         double percentile = -1;
+        double rank = -1;
 
         try {
-            percentile = Double.parseDouble(percentileString);
+            percentile = Double.parseDouble((String) table.getModel().getValueAt(row, 2));
         } catch (Exception e) {
         }
 
-        setText((String) value);
-        setForeground(Color.black);
-
-        if (percentile >= 100) {
-            setForeground(Color.WHITE);
-            setBackground(Color.decode(Colors.COLOR_RED_DARK));
-        } else if (percentile > 99) {
-            setBackground(Color.decode(Colors.COLOR_RED));
-        } else if (percentile >= 98) {
-            setBackground(Color.decode(Colors.COLOR_ORANGE));
-        } else {
-            setBackground(Color.WHITE);
+        try {
+            rank = Double.parseDouble((String) table.getModel().getValueAt(row, 3));
+        } catch (Exception e) {
         }
+
+        if(row % 2 == 0){
+            setForeground(Color.black);
+            setBackground(Color.WHITE);
+        } else {
+            setForeground(Color.black);
+            setBackground(Color.decode("#EEEEEE"));
+        }
+
+        if(percentile > 99){
+            setForeground(Color.black);
+            setBackground(Color.decode("#80D2F8"));
+        }
+
+        if(rank == 1){
+            setForeground(Color.black);
+            setBackground(Color.decode("#FF7676"));
+        }
+
+        setText((String) value);
 
         return this;
     }

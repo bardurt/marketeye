@@ -1,5 +1,6 @@
 package com.zygne.stockanalyzer;
 
+import com.zygne.stockanalyzer.domain.Logger;
 import com.zygne.stockanalyzer.domain.api.DataBroker;
 import com.zygne.stockanalyzer.domain.model.BarData;
 import com.zygne.stockanalyzer.domain.model.DataSize;
@@ -17,16 +18,30 @@ import java.util.List;
 public class YahooDataBroker implements DataBroker {
 
     private Callback callback;
+    private Asset asset;
+    private final Logger logger;
+
+    public YahooDataBroker(Logger logger) {
+        this.logger = logger;
+    }
 
     @Override
     public void downloadHistoricalBarData(String symbol, DataSize dataSize, TimeInterval timeInterval) {
+
+        logger.log(Logger.LOG_LEVEL.INFO, symbol + " " + timeInterval + " " + dataSize.getSize() + " " + dataSize.getUnit());
 
         final int years = dataSize.getSize();
 
         Calendar calendar = Calendar.getInstance();
         String timeEnd = "" + (calendar.getTime().getTime() / 1000);
 
-        calendar.add(Calendar.YEAR, years * -1);
+        if(dataSize.getUnit() == DataSize.Unit.Year) {
+            calendar.add(Calendar.YEAR, years * -1);
+        } else if(dataSize.getUnit() == DataSize.Unit.Month){
+            calendar.add(Calendar.MONTH, years * -1);
+        } else {
+            calendar.add(Calendar.YEAR, years * -1);
+        }
 
         String timeStart = "" + (calendar.getTime().getTime() / 1000);
 
@@ -40,7 +55,7 @@ public class YahooDataBroker implements DataBroker {
 
         String url = "https://query1.finance.yahoo.com/v7/finance/download/" + symbol + "?period1=" + timeStart + "&period2=" + timeEnd + "&interval=" + time + "&events=history&includeAdjustedClose=false";
 
-        System.out.println(url);
+        logger.log(Logger.LOG_LEVEL.INFO, "Downloading data from " + url);
 
         Thread t = new Thread(() -> {
             List<BarData> data = downLoadTimeSeries(url);
@@ -130,10 +145,9 @@ public class YahooDataBroker implements DataBroker {
     public void removeConnectionListener() {
     }
 
-    public static void main(String[] args) {
-
-        YahooDataBroker dataBroker = new YahooDataBroker();
-
-        dataBroker.downloadHistoricalBarData("IBM", new DataSize(1, DataSize.Unit.Year), TimeInterval.Day);
+    @Override
+    public void setAsset(Asset asset) {
+        this.asset = asset;
     }
+
 }

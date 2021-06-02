@@ -22,12 +22,13 @@ public class FundamentalsView extends JPanel {
 
     public void populateFrom(Fundamentals fundamentals){
 
-        String details = "Fundamentals\n";
-        details += "Float : " + String.format("%,d", fundamentals.getSharesFloat()) + "\n";
-        details += "Short : " + String.format("%,d", fundamentals.getSharesShort()) + "\n";
-        details += "Short Percentage : " + String.format("%.2f", fundamentals.getShortPercentage()) + "%" + "\n";
-        details += "52 W High : " + String.format("%.2f", fundamentals.getHigh()) + "\n";
-        details += "52 W Low : " + String.format("%.2f", fundamentals.getLow());
+        String details = "";
+        details += "Float : " + String.format("%,d", fundamentals.getSharesFloat()) + ", ";
+        details += "Short : " + String.format("%,d", fundamentals.getSharesShort()) + ", ";
+        details += "Short Percentage : " + String.format("%.2f", fundamentals.getShortPercentage()) + "%" + ", ";
+        details += "52 W High : " + String.format("%.2f", fundamentals.getHigh()) + ", ";
+        details += "52 W Low : " + String.format("%.2f", fundamentals.getLow()) + ", ";
+        details += "Avg vol : " + String.format("%,d", fundamentals.getAvgVol());
 
         textFieldFloat.setText(details);
     }

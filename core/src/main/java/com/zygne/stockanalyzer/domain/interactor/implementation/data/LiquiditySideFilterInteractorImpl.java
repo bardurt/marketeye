@@ -37,7 +37,6 @@ public class LiquiditySideFilterInteractorImpl extends BaseInteractor implements
         }
 
         filtered.sort(new LiquiditySide.TimeComparator());
-        Collections.reverse(filtered);
 
         mainThread.post(() -> callback.onLiquiditySidesFiltered(filtered));
 

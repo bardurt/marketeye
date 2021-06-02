@@ -2,7 +2,10 @@ package client.awt;
 
 import client.Constants;
 import client.awt.components.LoadingView;
+import client.awt.components.UiLogger;
 import client.awt.components.tabs.*;
+import com.zygne.stockanalyzer.domain.Logger;
+import com.zygne.stockanalyzer.domain.api.DataBroker;
 import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.executor.ThreadExecutor;
@@ -12,22 +15,23 @@ import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 import com.zygne.stockanalyzer.presentation.presenter.base.*;
 import com.zygne.stockanalyzer.presentation.presenter.implementation.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class AwtGui extends JPanel implements MainPresenter.View,
-        LiquiditySidePresenter.View,
         ScriptPresenter.View,
         SettingsPresenter.View,
-        VpaTab.Callback,
-        LiquiditySideTab.Callback,
         ScriptTab.Callback,
         SettingsTab.Callback {
 
     private Settings settings;
+    private ResourceLoader resourceLoader = new ResourceLoader();
 
     private JLabel labelSymbol;
     private JLabel labelStatus;
@@ -40,20 +44,16 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     private SettingsPresenter settingsPresenter;
     private MainPresenter mainPresenter;
-    private LiquiditySidePresenter liquiditySidePresenter;
     private ScriptPresenter scriptPresenter;
     private MainThread mainThread = new JavaAwtThread();
     private Executor executor = ThreadExecutor.getInstance();
 
     private SettingsTab settingsTab;
     private VpaTab vpaTab;
-    private IntradayTab intradayTab;
     private LiquiditySideTab liquiditySideTab;
-    private FundamentalsTab fundamentalsTab;
-    private PriceGapTab priceGapTab;
-    private WicksTab wicksTab;
     private ScriptTab scriptTab;
-    private HighVolumeBarTab highVolumeBarTab;
+    private VolumeTab volumeTab;
+    private PnfTab pnfTab;
 
     private JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -62,19 +62,14 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         setSize(880, 880);
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        settingsTab = new SettingsTab();
+        settingsTab = new SettingsTab(resourceLoader);
         settingsTab.setCallback(this);
         vpaTab = new VpaTab();
-        vpaTab.setCallback(this);
-        intradayTab = new IntradayTab();
-        wicksTab = new WicksTab();
         liquiditySideTab = new LiquiditySideTab();
-        liquiditySideTab.setCallback(this);
-        priceGapTab = new PriceGapTab();
-        fundamentalsTab = new FundamentalsTab();
         scriptTab = new ScriptTab();
         scriptTab.setCallback(this);
-        highVolumeBarTab = new HighVolumeBarTab();
+        volumeTab = new VolumeTab();
+        pnfTab = new PnfTab();
 
         tabbedPane = new JTabbedPane();
 
@@ -124,27 +119,50 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     }
 
     @Override
-    public void onLiquiditySidesGenerated(List<LiquiditySide> data) {
-        liquiditySideTab.addSides(data);
-        scriptPresenter.setZones(data);
+    public void onDailyLiquidityGenerated(List<LiquiditySide> data) {
+        liquiditySideTab.addDaily(data);
+        List<LiquiditySide> sides = new ArrayList<>();
+
+        for (LiquiditySide e : data) {
+            if (e.getSide().equalsIgnoreCase("Buy")) {
+            } else {
+                sides.add(e);
+            }
+        }
+
+
+        scriptPresenter.setZones(sides);
     }
 
     @Override
-    public void onResistanceFound(List<LiquidityLevel> zones) {
-        vpaTab.addResistance(zones);
+    public void onWeeklyLiquidityGenerated(List<LiquiditySide> data) {
+        liquiditySideTab.addWeekly(data);
+    }
+
+    @Override
+    public void onSupplyCreated(List<LiquidityLevel> filtered, List<LiquidityLevel> raw) {
+        vpaTab.addSupply(filtered);
         liquiditySideTab.clear();
-        priceGapTab.clear();
 
-        scriptPresenter.setResistance(zones);
+        scriptPresenter.setResistance(filtered);
+
+        Collections.sort(filtered, new LiquidityLevel.VolumeComparator());
+        Collections.reverse(filtered);
+
+        List<LiquidityLevel> pocs = new ArrayList<>();
+
+        for (LiquidityLevel e : filtered) {
+            if (e.getPercentile() > 98) {
+                pocs.add(e);
+            }
+        }
+
+        vpaTab.addVolumeProfile(symbol, raw);
     }
 
     @Override
-    public void onSupportFound(List<LiquidityLevel> zones) {
-    }
-
-    @Override
-    public void onPivotFound(List<LiquidityLevel> zones) {
-
+    public void onBinnedSupplyCreated(List<LiquidityLevel> zones) {
+        vpaTab.addBinnedSupply(zones);
     }
 
     @Override
@@ -163,13 +181,12 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onTimeFramesPrepared(List<TimeInterval> timeIntervals, int defaultSelection) {
-        vpaTab.setTimeFrames(timeIntervals, defaultSelection);
-        liquiditySideTab.setTimeFrames(timeIntervals, defaultSelection);
+        settingsTab.setTimeFrames(timeIntervals, defaultSelection);
     }
 
     @Override
     public void onDataSizePrepared(List<DataSize> data, int defaultSelection) {
-        vpaTab.setDataSize(data, defaultSelection);
+        settingsTab.setDataSize(data, defaultSelection);
     }
 
     @Override
@@ -199,8 +216,9 @@ public class AwtGui extends JPanel implements MainPresenter.View,
             settingsTab.setSettings(settings);
         }
 
-        mainPresenter = new MainPresenterImpl(executor, mainThread, this, settings);
-        liquiditySidePresenter = new LiquiditySidePresenterImpl(executor, mainThread, this, settings);
+        Logger logger = new UiLogger(new JavaAwtThread(), settingsTab.getLogArea());
+        logger.setUp();
+        mainPresenter = new MainPresenterImpl(executor, mainThread, this, settings, logger);
         scriptPresenter = new ScriptPresenterImpl(executor, mainThread, this);
     }
 
@@ -220,16 +238,11 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     }
 
     @Override
-    public void generateReport(String symbol, double percentile, TimeInterval timeInterval, int dataSize, boolean fundamentals) {
+    public void generateReport(String symbol, double percentile, TimeInterval timeInterval, DataSize dataSize, boolean fundamentals, boolean cache, DataBroker.Asset asset) {
         if (mainPresenter != null) {
-            mainPresenter.getZones(symbol, percentile, timeInterval, dataSize, fundamentals);
-        }
-    }
-
-    @Override
-    public void findLiquiditySides(TimeInterval timeInterval, double size, double percentile, double priceMin, double priceMax) {
-        if (liquiditySidePresenter != null) {
-            liquiditySidePresenter.getSides(symbol, timeInterval, size, percentile, priceMin, priceMax);
+            this.symbol = symbol.toUpperCase();
+            mainPresenter.setAsset(asset);
+            mainPresenter.createReport(symbol, percentile, timeInterval, dataSize, fundamentals, cache);
         }
     }
 
@@ -241,23 +254,15 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     }
 
 
-    public void launch(String args[]) {
-        JFrame frame = new JFrame(Constants.APP_NAME);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 800);
-        frame.add(new AwtGui());
-
-        frame.pack();
-        frame.setVisible(true);
+    @Override
+    public void onDailyPriceGapsFound(List<PriceGap> data) {
+        liquiditySideTab.addDailyPriceGaps(data);
+        scriptPresenter.setGaps(data);
     }
 
     @Override
-    public void onPriceGapsFound(List<PriceGap> data) {
-        if (priceGapTab != null) {
-            priceGapTab.addPriceGaps(data);
-        }
-
-        scriptPresenter.setGaps(data);
+    public void onIntraDayPriceGapsFound(List<PriceGap> data) {
+        liquiditySideTab.addIntraDayPriceGaps(data);
     }
 
     private void connect() {
@@ -283,7 +288,7 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onHighVolumeBarFound(List<VolumeBarDetails> data) {
-        highVolumeBarTab.addItems(data);
+        volumeTab.addHighVolBars(data);
     }
 
     @Override
@@ -296,29 +301,41 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
             if (v == MainPresenter.ViewComponent.VPA) {
                 tabbedPane.addTab("VPA", vpaTab);
-                tabbedPane.addTab("High Vol Bars", highVolumeBarTab);
-            }
-
-            if (v == MainPresenter.ViewComponent.INTRA_DAY) {
-                tabbedPane.addTab("Intra Day", intradayTab);
+                tabbedPane.addTab("Highest Volume", volumeTab);
+                //tabbedPane.addTab("High Vol Bars", highVolumeBarTab);
             }
 
             if (v == MainPresenter.ViewComponent.WICKS) {
-                tabbedPane.addTab("Liquidity", wicksTab);
-            }
-
-            if (v == MainPresenter.ViewComponent.PRICE_GAPS) {
-                tabbedPane.addTab("Price Gaps", priceGapTab);
-            }
-
-            if (v == MainPresenter.ViewComponent.SCRIPT) {
-                tabbedPane.addTab("Script", scriptTab);
+                tabbedPane.addTab("Liquidity", liquiditySideTab);
             }
 
         }
 
-
-
+        //tabbedPane.addTab("PnF", pnfTab);
     }
 
+    @Override
+    public void onDailyBarsCreated(List<Histogram> histograms) {
+        pnfTab.addVolumeProfile("", histograms);
+    }
+
+    @Override
+    public void onHistogramCreated(List<Histogram> histograms) {
+    }
+
+    public void launch() {
+        JFrame frame = new JFrame(Constants.APP_NAME);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 800);
+        frame.add(new AwtGui());
+
+        Image image = resourceLoader.loadImage("icon.png");
+
+        if(image != null) {
+            frame.setIconImage(image);
+        }
+
+        frame.pack();
+        frame.setVisible(true);
+    }
 }

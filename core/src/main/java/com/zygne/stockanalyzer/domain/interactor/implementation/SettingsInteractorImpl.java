@@ -17,12 +17,10 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
     private static final String TAG_ALPHA_VANTAGE = "AV";
     private static final String TAG_INTERACTIVE_BROKERS = "IB";
     private static final String TAG_YAHOO_FINANCE = "YF";
-    private static final String TAG_PROVIDER = "DATA_PROVIDER";
 
     private static final String INDENT = "   ";
     private final Callback callback;
     private DataProvider defaultProvider = null;
-
 
     public SettingsInteractorImpl(Executor executor, MainThread mainThread, Callback callback) {
         super(executor, mainThread);
@@ -52,14 +50,16 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
 
     private void readSettings(File file) {
         FileReader fileReader = null;
-
+        String settingsPath = "";
 
         try {
             fileReader = new FileReader(file);
+            settingsPath = file.getAbsolutePath();
         } catch (Exception ignored) {
         }
 
         StringBuilder content = new StringBuilder();
+
         if (fileReader != null) {
             try {
                 BufferedReader br = new BufferedReader(fileReader);
@@ -80,7 +80,7 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
             String provider;
 
             if (defaultProvider == null) {
-                provider = TagHelper.getValueFromTagName(TAG_PROVIDER, content.toString());
+                provider = TAG_YAHOO_FINANCE;
             } else {
                 if(defaultProvider == DataProvider.ALPHA_VANTAGE){
                     provider = TAG_ALPHA_VANTAGE;
@@ -104,6 +104,7 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
                         mainThread.post(() -> callback.onSettingsError(SETTINGS_FILE));
                     } else {
                         Settings settings = new Settings();
+                        settings.setPath(settingsPath);
                         settings.setApiKey(apiKey);
                         settings.setCache(cache);
                         settings.setDataProvider(DataProvider.ALPHA_VANTAGE);
@@ -118,13 +119,15 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
                         mainThread.post(() -> callback.onSettingsError(SETTINGS_FILE));
                     } else {
                         Settings settings = new Settings();
+                        settings.setPath(settingsPath);
                         settings.setApiKey("");
                         settings.setCache(cache);
                         settings.setDataProvider(DataProvider.INTERACTIVE_BROKERS);
                         mainThread.post(() -> callback.onSettingsLoaded(settings));
                     }
-                } else {
+                }else {
                     Settings settings = new Settings();
+                    settings.setPath(settingsPath);
                     settings.setApiKey("");
                     settings.setCache("");
                     settings.setDataProvider(DataProvider.YAHOO_FINANCE);
@@ -151,7 +154,6 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
         stringBuilder.append("<!-- Configuration file -->");
         stringBuilder.append("\n");
         stringBuilder.append("\n");
-        stringBuilder.append(TagHelper.createTag(TAG_PROVIDER, TAG_ALPHA_VANTAGE));
         stringBuilder.append("\n");
         stringBuilder.append("<!-- Alpha Vantage Details-->");
         stringBuilder.append("\n");

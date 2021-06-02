@@ -47,7 +47,7 @@ public class VolumeBarDetailsInteractorImpl extends BaseInteractor implements Vo
             details.add(volumeBarDetails);
             count++;
 
-            if(count > 8){
+            if(count > 10){
                 break;
             }
         }

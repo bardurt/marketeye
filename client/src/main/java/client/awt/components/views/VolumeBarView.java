@@ -40,6 +40,7 @@ public class VolumeBarView extends JPanel {
         tablePrices = new JTable(tableModelPrices);
         tablePrices.setDefaultRenderer(LiquidityLevel.class, new LiquidityLevelRenderer());
         tablePrices.setDefaultRenderer(String.class, new LiquidityLevelRenderer());
+        tablePrices.setRowSorter(tableModelPrices.getSorter(tablePrices.getModel()));
 
         add(new JScrollPane(tablePrices));
     }
@@ -55,7 +56,7 @@ public class VolumeBarView extends JPanel {
         if(volumeBarDetails.getSupply() != null) {
             if (tablePrices != null) {
                 tableModelPrices.clear();
-                volumeBarDetails.getSupply().sort(new LiquidityLevel.PriceComparator());
+                volumeBarDetails.getSupply().sort(new LiquidityLevel.VolumeComparator());
                 Collections.reverse(volumeBarDetails.getSupply());
                 tableModelPrices.addItems(volumeBarDetails.getSupply());
                 tableModelPrices.fireTableDataChanged();

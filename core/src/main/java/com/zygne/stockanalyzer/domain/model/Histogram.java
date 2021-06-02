@@ -1,5 +1,7 @@
 package com.zygne.stockanalyzer.domain.model;
 
+import com.zygne.stockanalyzer.domain.utils.NumberHelper;
+
 import java.util.Comparator;
 
 public class Histogram {
@@ -55,6 +57,14 @@ public class Histogram {
         return false;
     }
 
+    public double getOpenCloseChange(){
+        return NumberHelper.getPercentChange(open, close);
+    }
+
+    public double getOpenHighChange(){
+        return NumberHelper.getPercentChange(low, high);
+    }
+
     @Override
     public boolean equals(Object obj) {
         long timeStamp1 = ((Histogram)obj).timeStamp;
@@ -74,6 +84,14 @@ public class Histogram {
         @Override
         public int compare(Histogram o1, Histogram o2) {
             return Long.compare(o1.volume, o2.volume);
+        }
+    }
+
+    public static final class PriceComparator implements Comparator<Histogram> {
+
+        @Override
+        public int compare(Histogram o1, Histogram o2) {
+            return Double.compare(o1.high, o2.high);
         }
     }
 

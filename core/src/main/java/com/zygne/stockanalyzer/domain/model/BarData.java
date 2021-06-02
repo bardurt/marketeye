@@ -24,6 +24,11 @@ public class BarData {
         public static final int YAHOO = 2;
     }
 
+    public static final class Asset{
+        public static final int STOCK = 0;
+        public static final int CRYPTO = 1;
+    }
+
     private static final String DELIM = ",";
 
     private String time;
@@ -33,6 +38,7 @@ public class BarData {
     private double close;
     private long volume;
     private int dataFarm = DataFarm.UNKNOWN;
+    private int asset = Asset.STOCK;
 
     public BarData(String time, double open, double high, double low, double close, long volume) {
         this.time = time;
@@ -97,6 +103,10 @@ public class BarData {
 
     public void setDataFarm(int dataFarm) {
         this.dataFarm = dataFarm;
+    }
+
+    public static String getDELIM() {
+        return DELIM;
     }
 
     public long getTimeStamp(){
@@ -193,6 +203,36 @@ public class BarData {
 
                 barData = new BarData(timeStamp, open, high, low, close, volume);
                 barData.setDataFarm(dataFarm);
+            } catch (Exception ignored){ }
+        }
+
+        return barData;
+    }
+
+    public static BarData fromStream(String stream, int dataFarm, int asset) {
+
+        BarData barData = null;
+        if(dataFarm == DataFarm.ALPHA_VANTAGE && asset == Asset.CRYPTO){
+
+            String[] tempArr;
+
+            try {
+                tempArr = stream.split(DELIM);
+                String timeStamp = tempArr[0];
+                double open = Double.parseDouble(tempArr[1]);
+                double high = Double.parseDouble(tempArr[2]);
+                double low = Double.parseDouble(tempArr[3]);
+                double close = Double.parseDouble(tempArr[4]);
+                double volume = Double.parseDouble(tempArr[9]);
+
+                int farm = DataFarm.UNKNOWN;
+
+                try{
+                    farm = Integer.parseInt(tempArr[6]);
+                } catch (Exception ignored){ }
+
+                barData = new BarData(timeStamp, open, high, low, close, (long) volume);
+                barData.setDataFarm(farm);
             } catch (Exception e){
                 e.printStackTrace();
             }

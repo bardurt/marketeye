@@ -11,8 +11,14 @@ public interface DataBroker extends Api {
     void downloadHistoricalBarData(String symbol, DataSize dataSize, TimeInterval timeInterval);
     void setCallback(Callback callback);
     void removeCallback();
+    void setAsset(Asset asset);
 
     interface Callback{
         void onDataFinished(List<BarData> data);
+    }
+
+    enum Asset{
+        Stock,
+        Crypto
     }
 }

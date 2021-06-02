@@ -24,25 +24,20 @@ public class ResistanceChartLineInteractor extends BaseInteractor implements Cha
     @Override
     public void run() {
 
+        List<LiquidityLevel> zones = new ArrayList<>(data);
+
         List<ChartObject> lines = new ArrayList<>();
 
-        for (LiquidityLevel e : data) {
-
+        for (LiquidityLevel e : zones) {
             ChartLine line = new ChartLine();
             line.level = e.price;
             line.size = 1;
-
-            if(e.getPercentile() > 99){
-                line.color = ChartLine.Color.RED;
-            } else if(e.getPercentile() > 98){
-                line.color = ChartLine.Color.ORANGE;
-            } else {
-                line.color = ChartLine.Color.BLUE;
-            }
+            line.color = ChartLine.Color.BLUE;
 
             lines.add(line);
-
         }
+
+        callback.onChartLineCreated(lines);
 
         mainThread.post(() -> callback.onChartLineCreated(lines));
 

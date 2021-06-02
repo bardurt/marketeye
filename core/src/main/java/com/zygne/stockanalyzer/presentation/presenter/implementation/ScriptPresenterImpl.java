@@ -54,7 +54,7 @@ public class ScriptPresenterImpl extends BasePresenter implements ScriptPresente
 
     @Override
     public void setSymbol(String symbol) {
-        this.symbol = symbol;
+        this.symbol = symbol.toUpperCase();
     }
 
     @Override

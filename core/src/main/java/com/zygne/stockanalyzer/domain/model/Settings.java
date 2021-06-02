@@ -4,9 +4,18 @@ import com.zygne.stockanalyzer.domain.model.enums.DataProvider;
 
 public class Settings {
 
+    private String path;
     private String apiKey;
     private String cache;
     private DataProvider dataProvider;
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     public String getApiKey() {
         return apiKey;
@@ -34,7 +43,8 @@ public class Settings {
 
     @Override
     public String toString() {
-        String value = "Data Provider : " + dataProvider.toString() + "\n"
+        String value = "Path : " + path + "\n"
+                + "Data Provider : " + dataProvider.toString() + "\n"
                 + "Cache : " + cache;
 
         if(dataProvider == DataProvider.ALPHA_VANTAGE){

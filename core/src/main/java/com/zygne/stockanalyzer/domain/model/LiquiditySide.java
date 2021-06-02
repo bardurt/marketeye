@@ -17,6 +17,8 @@ public class LiquiditySide {
     public long volume;
     public int volumeRank;
     public double percentile;
+    public int index;
+    public boolean broken = false;
 
     public long timeStamp;
 
@@ -87,6 +89,10 @@ public class LiquiditySide {
     public boolean inZone(double value) {
 
         return value <= end && value >= start;
+    }
+
+    public double getMidPoint(){
+        return (start + end) / 2;
     }
 
     @Override

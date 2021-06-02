@@ -1,7 +1,5 @@
 package client.awt.components.tabs;
 
-import javafx.scene.control.CheckBox;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -28,7 +26,7 @@ public class ScriptTab extends JPanel {
         JPanel panelResistance = new JPanel();
 
 
-        panelResistance.add(new JLabel("Resistance"));
+        panelResistance.add(new JLabel("Supply"));
 
         checkboxResistance = new Checkbox();
         panelResistance.add(checkboxResistance);

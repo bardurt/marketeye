@@ -1,3 +1,4 @@
 rootProject.name = 'StockAnalyzer'
 include 'core'
 include 'client'
+include 'charting'

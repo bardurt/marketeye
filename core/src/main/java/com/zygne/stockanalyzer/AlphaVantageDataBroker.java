@@ -1,5 +1,6 @@
 package com.zygne.stockanalyzer;
 
+import com.zygne.stockanalyzer.domain.Logger;
 import com.zygne.stockanalyzer.domain.api.DataBroker;
 import com.zygne.stockanalyzer.domain.exceptions.ApiCallExceededException;
 import com.zygne.stockanalyzer.domain.model.BarData;
@@ -12,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class AlphaVantageDataBroker implements DataBroker {
@@ -27,16 +29,56 @@ public class AlphaVantageDataBroker implements DataBroker {
     private static final long TIME_TO_SLEEP = 15000;
     private final String apiKey;
     private int failures = 0;
-
+    private Asset asset = Asset.Stock;
     private Callback callback;
+    private Logger logger;
 
-    public AlphaVantageDataBroker(String apiKey) {
+    public AlphaVantageDataBroker(String apiKey, Logger logger) {
         this.apiKey = apiKey;
+        this.logger = logger;
     }
 
     @Override
     public void downloadHistoricalBarData(String symbol, DataSize dataSize, TimeInterval timeInterval) {
+        if (asset == Asset.Stock) {
+            downloadStocks(symbol, dataSize, timeInterval);
+        } else {
+            downloadCrypto(symbol, dataSize, timeInterval);
+        }
+    }
 
+    @Override
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
+    @Override
+    public void removeCallback() {
+        this.callback = null;
+    }
+
+    @Override
+    public void connect() {
+    }
+
+    @Override
+    public void disconnect() {
+    }
+
+    @Override
+    public void setConnectionListener(ConnectionListener connectionListener) {
+    }
+
+    @Override
+    public void removeConnectionListener() {
+    }
+
+    @Override
+    public void setAsset(Asset asset) {
+        this.asset = asset;
+    }
+
+    private void downloadStocks(String symbol, DataSize dataSize, TimeInterval timeInterval) {
         final String interval;
 
         if (timeInterval == TimeInterval.One_Minute) {
@@ -55,15 +97,21 @@ public class AlphaVantageDataBroker implements DataBroker {
             interval = null;
         }
 
+        final int monthsToFetch;
 
-        final int monthsToFetch = dataSize.getSize();
+        if (dataSize.getUnit() == DataSize.Unit.Day) {
+            monthsToFetch = dataSize.getSize() / 30;
+        } else {
+            monthsToFetch = dataSize.getSize();
+        }
 
         if (interval != null) {
-            System.out.println(symbol + " " + interval + " " + dataSize.getSize());
+
+            logger.log(Logger.LOG_LEVEL.INFO, "Downloading data for $" + symbol + ", interval " + interval + ", months " + dataSize.getSize());
 
             Thread t = new Thread(() -> {
-                List<BarData> data = fetchIntraDay(symbol, interval, monthsToFetch, apiKey);
-                if(callback != null){
+                List<BarData> data = fetchIntraDayStocks(symbol, interval, monthsToFetch, apiKey);
+                if (callback != null) {
                     callback.onDataFinished(data);
                 }
             });
@@ -79,12 +127,13 @@ public class AlphaVantageDataBroker implements DataBroker {
                 timeSeries = TIME_SERIES_WEEKLY;
             }
 
-            System.out.println(symbol + " " + timeSeries + " " + dataSize.getSize());
+            logger.log(Logger.LOG_LEVEL.INFO, symbol + " " + timeSeries + " " + dataSize.getSize());
 
 
             Thread t = new Thread(() -> {
-                List<BarData> data = downLoadTimeSeries(symbol, timeSeries, apiKey);
-                if(callback != null){
+                List<BarData> data = downLoadTimeSeriesStock(symbol, timeSeries, apiKey);
+                List<BarData> filtered = filter(dataSize, data);
+                if (callback != null) {
                     callback.onDataFinished(data);
                 }
             });
@@ -93,29 +142,25 @@ public class AlphaVantageDataBroker implements DataBroker {
         }
     }
 
-    @Override
-    public void setCallback(Callback callback) {
-        this.callback = callback;
+    private void downloadCrypto(String symbol, DataSize dataSize, TimeInterval timeInterval) {
+
+        final String timeSeries;
+
+        timeSeries = TIME_SERIES_DAILY;
+
+
+        Thread t = new Thread(() -> {
+            List<BarData> data = downLoadTimeSeriesCrypto(symbol, timeSeries, apiKey);
+            List<BarData> filtered = filter(dataSize, data);
+            if (callback != null) {
+                callback.onDataFinished(filtered);
+            }
+        });
+
+        t.start();
     }
 
-    @Override
-    public void removeCallback() {
-        this.callback = null;
-    }
-
-    @Override
-    public void connect() { }
-
-    @Override
-    public void disconnect() { }
-
-    @Override
-    public void setConnectionListener(ConnectionListener connectionListener) { }
-
-    @Override
-    public void removeConnectionListener() { }
-
-    private List<BarData> fetchIntraDay(String symbol, String interval, int monthsToFetch, String apiKey) {
+    private List<BarData> fetchIntraDayStocks(String symbol, String interval, int monthsToFetch, String apiKey) {
         List<BarData> lines = new ArrayList<>();
 
         // Flag to check if downloading data is finished or not
@@ -137,7 +182,7 @@ public class AlphaVantageDataBroker implements DataBroker {
                 String time = "year" + year + "month" + month;
                 List<BarData> data = null;
                 try {
-                    data = downloadIntraDay(symbol, interval, apiKey, time);
+                    data = downloadIntraDayStock(symbol, interval, apiKey, time);
                     if (data.isEmpty()) {
                         finished = true;
                         break;
@@ -159,7 +204,8 @@ public class AlphaVantageDataBroker implements DataBroker {
                 // add this month to total count
                 currentCount++;
 
-                System.out.println("Downloaded page : " + currentCount);
+                logger.log(Logger.LOG_LEVEL.INFO, "Downloaded page : " + currentCount);
+
                 // check if we have fetched all the months requested
                 if (currentCount >= monthsToFetch) {
                     finished = true;
@@ -185,7 +231,7 @@ public class AlphaVantageDataBroker implements DataBroker {
             year++;
         }
 
-        System.out.println("Downloaded complete : " + currentCount);
+        logger.log(Logger.LOG_LEVEL.INFO, "Downloaded complete : " + currentCount);
         return lines;
     }
 
@@ -196,7 +242,7 @@ public class AlphaVantageDataBroker implements DataBroker {
      * @param interval : time interval for historical data (1 min, 3 min)
      * @param apiKey   : Api key for AV
      */
-    private List<BarData> downloadIntraDay(String symbol, String interval, String apiKey, String time) throws ApiCallExceededException {
+    private List<BarData> downloadIntraDayStock(String symbol, String interval, String apiKey, String time) throws ApiCallExceededException {
 
         // container for the read historical data
         List<BarData> lines = new ArrayList<>();
@@ -228,7 +274,7 @@ public class AlphaVantageDataBroker implements DataBroker {
                     break;
                 }
 
-                if(!validateInput(line)){
+                if (!validateInput(line)) {
                     try {
                         bufferedReader.close();
                         bufferedReader = null;
@@ -250,11 +296,11 @@ public class AlphaVantageDataBroker implements DataBroker {
 
                 // if the read data is null, then it is most likely a header
                 if (data != null) {
-                   BarData barData = BarData.fromStream(data);
-                   if(barData != null){
-                       barData.setDataFarm(BarData.DataFarm.ALPHA_VANTAGE);
-                       lines.add(barData);
-                   }
+                    BarData barData = BarData.fromStream(data);
+                    if (barData != null) {
+                        barData.setDataFarm(BarData.DataFarm.ALPHA_VANTAGE);
+                        lines.add(barData);
+                    }
                 }
             }
 
@@ -285,7 +331,7 @@ public class AlphaVantageDataBroker implements DataBroker {
         return lines;
     }
 
-    private List<BarData> downLoadTimeSeries(String symbol, String series, String apiKey) {
+    private List<BarData> downLoadTimeSeriesStock(String symbol, String series, String apiKey) {
 
         List<BarData> lines = new ArrayList<>();
 
@@ -311,7 +357,7 @@ public class AlphaVantageDataBroker implements DataBroker {
                 // if the read data is null, then it is most likely a header
                 if (data != null) {
                     BarData barData = BarData.fromStream(data);
-                    if(barData != null){
+                    if (barData != null) {
                         barData.setDataFarm(BarData.DataFarm.ALPHA_VANTAGE);
                         lines.add(barData);
                     }
@@ -341,6 +387,81 @@ public class AlphaVantageDataBroker implements DataBroker {
         return lines;
     }
 
+
+    private List<BarData> downLoadTimeSeriesCrypto(String symbol, String series, String apiKey) {
+
+        List<BarData> lines = new ArrayList<>();
+
+        String url = "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=" + symbol.toUpperCase() + "&market=USD&apikey=" + apiKey + "&datatype=csv";
+
+        System.out.println(url);
+        InputStreamReader inputStreamReader = null;
+        BufferedReader bufferedReader = null;
+        URLConnection urlConnection = null;
+        try {
+            URL content = new URL(url);
+
+            // establish connection to file in URL
+            urlConnection = content.openConnection();
+
+            inputStreamReader = new InputStreamReader(urlConnection.getInputStream());
+
+            bufferedReader = new BufferedReader(inputStreamReader);
+
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null) {
+                String data = splitString(line);
+                // if the read data is null, then it is most likely a header
+                if (data != null) {
+                    BarData barData = BarData.fromStream(data, BarData.DataFarm.ALPHA_VANTAGE, BarData.Asset.CRYPTO);
+                    if (barData != null) {
+                        barData.setDataFarm(BarData.DataFarm.ALPHA_VANTAGE);
+                        lines.add(barData);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (inputStreamReader != null) {
+                try {
+                    inputStreamReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return lines;
+    }
+
+    private List<BarData> filter(DataSize dataSize, List<BarData> original) {
+
+        List<BarData> lines = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, -dataSize.getSize());
+
+        long timeEnd = calendar.getTimeInMillis();
+
+        for (BarData e : original) {
+            if (e.getTimeStamp() > timeEnd) {
+                lines.add(e);
+            }
+        }
+
+        return lines;
+    }
+
     private String splitString(String line) {
 
         String[] parts = line.split(",", -1);
@@ -360,9 +481,9 @@ public class AlphaVantageDataBroker implements DataBroker {
         return line;
     }
 
-    private boolean validateInput(String input){
+    private boolean validateInput(String input) {
 
-        if(input.contains(ERROR_INPUT)){
+        if (input.contains(ERROR_INPUT)) {
             System.out.println(input);
             return false;
         }

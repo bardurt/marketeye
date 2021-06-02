@@ -102,6 +102,10 @@ public class Fundamentals {
     }
 
     public void calculate() {
-        shortPercentage = (sharesShort / (double) sharesFloat) * 100;
+        if(sharesFloat > 0) {
+            shortPercentage = (sharesShort / (double) sharesFloat) * 100;
+        } else {
+            shortPercentage = 0;
+        }
     }
 }

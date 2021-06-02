@@ -30,6 +30,10 @@ public class LiquidityLevelFilterInteractorImpl extends BaseInteractor implement
         data.sort(new LiquidityLevel.PriceComparator());
         Collections.reverse(data);
 
+        if(data.size() >= 1) {
+            filtered.add(data.get(0));
+        }
+
         for (int i = 1; i < data.size(); i++) {
             LiquidityLevel e = data.get(i);
 

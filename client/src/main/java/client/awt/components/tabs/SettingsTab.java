@@ -1,54 +1,62 @@
 package client.awt.components.tabs;
 
+import client.awt.ResourceLoader;
+import client.awt.components.views.ReportView;
+import com.zygne.stockanalyzer.domain.api.DataBroker;
+import com.zygne.stockanalyzer.domain.model.DataSize;
 import com.zygne.stockanalyzer.domain.model.Settings;
 import com.zygne.stockanalyzer.domain.model.enums.DataProvider;
-import javafx.scene.control.RadioButton;
+import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.List;
 
-public class SettingsTab  extends JPanel {
+public class SettingsTab extends JPanel implements ReportView.Callback {
 
     private Callback callback;
     private TextArea textAreaInfo;
-    private JRadioButton rbIb;
+    private TextArea textAreaLog;
     private JRadioButton rbAv;
     private JRadioButton rbYahoo;
+    private ReportView reportView;
+    private ResourceLoader resourceLoader;
 
-    public SettingsTab(){
+    public SettingsTab(ResourceLoader resourceLoader) {
         setLayout(new BorderLayout());
 
         JPanel providerPanel = new JPanel(new GridBagLayout());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
-        rbIb = new JRadioButton("Interactive Brokers");
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+
+        JButton btnLoadSettings = new JButton("Load Settings");
+        // providerPanel.add(btnLoadSettings, gridBagConstraints);
+        btnLoadSettings.addActionListener(e -> loadSettings());
+
         rbAv = new JRadioButton("Alpha Vantage");
+
         rbYahoo = new JRadioButton("Yahoo Finance");
 
         ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(rbIb);
         buttonGroup.add(rbAv);
         buttonGroup.add(rbYahoo);
 
-        rbIb.setSelected(true);
-
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        providerPanel.add(rbIb, gridBagConstraints);
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         providerPanel.add(rbAv, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         providerPanel.add(rbYahoo, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
 
         JButton btnSelectProvider = new JButton("Set");
         providerPanel.add(btnSelectProvider, gridBagConstraints);
@@ -61,49 +69,94 @@ public class SettingsTab  extends JPanel {
         textAreaInfo = new TextArea("");
         textAreaInfo.setEditable(false);
 
-        JPanel infoPanel = new JPanel(new BorderLayout());
-        infoPanel.add(textAreaInfo);
+        textAreaLog = new TextArea("");
+        textAreaLog.setEditable(false);
 
-        add(providerPanel, BorderLayout.NORTH);
+        reportView = new ReportView();
+        reportView.setCallback(this);
+
+        JPanel infoPanel = new JPanel(new GridLayout(0, 2));
+        infoPanel.add(textAreaInfo);
+        infoPanel.add(textAreaLog);
+
+        add(reportView, BorderLayout.NORTH);
+        add(providerPanel, BorderLayout.CENTER);
         add(infoPanel, BorderLayout.SOUTH);
 
     }
 
-    public void setSettings(Settings settings){
+    public void setSettings(Settings settings) {
         textAreaInfo.setText(settings.toString());
 
-        if(settings.getDataProvider() == DataProvider.ALPHA_VANTAGE){
+        if (settings.getDataProvider() == DataProvider.ALPHA_VANTAGE) {
             rbAv.setSelected(true);
-        } else if (settings.getDataProvider() == DataProvider.INTERACTIVE_BROKERS) {
-            rbIb.setSelected(true);
-        }  else if (settings.getDataProvider() == DataProvider.YAHOO_FINANCE) {
+            reportView.adjustToProvider(DataProvider.ALPHA_VANTAGE);
+        } else {
             rbYahoo.setSelected(true);
+            reportView.adjustToProvider(DataProvider.YAHOO_FINANCE);
         }
 
     }
 
-    public void setCallback(Callback callback){
+    public void setCallback(Callback callback) {
         this.callback = callback;
     }
 
-    private void selectProvider(){
+    private void selectProvider() {
 
-        if(callback == null){
+        if (callback == null) {
             return;
         }
 
-        if(rbIb.isSelected()){
-            callback.onProviderSelected(DataProvider.INTERACTIVE_BROKERS);
-        } else if (rbAv.isSelected()){
+        if (rbAv.isSelected()) {
+            reportView.adjustToProvider(DataProvider.ALPHA_VANTAGE);
             callback.onProviderSelected(DataProvider.ALPHA_VANTAGE);
         } else {
+            reportView.adjustToProvider(DataProvider.YAHOO_FINANCE);
             callback.onProviderSelected(DataProvider.YAHOO_FINANCE);
         }
 
     }
 
+    private void loadSettings() {
+        JFileChooser jFileChooser = new JFileChooser();
+
+        int returnVal = jFileChooser.showOpenDialog(textAreaInfo);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = jFileChooser.getSelectedFile();
+
+            if (callback != null) {
+                System.out.println("Settings Path " + file.getAbsolutePath());
+            }
+        } else {
+
+        }
+    }
+
+    public void setTimeFrames(java.util.List<TimeInterval> data, int defaultSelection) {
+        reportView.setTimeFrames(data, defaultSelection);
+    }
+
+    public void setDataSize(List<DataSize> data, int defaultSelection) {
+        reportView.setDataSize(data, defaultSelection);
+    }
+
     public interface Callback {
         void onProviderSelected(DataProvider dataProvider);
+
+        void generateReport(String symbol, double percentile, TimeInterval timeInterval, DataSize dataSize, boolean fundamentals, boolean cache, DataBroker.Asset asset);
+    }
+
+    @Override
+    public void reportButtonClicked(String symbol, double percentile, TimeInterval timeInterval, DataSize dataSize, boolean fundamentals, boolean cache, DataBroker.Asset asset) {
+        if (callback != null) {
+            callback.generateReport(symbol, percentile, timeInterval, dataSize, fundamentals, cache, asset);
+        }
+    }
+
+    public TextArea getLogArea() {
+        return textAreaLog;
     }
 
 }

@@ -7,13 +7,15 @@ import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.Liquid
 import com.zygne.stockanalyzer.domain.model.CandleStick;
 import com.zygne.stockanalyzer.domain.model.Histogram;
 import com.zygne.stockanalyzer.domain.model.LiquiditySide;
+import com.zygne.stockanalyzer.domain.model.PriceGap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LiquiditySideInteractorImpl extends BaseInteractor implements LiquiditySideInteractor {
 
-    private static final double MIN_CHANGE = 3.0;
+    private static final double MIN_CHANGE = 2.0;
 
     private final Callback callback;
     private final List<Histogram> data;
@@ -29,6 +31,34 @@ public class LiquiditySideInteractorImpl extends BaseInteractor implements Liqui
 
     @Override
     public void run() {
+        Collections.sort(data, new Histogram.TimeComparator());
+        List<LiquiditySide> zones = findSides();
+
+        zones = findBroken(zones);
+
+        List<LiquiditySide> validSides = new ArrayList<>();
+
+        for (LiquiditySide e : zones) {
+            if (!e.broken) {
+                validSides.add(e);
+            }
+        }
+
+        validSides.sort(new LiquiditySide.VolumeComparator());
+
+        int size = validSides.size();
+
+        for (int i = 0; i < validSides.size(); i++) {
+            validSides.get(i).volumeRank = size - i;
+            validSides.get(i).percentile = ((i + 1) / (double) size) * 100;
+        }
+
+        mainThread.post(() -> callback.onLiquiditySidesCreated(validSides));
+
+    }
+
+    private List<LiquiditySide> findSides(){
+
         List<CandleStick> sticks = new ArrayList<>();
 
         for (Histogram e : data) {
@@ -38,8 +68,9 @@ public class LiquiditySideInteractorImpl extends BaseInteractor implements Liqui
         List<LiquiditySide> zones = new ArrayList<>();
 
 
-        for (CandleStick e : sticks) {
+        for (int i = 0; i < data.size(); i++) {
 
+            CandleStick e = sticks.get(i);
 
             double change = ((e.top - e.bottom) / e.bottom) * 100;
 
@@ -53,11 +84,7 @@ public class LiquiditySideInteractorImpl extends BaseInteractor implements Liqui
                     p.timeStamp = e.timeStamp;
                     p.volume = e.volume;
 
-                    if(e.bullish){
-                        p.strength = LiquiditySide.WEAK;
-                    } else {
-                        p.strength = LiquiditySide.STRONG;
-                    }
+                    p.index = i;
 
                     zones.add(p);
                 }
@@ -70,27 +97,30 @@ public class LiquiditySideInteractorImpl extends BaseInteractor implements Liqui
                     p.timeStamp = e.timeStamp;
                     p.volume = e.volume;
 
-                    if(e.bullish){
-                        p.strength = LiquiditySide.STRONG;
-                    } else {
-                        p.strength = LiquiditySide.WEAK;
-                    }
-
+                    p.index = i;
                     zones.add(p);
                 }
+
             }
         }
 
-        zones.sort(new LiquiditySide.VolumeComparator());
+        return zones;
+    }
 
-        int size = zones.size();
+    private List<LiquiditySide> findBroken(List<LiquiditySide> sides){
 
-        for (int i = 0; i < zones.size(); i++) {
-            zones.get(i).volumeRank = size - i;
-            zones.get(i).percentile = ((i + 1) / (double) size) * 100;
+        for(LiquiditySide e : sides){
+            for(int i = e.index+1; i < data.size(); i++){
+                Histogram h = data.get(i);
+
+                if(h.intersects(e.getEnd())){
+                     e.broken = true;
+                     break;
+                }
+            }
+
         }
 
-        mainThread.post(() -> callback.onLiquiditySidesCreated(zones));
-
+        return sides;
     }
 }
