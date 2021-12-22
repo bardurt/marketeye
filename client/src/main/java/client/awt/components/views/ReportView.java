@@ -27,6 +27,7 @@ public class ReportView extends JPanel {
     private JComboBox comboDataSize;
     private TextField textFieldSymbol;
     private Checkbox checkboxCache;
+    private JLabel assetLabel;
     private JRadioButton rbCrypto;
     private JRadioButton rbStock;
 
@@ -34,7 +35,9 @@ public class ReportView extends JPanel {
     private List<TimeInterval> timeIntervalList = new ArrayList<>();
 
     public ReportView() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        JPanel optionsPanel = new JPanel(new GridBagLayout());
 
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.NORTHWEST;
@@ -46,29 +49,30 @@ public class ReportView extends JPanel {
 
         constraints.gridx = 0;
         constraints.gridy = 0;
-        panel.add(labelSymbol, constraints);
+        optionsPanel.add(labelSymbol, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 1;
-        panel.add(textFieldSymbol, constraints);
+        optionsPanel.add(textFieldSymbol, constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 0;
-        panel.add(new JLabel("Asset"), constraints);
+        assetLabel = new JLabel("Asset");
+        optionsPanel.add(assetLabel, constraints);
 
         rbStock = new JRadioButton("STX");
         rbStock.setSelected(true);
 
         constraints.gridx = 1;
         constraints.gridy = 1;
-        panel.add(rbStock, constraints);
+        optionsPanel.add(rbStock, constraints);
 
         rbCrypto = new JRadioButton("CRPT");
         rbCrypto.setSelected(false);
 
         constraints.gridx = 1;
         constraints.gridy = 2;
-        panel.add(rbCrypto, constraints);
+        optionsPanel.add(rbCrypto, constraints);
 
         ButtonGroup buttonGroup = new ButtonGroup();
         buttonGroup.add(rbCrypto);
@@ -77,35 +81,39 @@ public class ReportView extends JPanel {
         JLabel labelTimeFrame = new JLabel("Time Frame");
         constraints.gridx = 3;
         constraints.gridy = 0;
-        panel.add(labelTimeFrame, constraints);
+        optionsPanel.add(labelTimeFrame, constraints);
 
         comboTimeFrame = new JComboBox();
         constraints.gridx = 3;
         constraints.gridy = 1;
-        panel.add(comboTimeFrame, constraints);
+        optionsPanel.add(comboTimeFrame, constraints);
 
         JLabel labelDataSize = new JLabel("Data Size");
 
         constraints.gridx = 4;
         constraints.gridy = 0;
-        panel.add(labelDataSize, constraints);
+        optionsPanel.add(labelDataSize, constraints);
 
         comboDataSize = new JComboBox();
         constraints.gridx = 4;
         constraints.gridy = 1;
-        panel.add(comboDataSize, constraints);
+        optionsPanel.add(comboDataSize, constraints);
 
         JLabel labelCache = new JLabel("Cache");
 
         constraints.gridx = 5;
         constraints.gridy = 0;
-        panel.add(labelCache, constraints);
+        optionsPanel.add(labelCache, constraints);
 
         checkboxCache = new Checkbox();
         checkboxCache.setState(true);
         constraints.gridx = 5;
         constraints.gridy = 1;
-        panel.add(checkboxCache, constraints);
+        optionsPanel.add(checkboxCache, constraints);
+
+        mainPanel.add(optionsPanel, BorderLayout.NORTH);
+
+        JPanel buttonPanel = new JPanel(new BorderLayout());
 
         JButton buttonCreateReport = new JButton("Create Report");
         buttonCreateReport.setBounds(50, 100, 95, 30);
@@ -115,9 +123,7 @@ public class ReportView extends JPanel {
             }
         });
 
-        constraints.gridx = 6;
-        constraints.gridy = 1;
-        panel.add(buttonCreateReport, constraints);
+        buttonPanel.add(buttonCreateReport, BorderLayout.EAST);
 
         rbCrypto.addItemListener(new ItemListener() {
             @Override
@@ -133,7 +139,8 @@ public class ReportView extends JPanel {
             }
         });
 
-        add(panel);
+        mainPanel.add(buttonPanel, BorderLayout.CENTER);
+        add(mainPanel);
     }
 
     private void createReport() {
@@ -197,9 +204,24 @@ public class ReportView extends JPanel {
         if(dataProvider == DataProvider.YAHOO_FINANCE){
             checkboxCache.setState(false);
             checkboxCache.setEnabled(false);
+            rbCrypto.setVisible(false);
+            rbStock.setEnabled(true);
+            rbStock.setVisible(false);
+            assetLabel.setVisible(false);
+        } else if(dataProvider == DataProvider.CRYPTO_COMPARE){
+            checkboxCache.setState(true);
+            checkboxCache.setEnabled(true);
+            rbCrypto.setVisible(false);
+            rbStock.setEnabled(true);
+            rbStock.setVisible(false);
+            assetLabel.setVisible(false);
         } else {
             checkboxCache.setState(true);
             checkboxCache.setEnabled(true);
+            rbCrypto.setVisible(false);
+            rbStock.setEnabled(true);
+            rbStock.setVisible(false);
+            assetLabel.setVisible(false);
         }
     }
 

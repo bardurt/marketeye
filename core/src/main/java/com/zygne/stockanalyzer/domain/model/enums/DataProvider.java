@@ -3,7 +3,8 @@ package com.zygne.stockanalyzer.domain.model.enums;
 public enum DataProvider {
     ALPHA_VANTAGE("Alpha Vantage"),
     INTERACTIVE_BROKERS("Interactive Brokers"),
-    YAHOO_FINANCE("Yahoo Finance");
+    YAHOO_FINANCE("Yahoo Finance"),
+    CRYPTO_COMPARE("Crypto Compare");
 
     private final String label;
 

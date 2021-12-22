@@ -26,6 +26,83 @@ public class YahooDataBroker implements DataBroker {
     }
 
     @Override
+    public void getLastTickPrice(String symbol) {
+
+        final String name;
+        if(asset == Asset.Crypto){
+            if(!symbol.contains("-usd")){
+                name = symbol+"-usd";
+            } else {
+                name = symbol;
+            }
+        } else {
+            name = symbol;
+        }
+
+        Thread t = new Thread(() -> {
+            String url = "https://finance.yahoo.com/quote/" + name + "?p=" + name;
+
+            System.out.println(url);
+
+            InputStreamReader inputStreamReader = null;
+            BufferedReader bufferedReader = null;
+            URLConnection urlConnection = null;
+            String data = "";
+            StringBuilder dataBuilder = new StringBuilder();
+            try {
+                URL content = new URL(url);
+
+                // establish connection to file in URL
+                urlConnection = content.openConnection();
+
+                inputStreamReader = new InputStreamReader(urlConnection.getInputStream());
+
+                bufferedReader = new BufferedReader(inputStreamReader);
+
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    if (line.contains(YahooFinanceHelper.REGULAR_MARKET_PRICE)) {
+                        dataBuilder.append(line);
+                    }
+
+                    if (line.contains(YahooFinanceHelper.CURRENT_PRICE)) {
+                        dataBuilder.append(line);
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (bufferedReader != null) {
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (inputStreamReader != null) {
+                    try {
+                        inputStreamReader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            data = dataBuilder.toString();
+
+            double price = YahooFinanceHelper.getCurrentPrice(data);
+
+            callback.onTickPriceFetched(price);
+            System.out.println("Current price for " + symbol.toUpperCase() + " = " + price);
+        });
+
+        t.start();
+    }
+
+    @Override
     public void downloadHistoricalBarData(String symbol, DataSize dataSize, TimeInterval timeInterval) {
 
         logger.log(Logger.LOG_LEVEL.INFO, symbol + " " + timeInterval + " " + dataSize.getSize() + " " + dataSize.getUnit());
@@ -53,7 +130,18 @@ public class YahooDataBroker implements DataBroker {
             time = "1wk";
         }
 
-        String url = "https://query1.finance.yahoo.com/v7/finance/download/" + symbol + "?period1=" + timeStart + "&period2=" + timeEnd + "&interval=" + time + "&events=history&includeAdjustedClose=false";
+        final String name;
+        if(asset == Asset.Crypto){
+            if(!symbol.contains("-usd")){
+                name = symbol+"-usd";
+            } else {
+                name = symbol;
+            }
+        } else {
+            name = symbol;
+        }
+
+        String url = "https://query1.finance.yahoo.com/v7/finance/download/" + name + "?period1=" + timeStart + "&period2=" + timeEnd + "&interval=" + time + "&events=history&includeAdjustedClose=true";
 
         logger.log(Logger.LOG_LEVEL.INFO, "Downloading data from " + url);
 
@@ -148,6 +236,34 @@ public class YahooDataBroker implements DataBroker {
     @Override
     public void setAsset(Asset asset) {
         this.asset = asset;
+    }
+
+    public static void main(String[] args){
+
+        DataBroker dataBroker = new YahooDataBroker(new Logger() {
+            @Override
+            public void shutDown() {
+
+            }
+
+            @Override
+            public void setUp() {
+
+            }
+
+            @Override
+            public void log(LOG_LEVEL level, String message) {
+
+            }
+
+            @Override
+            public void clear() {
+
+            }
+        });
+
+        dataBroker.getLastTickPrice("adtx");
+
     }
 
 }

@@ -87,7 +87,7 @@ public class PineScriptInteractor extends BaseInteractor implements ScriptIntera
         stringBuilder.append("hline(");
         stringBuilder.append(chartLine.level);
         stringBuilder.append(",");
-        stringBuilder.append("color=color.new("+mapColor(chartLine.color)+", 80)");
+        stringBuilder.append("color=color.new("+mapColor(chartLine.color)+", 50)");
         stringBuilder.append(",");
         stringBuilder.append("linewidth=");
         stringBuilder.append(lineWidth);
@@ -108,9 +108,9 @@ public class PineScriptInteractor extends BaseInteractor implements ScriptIntera
         stringBuilder.append(name1).append("=hline(").append(chartZone.top).append(", linestyle=hline.style_dotted,");
 
         if (chartZone.color == ChartObject.Color.GREEN) {
-            stringBuilder.append("color=color.new("+ COLOR_GREEN+", 80)");
+            stringBuilder.append("color=color.new("+ COLOR_GREEN+", 50)");
         } else {
-            stringBuilder.append("color=color.new("+ COLOR_RED+", 80)");
+            stringBuilder.append("color=color.new("+ COLOR_RED+", 50)");
         }
         stringBuilder.append(")");
         stringBuilder.append("\n");
@@ -118,9 +118,9 @@ public class PineScriptInteractor extends BaseInteractor implements ScriptIntera
         stringBuilder.append(name2).append("=hline(").append(chartZone.bottom).append(", linestyle=hline.style_dotted,");
 
         if (chartZone.color == ChartObject.Color.GREEN) {
-            stringBuilder.append("color=color.new("+ COLOR_GREEN+", 80)");
+            stringBuilder.append("color=color.new("+ COLOR_GREEN+", 50)");
         } else {
-            stringBuilder.append("color=color.new("+ COLOR_RED+", 80)");
+            stringBuilder.append("color=color.new("+ COLOR_RED+", 59)");
         }
         stringBuilder.append(")");
         stringBuilder.append("\n");

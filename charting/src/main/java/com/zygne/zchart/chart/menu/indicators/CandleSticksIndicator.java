@@ -1,0 +1,31 @@
+package com.zygne.zchart.chart.menu.indicators;
+
+import com.zygne.zchart.chart.model.chart.CandleStick;
+import com.zygne.zchart.chart.model.chart.Canvas;
+import com.zygne.zchart.chart.model.chart.Object2d;
+
+import java.util.List;
+
+public class CandleSticksIndicator extends Object2d {
+
+    private List<CandleStick> candleSticks;
+
+    public CandleSticksIndicator(List<CandleStick> candleSticks) {
+        this.candleSticks = candleSticks;
+    }
+
+    public List<CandleStick> getCandleSticks() {
+        return candleSticks;
+    }
+
+    public void setCandleSticks(List<CandleStick> candleSticks) {
+        this.candleSticks = candleSticks;
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        for (CandleStick e : candleSticks) {
+            e.draw(canvas);
+        }
+    }
+}

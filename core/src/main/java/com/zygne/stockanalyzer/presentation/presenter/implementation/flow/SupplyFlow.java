@@ -11,9 +11,7 @@ import java.util.List;
 public class SupplyFlow implements VolumePriceInteractor.Callback,
         VolumePriceSumInteractor.Callback,
         LiquidityLevelInteractor.Callback,
-        LiquidityLevelFilterInteractor.Callback,
-        FundamentalsInteractor.Callback,
-        BreakPointInteractor.Callback {
+        LiquidityLevelFilterInteractor.Callback {
 
     private final Executor executor;
     private final MainThread mainThread;
@@ -28,23 +26,15 @@ public class SupplyFlow implements VolumePriceInteractor.Callback,
         this.callback = callback;
     }
 
-    public void start(List<Histogram> histogramList, double percentile, int rule) {
+    public void start(List<Histogram> histogramList, double percentile, VolumePriceInteractor.PriceStructure priceStructure) {
         this.histogramList = histogramList;
         this.percentile = percentile;
-        new VolumePriceInteractorImpl(executor, mainThread, this, histogramList, rule).execute();
+        new VolumePriceInteractorImpl(executor, mainThread, this, histogramList, priceStructure).execute();
     }
-
-    @Override
-    public void onBreakPointsCalculated(List<LiquidityLevel> data) {
-        callback.onSupplyCompleted(data, rawLevels);
-    }
-
-    @Override
-    public void onFundamentalsFetched(Fundamentals fundamentals) { }
 
     @Override
     public void onLiquidityLevelsFiltered(List<LiquidityLevel> data) {
-        new BearishbreakPointinteractor(executor, mainThread, this, histogramList, data).execute();
+        callback.onSupplyCompleted(data, rawLevels);
     }
 
     @Override

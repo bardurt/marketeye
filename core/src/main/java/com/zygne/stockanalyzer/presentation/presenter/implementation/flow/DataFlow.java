@@ -6,11 +6,14 @@ import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.interactor.implementation.data.*;
 import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.*;
+import com.zygne.stockanalyzer.domain.interactor.implementation.data.io.*;
 import com.zygne.stockanalyzer.domain.model.BarData;
 import com.zygne.stockanalyzer.domain.model.DataSize;
 import com.zygne.stockanalyzer.domain.model.Histogram;
 import com.zygne.stockanalyzer.domain.model.Settings;
 import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
+import com.zygne.stockanalyzer.domain.utils.NumberHelper;
+import com.zygne.stockanalyzer.domain.utils.TimeHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +25,8 @@ public class DataFlow implements DataFetchInteractor.Callback,
         MissingDataInteractor.Callback,
         DataMergeInteractor.Callback,
         HistogramInteractor.Callback,
-        DateFilterInteractor.Callback{
+        DateFilterInteractor.Callback,
+        LatestPriceInteractor.Callback {
 
 
     private final Callback callback;
@@ -59,13 +63,13 @@ public class DataFlow implements DataFetchInteractor.Callback,
         this.cachedData.clear();
         this.downloadedData.clear();
 
-        if(timeInterval == TimeInterval.Day){
+        if (timeInterval == TimeInterval.Day) {
             cache = false;
         }
-        if(timeInterval == TimeInterval.Week){
+        if (timeInterval == TimeInterval.Week) {
             cache = false;
         }
-        if(timeInterval == TimeInterval.Month){
+        if (timeInterval == TimeInterval.Month) {
             cache = false;
         }
 
@@ -75,6 +79,10 @@ public class DataFlow implements DataFetchInteractor.Callback,
             logger.log(Logger.LOG_LEVEL.INFO, "Download data for " + ticker.toUpperCase());
             new DataFetchInteractorImpl(executor, mainThread, this, ticker, timeInterval, new DataSize(timeFrame, unit), dataBroker).execute();
         }
+    }
+
+    public void fetchLatestPrice(String symbol, DataBroker dataBroker) {
+        new LatestPriceInteractorImpl(executor, mainThread, this, symbol, dataBroker).execute();
     }
 
     @Override
@@ -105,6 +113,7 @@ public class DataFlow implements DataFetchInteractor.Callback,
 
     @Override
     public void onDataCached(List<BarData> lines) {
+        logger.log(Logger.LOG_LEVEL.INFO, "Filtering data");
         new DateFilterInteractorImpl(executor, mainThread, this, lines, new DataSize(timeFrame, unit)).execute();
     }
 
@@ -129,9 +138,11 @@ public class DataFlow implements DataFetchInteractor.Callback,
 
     @Override
     public void onMissingDataCalculated(int daysMissing) {
+        logger.log(Logger.LOG_LEVEL.INFO, "Days missing " + daysMissing);
         if (daysMissing > 0) {
-            daysMissing = (int) Math.ceil(daysMissing / 30);
-            new DataFetchInteractorImpl(executor, mainThread, this, ticker, timeInterval, new DataSize(daysMissing, DataSize.Unit.Month), dataBroker).execute();
+            int months = TimeHelper.roundToMonths(daysMissing);
+            logger.log(Logger.LOG_LEVEL.INFO, "Will download " + months + " months of data");
+            new DataFetchInteractorImpl(executor, mainThread, this, ticker, timeInterval, new DataSize(months, DataSize.Unit.Month), dataBroker).execute();
         } else {
             new HistogramInteractorImpl(executor, mainThread, this, cachedData).execute();
         }
@@ -157,8 +168,15 @@ public class DataFlow implements DataFetchInteractor.Callback,
         new HistogramInteractorImpl(executor, mainThread, this, lines).execute();
     }
 
+    @Override
+    public void onLatestPriceFetched(double price) {
+        callback.onLatestPriceFetched(price);
+    }
+
     public interface Callback {
         void onDataFetched(List<Histogram> data, String time);
+
+        void onLatestPriceFetched(double price);
 
         void onDataError();
     }

@@ -34,13 +34,22 @@ public class DateFilterInteractorImpl extends BaseInteractor implements DateFilt
 
         Calendar calendar = Calendar.getInstance();
 
+        int scalar = 1;
+
         if(dataSize.getUnit() == DataSize.Unit.Month) {
-            calendar.add(Calendar.MONTH, -dataSize.getSize());
-        } else if(dataSize.getUnit() == DataSize.Unit.Year) {
+            scalar = 30;
+        } else if(dataSize.getUnit() == DataSize.Unit.Week) {
+            scalar = 7;
+        }else if(dataSize.getUnit() == DataSize.Unit.Year) {
+            scalar = 365;
             calendar.add(Calendar.YEAR, -dataSize.getSize());
         } else if(dataSize.getUnit() == DataSize.Unit.Day) {
-            calendar.add(Calendar.DATE, -dataSize.getSize());
+           scalar = 1;
         }
+
+        int time = dataSize.getSize()*scalar;
+
+        calendar.add(Calendar.DATE, -time);
 
         long timeEnd = calendar.getTimeInMillis();
 

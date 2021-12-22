@@ -1,9 +1,8 @@
 package client.awt.components.tabs;
 
 import com.zygne.stockanalyzer.domain.model.Histogram;
-import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
-import com.zygne.zchart.volumeprofile.PointAndFigurePanel;
-import com.zygne.zchart.volumeprofile.model.data.Quote;
+import com.zygne.zchart.chart.PointAndFigurePanel;
+import com.zygne.zchart.chart.model.data.Quote;
 
 import javax.swing.*;
 import java.awt.*;

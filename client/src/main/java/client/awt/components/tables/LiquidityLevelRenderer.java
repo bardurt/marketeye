@@ -16,16 +16,11 @@ public class LiquidityLevelRenderer extends JLabel implements TableCellRenderer 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                    boolean hasFocus, int row, int column) {
 
-        double percentile = -1;
         double rank = -1;
 
-        try {
-            percentile = Double.parseDouble((String) table.getModel().getValueAt(row, 2));
-        } catch (Exception e) {
-        }
 
         try {
-            rank = Double.parseDouble((String) table.getModel().getValueAt(row, 3));
+            rank = Integer.parseInt((String) table.getModel().getValueAt(row, 2));
         } catch (Exception e) {
         }
 
@@ -37,7 +32,7 @@ public class LiquidityLevelRenderer extends JLabel implements TableCellRenderer 
             setBackground(Color.decode("#EEEEEE"));
         }
 
-        if(percentile > 99){
+        if(rank < 11){
             setForeground(Color.black);
             setBackground(Color.decode("#80D2F8"));
         }

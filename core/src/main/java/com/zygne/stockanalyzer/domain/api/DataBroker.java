@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface DataBroker extends Api {
 
+    void getLastTickPrice(String symbol);
     void downloadHistoricalBarData(String symbol, DataSize dataSize, TimeInterval timeInterval);
     void setCallback(Callback callback);
     void removeCallback();
@@ -15,6 +16,7 @@ public interface DataBroker extends Api {
 
     interface Callback{
         void onDataFinished(List<BarData> data);
+        void onTickPriceFetched(double price);
     }
 
     enum Asset{

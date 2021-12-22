@@ -39,6 +39,11 @@ public class AlphaVantageDataBroker implements DataBroker {
     }
 
     @Override
+    public void getLastTickPrice(String symbol) {
+
+    }
+
+    @Override
     public void downloadHistoricalBarData(String symbol, DataSize dataSize, TimeInterval timeInterval) {
         if (asset == Asset.Stock) {
             downloadStocks(symbol, dataSize, timeInterval);

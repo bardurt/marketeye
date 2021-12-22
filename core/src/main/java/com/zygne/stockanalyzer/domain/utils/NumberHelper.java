@@ -31,4 +31,16 @@ public class NumberHelper {
     public static double roundUp(double original, double group) {
         return round((original / group)) * group;
     }
+
+    public static int roundToMonths(int days){
+        int months = (int) Math.ceil(days / 30)+1;
+
+        return months;
+    }
+
+    public static void main(String[] args){
+
+        int days = 88;
+        System.out.println("Months " + days + " = " + roundToMonths(days));
+    }
 }

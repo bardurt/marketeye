@@ -14,7 +14,7 @@ public class LiquidityLevelTableModel extends AbstractTableModel {
     private final List<LiquidityLevel> data = new ArrayList<>();
 
     private final String[] columnNames = new String[]{
-            "Price", "Vol", "Pct", "Rank","Hits"
+            "Price", "Vol", "Rank"
     };
 
 
@@ -54,11 +54,7 @@ public class LiquidityLevelTableModel extends AbstractTableModel {
         } else if (1 == columnIndex) {
             return String.format("%,d", row.getVolume());
         } else if (2 == columnIndex) {
-            return String.format("%.2f", row.getPercentile());
-        } else if (3 == columnIndex) {
             return String.format("%d", row.getRank());
-        } else if (4 == columnIndex) {
-            return String.format("%d", row.getHits());
         }
         return null;
     }
@@ -67,7 +63,6 @@ public class LiquidityLevelTableModel extends AbstractTableModel {
         TableRowSorter<LiquidityLevelTableModel> sorter = new TableRowSorter<>((LiquidityLevelTableModel) tableModel);
         sorter.setComparator(0, new LiquidityLevelTableModel.PriceSorter());
         sorter.setComparator(2, new LiquidityLevelTableModel.PriceSorter());
-        sorter.setComparator(3, new HitsSorter());
 
         return sorter;
     }

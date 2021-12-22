@@ -10,4 +10,12 @@ public interface VolumePriceInteractor extends Interactor {
     interface Callback {
         void onVolumePriceCreated(List<VolumePrice> data);
     }
+
+    public enum PriceStructure{
+        H,
+        HL,
+        OHLC,
+        OHLCM,
+        SECTION
+    }
 }

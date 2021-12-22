@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PriceGapInteractorImpl extends BaseInteractor implements PriceGapInteractor {
 
-    private static final double MIN_CHANGE = 3d;
+    private static final double MIN_CHANGE = 0.0;
 
     private final Callback callback;
     private final List<Histogram> histogramList;

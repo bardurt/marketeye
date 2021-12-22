@@ -3,8 +3,9 @@ package client.awt.components.tabs;
 import client.awt.components.tables.LiquidityLevelRenderer;
 import client.awt.components.tables.LiquidityLevelTableModel;
 import client.awt.components.views.FundamentalsView;
-import com.zygne.zchart.volumeprofile.VolumeProfilePanel;
-import com.zygne.zchart.volumeprofile.model.data.Quote;
+import com.zygne.zchart.chart.charts.volumeatprice.VolumePricePanel;
+import com.zygne.zchart.chart.charts.volumeprofile.VolumeProfilePanel;
+import com.zygne.zchart.chart.model.data.Quote;
 import com.zygne.stockanalyzer.domain.model.Fundamentals;
 import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
 
@@ -14,23 +15,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class VpaTab extends JPanel{
+public class VpaTab extends BaseTab{
 
-    private LiquidityLevelTableModel tableModelPrices;
-    private JTable tablePrices;
 
-    private FundamentalsView fundamentalsView;
-
-    private VolumeProfilePanel vpGrouped;
+    private VolumeProfilePanel volumeProfilePanel;
+    private VolumePricePanel volumePricePanel;
 
     public VpaTab() {
+        super();
         setLayout(new BorderLayout());
 
         JPanel contentPanel = new JPanel(new BorderLayout());
-
-        fundamentalsView = new FundamentalsView();
-
-        contentPanel.add(fundamentalsView, BorderLayout.NORTH);
 
         JPanel tablesPanel = new JPanel(new BorderLayout());
 
@@ -38,22 +33,22 @@ public class VpaTab extends JPanel{
         supplyPanel.add(new JLabel("Volume at price"), BorderLayout.NORTH);
         JPanel pricesPanel = new JPanel(new GridLayout(0,1));
 
-        tableModelPrices = new LiquidityLevelTableModel();
-        tablePrices = new JTable(tableModelPrices);
-        tablePrices.setDefaultRenderer(LiquidityLevel.class, new LiquidityLevelRenderer());
-        tablePrices.setDefaultRenderer(String.class, new LiquidityLevelRenderer());
-        tablePrices.setRowSorter(tableModelPrices.getSorter(tablePrices.getModel()));
+        //tablesPanel.add(pricesPanel, BorderLayout.WEST);
 
-        supplyPanel.add(new JScrollPane(tablePrices), BorderLayout.CENTER);
-        pricesPanel.add(supplyPanel);
+        JPanel volumePanel = new JPanel(new GridLayout(0,2));
 
-        tablesPanel.add(pricesPanel, BorderLayout.WEST);
+        JPanel volumePriceContainer = new JPanel(new BorderLayout());
+        volumePricePanel = new VolumePricePanel(volumePriceContainer);
+        volumePriceContainer.add(new JLabel("Volume At Price"), BorderLayout.NORTH);
+        volumePriceContainer.add(volumePricePanel, BorderLayout.CENTER);
 
-        JPanel volumePanel = new JPanel(new BorderLayout());
-        volumePanel.add(new JLabel("Volume Profile"), BorderLayout.NORTH);
+        JPanel volumeProfileContainer = new JPanel(new BorderLayout());
+        volumeProfilePanel = new VolumeProfilePanel(volumeProfileContainer, VolumeProfilePanel.ChartType.GROUPED);
+        volumeProfileContainer.add(new JLabel("Volume Profile"), BorderLayout.NORTH);
+        volumeProfileContainer.add(volumeProfilePanel, BorderLayout.CENTER);
 
-        vpGrouped = new VolumeProfilePanel(volumePanel, VolumeProfilePanel.ChartType.GROUPED);
-        volumePanel.add(vpGrouped, BorderLayout.CENTER);
+        volumePanel.add(volumePriceContainer);
+        volumePanel.add(volumeProfileContainer);
 
         tablesPanel.add(volumePanel, BorderLayout.CENTER);
 
@@ -62,19 +57,20 @@ public class VpaTab extends JPanel{
     }
 
     public void addSupply(List<LiquidityLevel> data){
-        fundamentalsView.clear();
-        if (tablePrices != null) {
-            tableModelPrices.clear();
-            data.sort(new LiquidityLevel.PriceComparator());
-            Collections.reverse(data);
-            tableModelPrices.addItems(data);
-            tableModelPrices.fireTableDataChanged();
-            tablePrices.invalidate();
 
-            for(int i = 0; i < tablePrices.getModel().getColumnCount(); i++){
-                tablePrices.convertRowIndexToView(i);
+        List<Quote> volumeProfileList = new ArrayList<Quote>();
+
+        for(LiquidityLevel e : data){
+
+            if(e.getPercentile() > 90) {
+                Quote quote = new Quote();
+                quote.setHigh(e.price);
+                quote.setVolume(e.getVolume());
+                quote.setPercentile(e.getPercentile());
+                volumeProfileList.add(quote);
             }
         }
+        volumePricePanel.addQuotes(volumeProfileList);
 
     }
 
@@ -86,18 +82,17 @@ public class VpaTab extends JPanel{
             Quote quote = new Quote();
             quote.setHigh(e.price);
             quote.setVolume(e.getVolume());
+            quote.setPercentile(e.getPercentile());
             volumeProfileList.add(quote);
         }
-        vpGrouped.addQuotes(volumeProfileList);
-        vpGrouped.addWaterMark(symbol);
-    }
-
-    public void addBinnedSupply(List<LiquidityLevel> data){
+        volumeProfilePanel.addQuotes(volumeProfileList);
+        volumeProfilePanel.addTitle(symbol);
+        volumePricePanel.addTitle(symbol);
 
     }
 
-    public void addFundamentals(Fundamentals fundamentals){
-        fundamentalsView.populateFrom(fundamentals);
+    public void setCurrentPrice(double currentPrice){
+        volumeProfilePanel.setCurrentPrice(currentPrice);
+        volumePricePanel.setCurrentPrice(currentPrice);
     }
-
 }

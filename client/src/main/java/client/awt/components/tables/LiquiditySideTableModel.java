@@ -15,7 +15,7 @@ public class LiquiditySideTableModel extends AbstractTableModel {
     private final List<LiquiditySide> data = new ArrayList<>();
 
     private final String[] columnNames = new String[]{
-            "Range", "Vol", "Pctl", "Date"
+            "Price", "Vol", "Pctl", "Date"
     };
 
     private final Class[] columnClass = new Class[]{
@@ -58,7 +58,7 @@ public class LiquiditySideTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         LiquiditySide row = data.get(rowIndex);
         if (0 == columnIndex) {
-            String range = String.format("%.2f", row.getStart()) + " - " + String.format("%.2f", row.getEnd());
+            String range = String.format("%.2f", row.getStart());
             return range;
         } else if (1 == columnIndex) {
             return String.format("%,d", row.getVolume());

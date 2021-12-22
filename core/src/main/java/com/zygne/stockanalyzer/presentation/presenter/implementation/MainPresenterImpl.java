@@ -10,6 +10,7 @@ import com.zygne.stockanalyzer.domain.model.enums.DataProvider;
 import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 import com.zygne.stockanalyzer.presentation.presenter.base.BasePresenter;
 import com.zygne.stockanalyzer.presentation.presenter.base.MainPresenter;
+import com.zygne.stockanalyzer.presentation.presenter.implementation.delegates.CryptoCompareDelegate;
 import com.zygne.stockanalyzer.presentation.presenter.implementation.delegates.YahooFinanceDelegate;
 import com.zygne.stockanalyzer.presentation.presenter.implementation.delegates.AlphaVantageDelegate;
 
@@ -22,11 +23,14 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter {
         super(executor, mainThread);
         this.mainThread = mainThread;
         this.logger = logger;
+
         if(settings.getDataProvider() == DataProvider.INTERACTIVE_BROKERS) {
             delegate = new YahooFinanceDelegate(executor, mainThread, view, settings, logger);
         } else if(settings.getDataProvider() == DataProvider.ALPHA_VANTAGE) {
             delegate = new AlphaVantageDelegate(executor, mainThread, view, settings, logger);
-        } else {
+        } else if(settings.getDataProvider() == DataProvider.CRYPTO_COMPARE) {
+            delegate = new CryptoCompareDelegate(executor, mainThread, view, settings, logger);
+        }else {
             delegate = new YahooFinanceDelegate(executor, mainThread, view, settings, logger);
         }
     }

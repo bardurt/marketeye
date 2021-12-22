@@ -54,4 +54,12 @@ public class TimeHelper {
                 && cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH)
                 && cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
     }
+
+    public static int roundToMonths(int days){
+        if(days <= 0){
+            return 0;
+        }
+
+        return (int) Math.ceil(days / 30)+1;
+    }
 }

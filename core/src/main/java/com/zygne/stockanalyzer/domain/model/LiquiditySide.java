@@ -4,8 +4,8 @@ import java.util.Comparator;
 
 public class LiquiditySide {
 
-    public static final int REJECT = 0;
-    public static final int ACCEPT = 1;
+    public static final int SELL = 0;
+    public static final int BUY = 1;
 
     public static final int WEAK = 2;
     public static final int STRONG = 3;
@@ -31,7 +31,7 @@ public class LiquiditySide {
     }
 
     public String getSide() {
-        if (type == REJECT) {
+        if (type == SELL) {
             return "Sell";
         } else {
             return "Buy";
@@ -99,7 +99,7 @@ public class LiquiditySide {
     public String toString() {
         String value;
 
-        if (type == REJECT) {
+        if (type == SELL) {
             value = "Reject";
         } else {
             value = "Accept";

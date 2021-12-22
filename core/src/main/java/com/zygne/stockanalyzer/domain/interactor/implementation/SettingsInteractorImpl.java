@@ -16,6 +16,7 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
     private static final String SETTINGS_FILE = "config.xml";
     private static final String TAG_ALPHA_VANTAGE = "AV";
     private static final String TAG_INTERACTIVE_BROKERS = "IB";
+    private static final String TAG_CRYPTO_COMPARE = "CC";
     private static final String TAG_YAHOO_FINANCE = "YF";
 
     private static final String INDENT = "   ";
@@ -86,7 +87,9 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
                     provider = TAG_ALPHA_VANTAGE;
                 } else if (defaultProvider == DataProvider.INTERACTIVE_BROKERS) {
                     provider = TAG_INTERACTIVE_BROKERS;
-                } else {
+                } else if (defaultProvider == DataProvider.CRYPTO_COMPARE){
+                    provider = TAG_CRYPTO_COMPARE;
+                }else {
                     provider = TAG_YAHOO_FINANCE;
                 }
             }
@@ -123,6 +126,21 @@ public class SettingsInteractorImpl extends BaseInteractor implements SettingsIn
                         settings.setApiKey("");
                         settings.setCache(cache);
                         settings.setDataProvider(DataProvider.INTERACTIVE_BROKERS);
+                        mainThread.post(() -> callback.onSettingsLoaded(settings));
+                    }
+                }  else if (provider.equalsIgnoreCase(TAG_CRYPTO_COMPARE))  {
+                    String data = TagHelper.getValueFromTagName(TAG_CRYPTO_COMPARE, content.toString());
+                    String apiKey = TagHelper.getValueFromTagName(TAG_API, data);
+                    String cache = TagHelper.getValueFromTagName(TAG_CACHE, data);
+
+                    if (apiKey.isEmpty()) {
+                        mainThread.post(() -> callback.onSettingsError(SETTINGS_FILE));
+                    } else {
+                        Settings settings = new Settings();
+                        settings.setPath(settingsPath);
+                        settings.setApiKey(apiKey);
+                        settings.setCache(cache);
+                        settings.setDataProvider(DataProvider.CRYPTO_COMPARE);
                         mainThread.post(() -> callback.onSettingsLoaded(settings));
                     }
                 }else {

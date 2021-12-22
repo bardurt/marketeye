@@ -1,11 +1,15 @@
 package com.zygne.stockanalyzer.presentation.presenter.implementation.delegates;
 
 import com.zygne.stockanalyzer.AlphaVantageDataBroker;
+import com.zygne.stockanalyzer.YahooDataBroker;
 import com.zygne.stockanalyzer.domain.Logger;
 import com.zygne.stockanalyzer.domain.api.DataBroker;
 import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
+import com.zygne.stockanalyzer.domain.interactor.implementation.data.HistogramGroupingInteractorImpl;
+import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.HistogramGroupingInteractor;
 import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.HistogramInteractor;
+import com.zygne.stockanalyzer.domain.interactor.implementation.data.base.VolumePriceInteractor;
 import com.zygne.stockanalyzer.domain.model.*;
 import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 import com.zygne.stockanalyzer.presentation.presenter.base.MainPresenter;
@@ -15,25 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AlphaVantageDelegate implements MainPresenter,
-        HistogramInteractor.Callback,
         SupplyFlow.Callback,
-        SupplyBinnedFlow.Callback,
-        DailyVolumeFlow.Callback,
-        DailySupplyFlow.Callback,
-        DailyLiquidityFlow.Callback,
-        PriceGapFlow.Callback,
         DataFlow.Callback,
-        FundamentalsFlow.Callback {
+        HistogramGroupingInteractor.Callback {
 
     private final DataBroker dataBroker;
 
     private final View view;
+    private List<Histogram> histogramListGrouped;
     private List<Histogram> histogramList;
-    private List<Histogram> dailyHistogramlist;
     private String ticker;
     private double percentile = 0;
-    private boolean fundamentalData;
-    private Fundamentals fundamentals;
 
     private TimeInterval timeInterval = TimeInterval.Five_Minutes;
     private boolean downloadingData = false;
@@ -42,7 +38,6 @@ public class AlphaVantageDelegate implements MainPresenter,
 
     private final DataFlow dataFlow;
     private final SupplyFlow supplyFlow;
-    private final SupplyBinnedFlow supplyBinnedFlow;
 
     private final Settings settings;
     private DataSize dataSize;
@@ -60,23 +55,21 @@ public class AlphaVantageDelegate implements MainPresenter,
         this.view.showError("");
         this.settings = settings;
         this.supplyFlow = new SupplyFlow(executor, mainThread, this);
-        this.supplyBinnedFlow = new SupplyBinnedFlow(executor, mainThread, this);
         this.dataFlow = new DataFlow(executor, mainThread, this, logger);
 
         List<TimeInterval> timeIntervals = new ArrayList<>();
-        timeIntervals.add(TimeInterval.One_Minute);
-        timeIntervals.add(TimeInterval.Five_Minutes);
-        timeIntervals.add(TimeInterval.Fifteen_Minutes);
-        timeIntervals.add(TimeInterval.Thirty_Minutes);
         timeIntervals.add(TimeInterval.Hour);
         timeIntervals.add(TimeInterval.Day);
         view.onTimeFramesPrepared(timeIntervals, 0);
 
         List<DataSize> dataSize = new ArrayList<>();
+        dataSize.add(new DataSize(1, DataSize.Unit.Week));
+        dataSize.add(new DataSize(2, DataSize.Unit.Week));
         dataSize.add(new DataSize(1, DataSize.Unit.Month));
         dataSize.add(new DataSize(3, DataSize.Unit.Month));
         dataSize.add(new DataSize(6, DataSize.Unit.Month));
         dataSize.add(new DataSize(12, DataSize.Unit.Month));
+        dataSize.add(new DataSize(18, DataSize.Unit.Month));
         dataSize.add(new DataSize(24, DataSize.Unit.Month));
         view.onDataSizePrepared(dataSize, dataSize.size() - 1);
 
@@ -105,7 +98,6 @@ public class AlphaVantageDelegate implements MainPresenter,
 
         this.percentile = percentile;
         this.timeInterval = timeInterval;
-        this.fundamentalData = fundamentalData;
         this.dataSize = dataSize;
         this.ticker = ticker;
 
@@ -115,21 +107,16 @@ public class AlphaVantageDelegate implements MainPresenter,
 
         view.showLoading("Fetching data for " + ticker.toUpperCase() + "");
 
-        dataFlow.fetchData(dataBroker, settings, ticker, timeInterval, dataSize.getSize(), dataSize.getUnit(), cache);
-    }
-
-    @Override
-    public void onHistogramCreated(List<Histogram> data) {
-        this.histogramList = data;
-        view.onHistogramCreated(data);
-        dateRange = histogramList.get(histogramList.size() - 1).dateTime + " - " + histogramList.get(0).dateTime;
-        supplyFlow.start(histogramList, percentile, 0);
+        dataFlow.fetchData(dataBroker, settings, ticker, TimeInterval.One_Minute, dataSize.getSize(), dataSize.getUnit(), cache);
     }
 
     @Override
     public void onSupplyCompleted(List<LiquidityLevel> filtered, List<LiquidityLevel> raw) {
+        downloadingData = false;
+        view.onHistogramCreated(histogramListGrouped);
         view.onSupplyCreated(filtered, raw);
-        supplyBinnedFlow.start(histogramList, percentile);
+        view.hideLoading();
+        view.onComplete(ticker, timeInterval.toString(), dateRange);
     }
 
     @Override
@@ -138,81 +125,43 @@ public class AlphaVantageDelegate implements MainPresenter,
 
     @Override
     public void findHighVolume() {
-        new DailyVolumeFlow(executor, mainThread, this, dataBroker).findVolume(ticker, dataSize);
-    }
-
-    @Override
-    public void onDailyHighVolumeFound(List<VolumeBarDetails> data, List<Histogram> histograms) {
-        this.dailyHistogramlist = histograms;
-        view.onDailyBarsCreated(histograms);
-        new DailySupplyFlow(executor, mainThread, this, data, histogramList).start();
-    }
-
-    @Override
-    public void onDailySupplyFound(List<VolumeBarDetails> data) {
-        view.onHighVolumeBarFound(data);
-        new DailyLiquidityFlow(executor, mainThread, this, dailyHistogramlist, logger).start();
-    }
-
-    @Override
-    public void onDailyLiquidityFound(List<LiquiditySide> data) {
-        view.onDailyLiquidityGenerated(data);
-        logger.log(Logger.LOG_LEVEL.INFO, "Finding daily price gaps");
-        new PriceGapFlow(executor, mainThread, this, dailyHistogramlist, PriceGapFlow.GapType.DAILY).start();
-    }
-
-    @Override
-    public void onBinnedSupplyCompleted(List<LiquidityLevel> data) {
-        downloadingData = false;
-        view.hideLoading();
-        view.onBinnedSupplyCreated(data);
-        view.onComplete(ticker, timeInterval.toString(), dateRange);
-
-        findHighVolume();
-    }
-
-    @Override
-    public void onPriceGapsGenerated(List<PriceGap> data, PriceGapFlow.GapType gapType) {
-
-        if(gapType == PriceGapFlow.GapType.DAILY) {
-            view.onDailyPriceGapsFound(data);
-            logger.log(Logger.LOG_LEVEL.INFO, "Daily price gaps completed");
-            logger.log(Logger.LOG_LEVEL.INFO, "Finding intra day price gaps");
-            new PriceGapFlow(executor, mainThread, this, histogramList, PriceGapFlow.GapType.INTRA_DAY).start();
-
-        } else {
-            logger.log(Logger.LOG_LEVEL.INFO, "Intra day price gaps completed");
-            view.onIntraDayPriceGapsFound(data);
-            logger.log(Logger.LOG_LEVEL.INFO, "Fetching fundamentals");
-            FundamentalsFlow fundamentalsFlow = new FundamentalsFlow(executor, mainThread, this, settings);
-            fundamentalsFlow.start(ticker, dailyHistogramlist);
-        }
     }
 
     @Override
     public void onDataFetched(List<Histogram> data, String time) {
         this.histogramList = data;
         this.dateRange = time;
-        view.onHistogramCreated(data);
-        supplyFlow.start(histogramList, percentile, 0);
+
+        if(timeInterval == TimeInterval.Day){
+            new HistogramGroupingInteractorImpl(executor, mainThread, this, data, HistogramGroupingInteractor.Group.DAY).execute();
+        } else if(timeInterval == TimeInterval.Hour){
+            new HistogramGroupingInteractorImpl(executor, mainThread, this, data, HistogramGroupingInteractor.Group.HOUR).execute();
+
+        }
     }
 
     @Override
     public void onDataError() {
         view.hideLoading();
         view.showError("Unable to fetch data");
+        downloadingData = false;
     }
 
-
     @Override
-    public void onFundamentalsPrepared(Fundamentals fundamentals) {
-        this.fundamentals = fundamentals;
-        view.onFundamentalsLoaded(fundamentals);
+    public void onLatestPriceFetched(double price) {
         view.hideLoading();
+        view.onLatestPriceFetched(price);
     }
 
     @Override
     public void setAsset(DataBroker.Asset asset) {
         dataBroker.setAsset(asset);
+    }
+
+    @Override
+    public void onHistogramGrouped(List<Histogram> data, HistogramGroupingInteractor.Group group) {
+        this.histogramListGrouped = data;
+        dateRange = histogramList.get(histogramList.size() - 1).dateTime + " - " + histogramList.get(0).dateTime;
+        supplyFlow.start(histogramList, percentile, VolumePriceInteractor.PriceStructure.OHLCM);
     }
 }

@@ -22,6 +22,7 @@ public class BarData {
         public static final int INTERACTIVE_BROKERS = 0;
         public static final int ALPHA_VANTAGE = 1;
         public static final int YAHOO = 2;
+        public static final int CRYPTO_COMPARE = 3;
     }
 
     public static final class Asset{
@@ -131,6 +132,13 @@ public class BarData {
                 dateFormat = TimeStampFormat.YAHOO_FINANCE;
             } else {
                 dateFormat = TimeStampFormat.YAHOO_FINANCE_SIMPLE;
+            }
+
+        } else if(dataFarm == DataFarm.CRYPTO_COMPARE){
+            if(time.length() > 11){
+                dateFormat = TimeStampFormat.ALPHA_VANTAGE;
+            } else {
+                dateFormat = TimeStampFormat.ALPHA_VANTAGE_SIMPLE;
             }
 
         }

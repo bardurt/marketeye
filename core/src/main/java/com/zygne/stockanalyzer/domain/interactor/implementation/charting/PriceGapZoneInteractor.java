@@ -34,7 +34,7 @@ public class PriceGapZoneInteractor extends BaseInteractor implements ChartZoneI
             zone2.color = ChartObject.Color.BLUE;
             zone2.top = p.getEnd();
             zone2.bottom = p.getStart();
-            zone2.transparency = 90;
+            zone2.transparency = 40;
 
             zones.add(zone2);
         }

@@ -4,6 +4,7 @@ import com.zygne.stockanalyzer.domain.executor.Executor;
 import com.zygne.stockanalyzer.domain.executor.MainThread;
 import com.zygne.stockanalyzer.domain.interactor.base.BaseInteractor;
 import com.zygne.stockanalyzer.domain.model.LiquiditySide;
+import com.zygne.stockanalyzer.domain.model.graphics.ChartLine;
 import com.zygne.stockanalyzer.domain.model.graphics.ChartObject;
 import com.zygne.stockanalyzer.domain.model.graphics.ChartZone;
 
@@ -27,19 +28,18 @@ public class ChartZoneInteractorImpl extends BaseInteractor implements ChartZone
         List<ChartObject> zones = new ArrayList<>();
 
         for(LiquiditySide liquiditySide : data){
-            ChartZone zone = new ChartZone();
+            ChartLine line = new ChartLine();
 
-            if(liquiditySide.type == LiquiditySide.REJECT){
-                zone.color = ChartObject.Color.RED;
+            if(liquiditySide.type == LiquiditySide.SELL){
+                line.color = ChartObject.Color.RED;
             } else {
-                zone.color = ChartObject.Color.GREEN;
+                line.color = ChartObject.Color.GREEN;
             }
 
-            zone.top = liquiditySide.end;
-            zone.bottom = liquiditySide.start;
-            zone.transparency = 95;
 
-            zones.add(zone);
+            line.level = liquiditySide.start;
+            line.size = 1;
+            zones.add(line);
         }
 
 

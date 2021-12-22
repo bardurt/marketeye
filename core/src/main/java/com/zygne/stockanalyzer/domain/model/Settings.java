@@ -47,7 +47,7 @@ public class Settings {
                 + "Data Provider : " + dataProvider.toString() + "\n"
                 + "Cache : " + cache;
 
-        if(dataProvider == DataProvider.ALPHA_VANTAGE){
+        if (dataProvider == DataProvider.ALPHA_VANTAGE || dataProvider == DataProvider.CRYPTO_COMPARE) {
             value += "\n" + "API KEY ; " + apiKey;
         }
 

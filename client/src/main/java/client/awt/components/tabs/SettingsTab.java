@@ -15,17 +15,19 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
-public class SettingsTab extends JPanel implements ReportView.Callback {
+public class SettingsTab extends BaseTab implements ReportView.Callback {
 
     private Callback callback;
     private TextArea textAreaInfo;
     private TextArea textAreaLog;
     private JRadioButton rbAv;
     private JRadioButton rbYahoo;
+    private JRadioButton rbCryptoCompare;
     private ReportView reportView;
     private ResourceLoader resourceLoader;
 
     public SettingsTab(ResourceLoader resourceLoader) {
+        super();
         setLayout(new BorderLayout());
 
         JPanel providerPanel = new JPanel(new GridBagLayout());
@@ -43,9 +45,12 @@ public class SettingsTab extends JPanel implements ReportView.Callback {
 
         rbYahoo = new JRadioButton("Yahoo Finance");
 
+        rbCryptoCompare = new JRadioButton("Crypto Compare");
+
         ButtonGroup buttonGroup = new ButtonGroup();
         buttonGroup.add(rbAv);
         buttonGroup.add(rbYahoo);
+        buttonGroup.add(rbCryptoCompare);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -57,6 +62,10 @@ public class SettingsTab extends JPanel implements ReportView.Callback {
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
+       // providerPanel.add(rbCryptoCompare, gridBagConstraints);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
 
         JButton btnSelectProvider = new JButton("Set");
         providerPanel.add(btnSelectProvider, gridBagConstraints);
@@ -91,6 +100,9 @@ public class SettingsTab extends JPanel implements ReportView.Callback {
         if (settings.getDataProvider() == DataProvider.ALPHA_VANTAGE) {
             rbAv.setSelected(true);
             reportView.adjustToProvider(DataProvider.ALPHA_VANTAGE);
+        } else  if (settings.getDataProvider() == DataProvider.CRYPTO_COMPARE) {
+            rbCryptoCompare.setSelected(true);
+            reportView.adjustToProvider(DataProvider.CRYPTO_COMPARE);
         } else {
             rbYahoo.setSelected(true);
             reportView.adjustToProvider(DataProvider.YAHOO_FINANCE);
@@ -111,9 +123,12 @@ public class SettingsTab extends JPanel implements ReportView.Callback {
         if (rbAv.isSelected()) {
             reportView.adjustToProvider(DataProvider.ALPHA_VANTAGE);
             callback.onProviderSelected(DataProvider.ALPHA_VANTAGE);
-        } else {
+        } else if (rbYahoo.isSelected())  {
             reportView.adjustToProvider(DataProvider.YAHOO_FINANCE);
             callback.onProviderSelected(DataProvider.YAHOO_FINANCE);
+        } else if (rbCryptoCompare.isSelected())  {
+            reportView.adjustToProvider(DataProvider.CRYPTO_COMPARE);
+            callback.onProviderSelected(DataProvider.CRYPTO_COMPARE);
         }
 
     }
@@ -146,6 +161,7 @@ public class SettingsTab extends JPanel implements ReportView.Callback {
         void onProviderSelected(DataProvider dataProvider);
 
         void generateReport(String symbol, double percentile, TimeInterval timeInterval, DataSize dataSize, boolean fundamentals, boolean cache, DataBroker.Asset asset);
+        void fetchLastPrice(String symbol);
     }
 
     @Override

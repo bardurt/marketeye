@@ -15,20 +15,19 @@ import com.zygne.stockanalyzer.domain.model.enums.TimeInterval;
 import com.zygne.stockanalyzer.presentation.presenter.base.*;
 import com.zygne.stockanalyzer.presentation.presenter.implementation.*;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class AwtGui extends JPanel implements MainPresenter.View,
-        ScriptPresenter.View,
         SettingsPresenter.View,
         ScriptTab.Callback,
-        SettingsTab.Callback {
+        SettingsTab.Callback,
+        LiquiditySideTab.Callback,
+        ChartPresenter.View,
+        ChartTab.Callback {
 
     private Settings settings;
     private ResourceLoader resourceLoader = new ResourceLoader();
@@ -41,10 +40,12 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     private JButton jButtonConnect;
 
     private String symbol;
+    private DataSize dataSize;
+    private TimeInterval timeInterval;
 
     private SettingsPresenter settingsPresenter;
     private MainPresenter mainPresenter;
-    private ScriptPresenter scriptPresenter;
+    private ChartPresenter chartPresenter;
     private MainThread mainThread = new JavaAwtThread();
     private Executor executor = ThreadExecutor.getInstance();
 
@@ -54,6 +55,12 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     private ScriptTab scriptTab;
     private VolumeTab volumeTab;
     private PnfTab pnfTab;
+    private ChartTab chartTab;
+
+    private Logger logger;
+
+    private DataProvider dataProvider;
+
 
     private JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -66,14 +73,18 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         settingsTab.setCallback(this);
         vpaTab = new VpaTab();
         liquiditySideTab = new LiquiditySideTab();
+        liquiditySideTab.setCallback(this);
         scriptTab = new ScriptTab();
         scriptTab.setCallback(this);
         volumeTab = new VolumeTab();
         pnfTab = new PnfTab();
+        chartTab = new ChartTab(this);
 
         tabbedPane = new JTabbedPane();
+        Font font = new Font("Verdana", Font.CENTER_BASELINE, 14);
+        //tabbedPane.setFont(font);
 
-        tabbedPane.addTab("Settings", settingsTab);
+        tabbedPane.addTab("\"<html><h1 style='padding:20px;'>Settings</h1></html>\"", settingsTab);
 
         JPanel infoPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -114,29 +125,12 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         statusPanel.add(jButtonConnect, BorderLayout.SOUTH);
         add(statusPanel, BorderLayout.SOUTH);
 
+        logger = new UiLogger(new JavaAwtThread(), settingsTab.getLogArea());
+        logger.setUp();
+
+        chartPresenter = new ChartPresenterImpl(executor, mainThread, this, logger);
         settingsPresenter = new SettingsPresenterImpl(executor, mainThread, this);
         settingsPresenter.start();
-    }
-
-    @Override
-    public void onDailyLiquidityGenerated(List<LiquiditySide> data) {
-        liquiditySideTab.addDaily(data);
-        List<LiquiditySide> sides = new ArrayList<>();
-
-        for (LiquiditySide e : data) {
-            if (e.getSide().equalsIgnoreCase("Buy")) {
-            } else {
-                sides.add(e);
-            }
-        }
-
-
-        scriptPresenter.setZones(sides);
-    }
-
-    @Override
-    public void onWeeklyLiquidityGenerated(List<LiquiditySide> data) {
-        liquiditySideTab.addWeekly(data);
     }
 
     @Override
@@ -144,30 +138,10 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         vpaTab.addSupply(filtered);
         liquiditySideTab.clear();
 
-        scriptPresenter.setResistance(filtered);
-
-        Collections.sort(filtered, new LiquidityLevel.VolumeComparator());
-        Collections.reverse(filtered);
-
-        List<LiquidityLevel> pocs = new ArrayList<>();
-
-        for (LiquidityLevel e : filtered) {
-            if (e.getPercentile() > 98) {
-                pocs.add(e);
-            }
-        }
-
         vpaTab.addVolumeProfile(symbol, raw);
-    }
+        chartTab.addVolumeProfile(raw);
+        chartPresenter.setSupply(filtered);
 
-    @Override
-    public void onBinnedSupplyCreated(List<LiquidityLevel> zones) {
-        vpaTab.addBinnedSupply(zones);
-    }
-
-    @Override
-    public void onFundamentalsLoaded(Fundamentals fundamentals) {
-        vpaTab.addFundamentals(fundamentals);
     }
 
     @Override
@@ -176,7 +150,7 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         labelSymbol.setText("Symbol : " + symbol.toUpperCase() + " " + timeFrame.toString() + " - " + dateRange);
         labelStatus.setText("");
         labelLoading.setText("");
-        scriptPresenter.setSymbol(symbol);
+        chartPresenter.getChartData(symbol, TimeInterval.Day, dataSize);
     }
 
     @Override
@@ -190,36 +164,15 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     }
 
     @Override
-    public void onStatusUpdate(String status) {
-        labelStatus.setText(status);
-    }
-
-    @Override
-    public void onConnected() {
-        jButtonConnect.setText("Disconnect");
-    }
-
-    @Override
-    public void onDisconnected() {
-        jButtonConnect.setText("Connect");
-    }
-
-    @Override
-    public void onScriptCreated(String script) {
-        scriptTab.addScript(script);
-    }
-
-    @Override
     public void onSettingsLoaded(Settings settings) {
         this.settings = settings;
+        this.dataProvider = settings.getDataProvider();
         if (settingsTab != null) {
             settingsTab.setSettings(settings);
         }
 
-        Logger logger = new UiLogger(new JavaAwtThread(), settingsTab.getLogArea());
-        logger.setUp();
+
         mainPresenter = new MainPresenterImpl(executor, mainThread, this, settings, logger);
-        scriptPresenter = new ScriptPresenterImpl(executor, mainThread, this);
     }
 
     @Override
@@ -241,28 +194,23 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     public void generateReport(String symbol, double percentile, TimeInterval timeInterval, DataSize dataSize, boolean fundamentals, boolean cache, DataBroker.Asset asset) {
         if (mainPresenter != null) {
             this.symbol = symbol.toUpperCase();
+            this.dataSize = dataSize;
+            this.timeInterval = timeInterval;
             mainPresenter.setAsset(asset);
             mainPresenter.createReport(symbol, percentile, timeInterval, dataSize, fundamentals, cache);
         }
     }
 
     @Override
-    public void generateScript(boolean resistance, boolean sides, boolean gaps) {
-        if (scriptPresenter != null) {
-            scriptPresenter.createScript(resistance, sides, gaps);
-        }
+    public void fetchLastPrice(String symbol) {
     }
 
-
     @Override
-    public void onDailyPriceGapsFound(List<PriceGap> data) {
-        liquiditySideTab.addDailyPriceGaps(data);
-        scriptPresenter.setGaps(data);
+    public void generateScript(boolean resistance, boolean sides, boolean gaps) {
     }
 
     @Override
     public void onIntraDayPriceGapsFound(List<PriceGap> data) {
-        liquiditySideTab.addIntraDayPriceGaps(data);
     }
 
     private void connect() {
@@ -273,6 +221,14 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onProviderSelected(DataProvider dataProvider) {
+
+        this.dataProvider = dataProvider;
+        if (dataProvider == DataProvider.CRYPTO_COMPARE) {
+            chartPresenter.setAsset(DataBroker.Asset.Crypto);
+        } else {
+            chartPresenter.setAsset(DataBroker.Asset.Stock);
+        }
+
         settingsPresenter.loadSettings(dataProvider);
     }
 
@@ -285,42 +241,36 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         }
     }
 
-
-    @Override
-    public void onHighVolumeBarFound(List<VolumeBarDetails> data) {
-        volumeTab.addHighVolBars(data);
-    }
-
     @Override
     public void prepareView(List<MainPresenter.ViewComponent> viewComponents) {
         tabbedPane.removeAll();
 
-        tabbedPane.addTab("Settings", settingsTab);
+        tabbedPane.addTab("<html><h3 style='padding:20px;'>Settings</h3></html>", settingsTab);
 
         for (MainPresenter.ViewComponent v : viewComponents) {
 
             if (v == MainPresenter.ViewComponent.VPA) {
-                tabbedPane.addTab("VPA", vpaTab);
-                tabbedPane.addTab("Highest Volume", volumeTab);
+                tabbedPane.addTab("<html><h3 style='padding:20px;'>VPA</h3></html>", vpaTab);
+                //tabbedPane.addTab("Highest Volume", volumeTab);
                 //tabbedPane.addTab("High Vol Bars", highVolumeBarTab);
             }
 
             if (v == MainPresenter.ViewComponent.WICKS) {
-                tabbedPane.addTab("Liquidity", liquiditySideTab);
+                tabbedPane.addTab("<html><h3 style='padding:20px;'>Chart</h3></html>", chartTab);
             }
 
         }
-
-        //tabbedPane.addTab("PnF", pnfTab);
     }
 
     @Override
     public void onDailyBarsCreated(List<Histogram> histograms) {
         pnfTab.addVolumeProfile("", histograms);
+
     }
 
     @Override
     public void onHistogramCreated(List<Histogram> histograms) {
+        chartPresenter.setHistograms(histograms);
     }
 
     public void launch() {
@@ -328,14 +278,47 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 800);
         frame.add(new AwtGui());
-
         Image image = resourceLoader.loadImage("icon.png");
 
-        if(image != null) {
+        if (image != null) {
             frame.setIconImage(image);
         }
 
         frame.pack();
         frame.setVisible(true);
+    }
+
+    @Override
+    public void onLatestPriceFetched(double price) {
+
+        String text = labelSymbol.getText();
+        text += " - Price : " + String.format("%.2f", price);
+        labelSymbol.setText(text);
+        vpaTab.setCurrentPrice(price);
+    }
+
+    @Override
+    public void findLiquidity() {
+    }
+
+    @Override
+    public void onChartReady(List<Histogram> histograms, List<PriceGap> priceGaps, List<PriceImbalance> priceImbalances, List<LiquidityLevel> liquidityLevels) {
+        chartTab.addData(histograms, symbol.toUpperCase());
+        chartTab.addPriceGaps(priceGaps);
+        chartTab.addPriceImbalances(priceImbalances);
+        chartTab.addSupply(liquidityLevels);
+    }
+
+    @Override
+    public void createChart() {
+
+        if (symbol == null) {
+            showError("No Symbol for chart!!");
+            return;
+        }
+        if (symbol.isEmpty()) {
+            showError("No Symbol for chart!!");
+            return;
+        }
     }
 }

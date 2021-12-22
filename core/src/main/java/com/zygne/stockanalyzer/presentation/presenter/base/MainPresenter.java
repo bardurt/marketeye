@@ -17,23 +17,15 @@ public interface MainPresenter {
 
     interface View extends BaseView {
         void onSupplyCreated(List<LiquidityLevel> filtered, List<LiquidityLevel> raw);
-        void onBinnedSupplyCreated(List<LiquidityLevel> zones);
-        void onDailyLiquidityGenerated(List<LiquiditySide> data);
         void onDailyBarsCreated(List<Histogram> histograms);
         void onHistogramCreated(List<Histogram> histograms);
-        void onWeeklyLiquidityGenerated(List<LiquiditySide> data);
-        void onFundamentalsLoaded(Fundamentals fundamentals);
-        void onDailyPriceGapsFound(List<PriceGap> data);
         void onIntraDayPriceGapsFound(List<PriceGap> data);
         void onComplete(String symbol, String timeFrame, String dateRange);
         void onTimeFramesPrepared(List<TimeInterval> timeIntervals, int defaultSelection);
         void onDataSizePrepared(List<DataSize> data, int defaultSelection);
-        void onStatusUpdate(String status);
-        void onHighVolumeBarFound(List<VolumeBarDetails> data);
-        void onConnected();
-        void onDisconnected();
         void toggleConnectionSettings(boolean b);
         void prepareView(List<ViewComponent> viewComponents);
+        void onLatestPriceFetched(double price);
     }
 
     enum ViewComponent{
@@ -41,7 +33,8 @@ public interface MainPresenter {
         PRICE_GAPS,
         INTRA_DAY,
         SCRIPT,
-        WICKS
+        WICKS,
+        CHART
     }
 
     enum AnalysisSettings{

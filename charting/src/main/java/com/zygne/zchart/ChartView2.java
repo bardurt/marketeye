@@ -1,26 +1,28 @@
 package com.zygne.zchart;
 
-import com.zygne.zchart.volumeprofile.PointAndFigurePanel;
-import com.zygne.zchart.volumeprofile.VolumeProfilePanel;
-import com.zygne.zchart.volumeprofile.model.data.Quote;
+import com.zygne.zchart.chart.charts.pricechart.PricePanel;
+import com.zygne.zchart.chart.model.data.Quote;
 
 import javax.swing.*;
-import javax.swing.event.MouseInputListener;
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChartView2 extends JPanel {
 
-     VolumeProfilePanel chartPanel;
+     private PricePanel chartPanel;
+     private JButton buttonZoomIn;
+     private JButton buttonZoomOut;
 
     public ChartView2() {
         setPreferredSize(new Dimension(1280, 720));
         setLayout(new BorderLayout());
-        chartPanel = new VolumeProfilePanel(this, VolumeProfilePanel.ChartType.GROUPED);
-        chartPanel.addQuotes(generateQuotesVp(generateData()));
+        chartPanel = new PricePanel(this);
+        chartPanel.addQuotes(generateBars());
         add(chartPanel, BorderLayout.CENTER);
+        chartPanel.addWaterMark("Hello");
+
+        buttonZoomIn = new JButton("Zoom in");
     }
 
     private ArrayList<Float> generateData() {
@@ -124,6 +126,45 @@ public class ChartView2 extends JPanel {
 
             timeStamp++;
         }
+
+        return quoteList;
+    }
+
+    private List<Quote> generateBars(){
+        List<Quote> quoteList = new ArrayList<>();
+
+        Quote q1 = new Quote();
+        q1.setOpen(10.11);
+        q1.setHigh(11.01);
+        q1.setLow(9.55);
+        q1.setClose(9.8);
+
+        quoteList.add(q1);
+
+        Quote q2 = new Quote();
+        q2.setOpen(9.90);
+        q2.setHigh(10.1);
+        q2.setLow(8.2);
+        q2.setClose(9.5);
+
+        quoteList.add(q2);
+
+        Quote q3 = new Quote();
+        q3.setOpen(9.5);
+        q3.setHigh(10.5);
+        q3.setLow(7);
+        q3.setClose(8.5);
+
+        quoteList.add(q3);
+
+        Quote q4 = new Quote();
+        q4.setOpen(9);
+        q4.setHigh(12.5);
+        q4.setLow(8.5);
+        q4.setClose(10);
+
+        quoteList.add(q4);
+
 
         return quoteList;
     }
