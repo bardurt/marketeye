@@ -1,9 +1,10 @@
 package client.awt.components;
 
 
-import com.zygne.stockanalyzer.domain.Logger;
-import com.zygne.stockanalyzer.domain.executor.MainThread;
+import domain.Logger;
+import domain.executor.MainThread;
 
+import javax.swing.*;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,12 +17,12 @@ public class UiLogger extends Thread implements Logger {
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     private final MainThread mainThread;
-    private final TextArea outPut;
+    private final JLabel outPut;
 
     private volatile boolean started = false;
     private volatile boolean shuttingDown = false;
 
-    public UiLogger(MainThread mainThread, TextArea outPut) {
+    public UiLogger(MainThread mainThread, JLabel outPut) {
         this.mainThread = mainThread;
         this.outPut = outPut;
     }
@@ -82,7 +83,7 @@ public class UiLogger extends Thread implements Logger {
                     if(outPut != null) {
                         if (item instanceof Command.Log) {
                             String log = "\n" + getTime() + " - " + ((Command.Log) item).getMessage();
-                            mainThread.post(() -> outPut.append(log));
+                            mainThread.post(() -> outPut.setText(log));
 
                         } else if (item instanceof Command.Clear){
                             mainThread.post(() -> outPut.setText(""));

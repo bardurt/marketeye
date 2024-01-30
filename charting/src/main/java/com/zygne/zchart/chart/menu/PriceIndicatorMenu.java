@@ -18,7 +18,6 @@ public class PriceIndicatorMenu extends BoxContainer {
     private Button priceImbalance;
     private Button priceImbalancePlus;
     private Button priceImbalanceMinus;
-    private Button priceGaps;
     private Button volume;
     private Button volumeBubble;
     private Button volumeBubblePlus;
@@ -72,11 +71,6 @@ public class PriceIndicatorMenu extends BoxContainer {
         priceImbalanceMinus.setText("-");
 
         row += 30;
-
-        priceGaps = new Button(x, row, this.width, 30);
-        priceGaps.setText("Gaps");
-
-        row += 30 + 5;
 
         volume = new Button(x, row, this.width, 30);
         volume.setText("Volume");
@@ -149,13 +143,6 @@ public class PriceIndicatorMenu extends BoxContainer {
             return true;
         }
 
-        if (priceGaps.inside(x, y)) {
-            if (listener != null) {
-                listener.toggleIndicator(Indicator.PRICE_GAPS);
-            }
-            return true;
-        }
-
         if (volume.inside(x, y)) {
             if (listener != null) {
                 listener.toggleIndicator(Indicator.VOLUME);
@@ -165,21 +152,21 @@ public class PriceIndicatorMenu extends BoxContainer {
 
         if (volumeBubble.inside(x, y)) {
             if (listener != null) {
-                listener.toggleIndicator(Indicator.VOLUME_BUBBBLE);
+                listener.toggleIndicator(Indicator.VOLUME_BUBBLE);
             }
             return true;
         }
 
         if (volumeBubblePlus.inside(x, y)) {
             if (listener != null) {
-                listener.increase(Indicator.VOLUME_BUBBBLE);
+                listener.increase(Indicator.VOLUME_BUBBLE);
             }
             return true;
         }
 
         if (volumeBubbleMinus.inside(x, y)) {
             if (listener != null) {
-                listener.decrease(Indicator.VOLUME_BUBBBLE);
+                listener.decrease(Indicator.VOLUME_BUBBLE);
             }
             return true;
         }
@@ -226,10 +213,6 @@ public class PriceIndicatorMenu extends BoxContainer {
 
         if (pricePressure != null) {
             pricePressure.draw(canvas);
-        }
-
-        if (priceGaps != null) {
-            priceGaps.draw(canvas);
         }
 
         if (volume != null) {
@@ -279,6 +262,6 @@ public class PriceIndicatorMenu extends BoxContainer {
         PRICE_IMBALANCE,
         PRICE_GAPS,
         VOLUME,
-        VOLUME_BUBBBLE
+        VOLUME_BUBBLE
     }
 }

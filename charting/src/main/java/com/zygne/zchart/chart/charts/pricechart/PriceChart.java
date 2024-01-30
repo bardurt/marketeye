@@ -12,7 +12,6 @@ import com.zygne.zchart.chart.util.ZoomHelper;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
-import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ public class PriceChart extends MouseInputAdapter implements Chart,
     private final int labelWidth = 60;
     private double scale = 1;
     private int barWidth = 1;
-    private int barSeparator = 1;
+    private int barSeparator = 0;
     private int lastBar = 0;
     private boolean scaling = false;
     private boolean stretching = false;
@@ -76,7 +75,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
     private CandleSticksIndicator candleSticksIndicator = null;
     private VolumeProfileIndicator volumeProfileIndicator = null;
-    private PriceGapsIndicator priceGapsIndicator = null;
     private PriceImbalanceIndicator priceImbalanceIndicator = null;
     private PricePressureIndicator pricePressureIndicator = null;
     private VolumeIndicator volumeIndicator = null;
@@ -205,12 +203,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         objects.clear();
         objects.add(waterMark);
         objects.add(copyright);
-
-        if (showPriceGaps) {
-            if (priceGapsIndicator != null) {
-                objects.add(priceGapsIndicator);
-            }
-        }
 
         if (showVolumeBubble) {
             if (volumeBubbleIndicator != null) {
@@ -439,7 +431,7 @@ public class PriceChart extends MouseInputAdapter implements Chart,
                 showVolume = !showVolume;
                 break;
             }
-            case VOLUME_BUBBBLE: {
+            case VOLUME_BUBBLE: {
                 showVolumeBubble = !showVolumeBubble;
                 break;
             }
@@ -455,7 +447,7 @@ public class PriceChart extends MouseInputAdapter implements Chart,
                 pricePressureIndicator.increase();
                 break;
             }
-            case VOLUME_BUBBBLE: {
+            case VOLUME_BUBBLE: {
                 volumeBubbleIndicator.increase();
                 break;
             }
@@ -474,7 +466,7 @@ public class PriceChart extends MouseInputAdapter implements Chart,
                 pricePressureIndicator.decrease();
                 break;
             }
-            case VOLUME_BUBBBLE: {
+            case VOLUME_BUBBLE: {
                 volumeBubbleIndicator.decrease();
                 break;
             }
@@ -556,7 +548,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
     private void updateIndicators() {
         priceScale.setScale(scale);
 
-        priceGapsIndicator = null;
         priceImbalanceIndicator = null;
         pricePressureIndicator = null;
         volumeIndicator = null;
@@ -641,7 +632,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
     @Override
     public void onPriceGapsCreated(PriceGapsIndicator priceGapsIndicator) {
-        this.priceGapsIndicator = priceGapsIndicator;
         refresh();
     }
 

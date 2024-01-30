@@ -9,25 +9,17 @@ import com.zygne.zchart.chart.model.data.Quote;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChartTab extends JPanel {
 
     private PricePanel pricePanel = new PricePanel(this);
-    private Callback callback;
 
     public ChartTab(Callback callback) {
-        this.callback = callback;
 
         JButton button = new JButton("Create Chart");
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                callback.createChart();
-            }
-        });
+        button.addActionListener(e -> callback.createChart());
 
         setLayout(new BorderLayout());
         add(pricePanel, BorderLayout.CENTER);
@@ -35,12 +27,9 @@ public class ChartTab extends JPanel {
 
     public void addData(List<Histogram> data, String symbol) {
 
-        List<Quote> quoteList = new ArrayList<Quote>();
+        List<Quote> quoteList = new ArrayList<>();
 
-
-        for (int i = 0; i < data.size(); i++) {
-
-            Histogram e = data.get(i);
+        for (Histogram e : data) {
 
             Quote quote = new Quote();
             quote.setHigh(e.high);
@@ -74,7 +63,7 @@ public class ChartTab extends JPanel {
 
 
     public void addPriceGaps(java.util.List<PriceGap> levels) {
-        List<Quote> volumeProfileList = new ArrayList<Quote>();
+        List<Quote> volumeProfileList = new ArrayList<>();
 
         for (PriceGap e : levels) {
 
@@ -93,15 +82,15 @@ public class ChartTab extends JPanel {
     }
 
     public void addPriceImbalances(java.util.List<PriceImbalance> levels) {
-        List<Quote> volumeProfileList = new ArrayList<Quote>();
+        List<Quote> volumeProfileList = new ArrayList<>();
 
         for (PriceImbalance e : levels) {
-                Quote quote = new Quote();
-                quote.setHigh(e.getEnd());
-                quote.setLow(e.getStart());
-                quote.setTimeStamp(e.getTimeStamp());
-                quote.setIndex(e.getIndex());
-                volumeProfileList.add(quote);
+            Quote quote = new Quote();
+            quote.setHigh(e.getEnd());
+            quote.setLow(e.getStart());
+            quote.setTimeStamp(e.getTimeStamp());
+            quote.setIndex(e.getIndex());
+            volumeProfileList.add(quote);
         }
         pricePanel.addPriceImbalances(volumeProfileList);
 
@@ -109,7 +98,7 @@ public class ChartTab extends JPanel {
 
     public void addSupply(List<LiquidityLevel> data) {
 
-        List<Quote> volumeProfileList = new ArrayList<Quote>();
+        List<Quote> volumeProfileList = new ArrayList<>();
 
         for (LiquidityLevel e : data) {
 

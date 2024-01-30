@@ -22,7 +22,7 @@ public class OptionsMenu extends BoxContainer {
         int row = y;
 
         scaleUpButton = new Button(x, y, this.width, 20);
-        scaleUpButton.setText("ø");
+        scaleUpButton.setText("Center");
 
     }
 

@@ -1,7 +1,6 @@
 package client.awt;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
 
@@ -34,15 +33,4 @@ public class ResourceLoader {
         return null;
     }
 
-    public ImageIcon loadIcon(String name) {
-
-        java.net.URL imgURL = getResourcePath(name);
-
-        if (imgURL != null) {
-            return new ImageIcon(imgURL, "icon");
-        } else {
-            System.err.println("Couldn't find file: " + name);
-            return null;
-        }
-    }
 }

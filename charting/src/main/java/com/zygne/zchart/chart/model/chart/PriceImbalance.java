@@ -31,7 +31,7 @@ public class PriceImbalance  extends Object2d {
 
         prepareColors();
 
-        canvas.setColor(205, 193, 29, 200);
+        canvas.setColor(205, 193, 29, 100);
         canvas.drawRectangle(x, y, width+paddingLeft, height, Canvas.Fill.SOLID);
 
     }

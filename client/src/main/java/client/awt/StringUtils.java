@@ -2,7 +2,6 @@ package client.awt;
 
 public class StringUtils {
 
-
     public static String repeat(String value, int count){
         if(count <= 0){
             return value;
@@ -12,13 +11,7 @@ public class StringUtils {
             return value;
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for(int i = 0; i < count; i++){
-            stringBuilder.append(value);
-        }
-
-        return stringBuilder.toString();
+        return value.repeat(count);
     }
 
     public static String repeatAndPad(String value, int count, int maxCount){
@@ -32,14 +25,10 @@ public class StringUtils {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        for(int i = 0; i < count; i++){
-            stringBuilder.append(value);
-        }
+        stringBuilder.append(value.repeat(count));
 
         if(count < maxCount){
-            for(int i = count; i < maxCount; i++){
-                stringBuilder.append(" ");
-            }
+            stringBuilder.append(" ".repeat(maxCount - count));
         }
 
         return stringBuilder.toString();

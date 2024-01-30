@@ -1,6 +1,7 @@
 package client.awt;
 
-import com.zygne.stockanalyzer.domain.executor.MainThread;
+
+import domain.executor.MainThread;
 
 import javax.swing.*;
 

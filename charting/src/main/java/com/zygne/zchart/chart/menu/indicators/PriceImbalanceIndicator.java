@@ -10,27 +10,23 @@ import java.util.List;
 public class PriceImbalanceIndicator extends Object2d {
 
     private int padding = 0;
+    private int increment = 20;
     private List<PriceImbalance> imbalances = new ArrayList<>();
 
     public PriceImbalanceIndicator(List<PriceImbalance> imbalances) {
         this.imbalances = imbalances;
     }
 
-
     public void increase() {
-        padding++;
-        if (padding > 100) {
-            padding = 100;
-        }
+        padding+= 20;
     }
 
     public void decrease() {
-        padding++;
-        if (padding > 100) {
-            padding = 100;
+        padding -= 20;
+        if(padding <=0){
+            padding = 0;
         }
     }
-
 
     @Override
     public void draw(Canvas canvas) {

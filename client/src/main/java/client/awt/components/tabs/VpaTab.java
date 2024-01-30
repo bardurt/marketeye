@@ -1,25 +1,20 @@
 package client.awt.components.tabs;
 
-import client.awt.components.tables.LiquidityLevelRenderer;
-import client.awt.components.tables.LiquidityLevelTableModel;
-import client.awt.components.views.FundamentalsView;
 import com.zygne.zchart.chart.charts.volumeatprice.VolumePricePanel;
 import com.zygne.zchart.chart.charts.volumeprofile.VolumeProfilePanel;
 import com.zygne.zchart.chart.model.data.Quote;
-import com.zygne.stockanalyzer.domain.model.Fundamentals;
 import com.zygne.stockanalyzer.domain.model.LiquidityLevel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class VpaTab extends BaseTab{
+public class VpaTab extends JPanel{
 
 
-    private VolumeProfilePanel volumeProfilePanel;
-    private VolumePricePanel volumePricePanel;
+    private final VolumeProfilePanel volumeProfilePanel;
+    private final VolumePricePanel volumePricePanel;
 
     public VpaTab() {
         super();
@@ -28,12 +23,6 @@ public class VpaTab extends BaseTab{
         JPanel contentPanel = new JPanel(new BorderLayout());
 
         JPanel tablesPanel = new JPanel(new BorderLayout());
-
-        JPanel supplyPanel = new JPanel(new BorderLayout());
-        supplyPanel.add(new JLabel("Volume at price"), BorderLayout.NORTH);
-        JPanel pricesPanel = new JPanel(new GridLayout(0,1));
-
-        //tablesPanel.add(pricesPanel, BorderLayout.WEST);
 
         JPanel volumePanel = new JPanel(new GridLayout(0,2));
 
@@ -58,7 +47,7 @@ public class VpaTab extends BaseTab{
 
     public void addSupply(List<LiquidityLevel> data){
 
-        List<Quote> volumeProfileList = new ArrayList<Quote>();
+        List<Quote> volumeProfileList = new ArrayList<>();
 
         for(LiquidityLevel e : data){
 
@@ -75,7 +64,7 @@ public class VpaTab extends BaseTab{
     }
 
     public void addVolumeProfile(String symbol, java.util.List<LiquidityLevel> levels){
-        List<Quote> volumeProfileList = new ArrayList<Quote>();
+        List<Quote> volumeProfileList = new ArrayList<>();
 
         for(LiquidityLevel e : levels){
 
@@ -91,8 +80,4 @@ public class VpaTab extends BaseTab{
 
     }
 
-    public void setCurrentPrice(double currentPrice){
-        volumeProfilePanel.setCurrentPrice(currentPrice);
-        volumePricePanel.setCurrentPrice(currentPrice);
-    }
 }
