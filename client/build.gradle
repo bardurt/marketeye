@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'client.Launcher'
+        )
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    implementation project(path: ':arch')
+    implementation project(path: ':data')
+    implementation project(path: ':charting')
+    implementation group: 'org.jfree', name: 'jfreechart', version: '1.5.0'
+}
