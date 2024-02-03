@@ -12,8 +12,6 @@ public interface ChartPresenter {
 
     interface View extends BaseView {
         void onChartReady(List<Histogram> histograms,
-                          List<PriceGap> priceGaps,
-                          List<PriceImbalance> priceImbalances,
                           List<LiquidityLevel> liquidityLevels);
     }
 }

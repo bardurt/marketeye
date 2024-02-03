@@ -37,25 +37,21 @@ public class RendererImpl implements Renderer {
 
         for (Object2d object2d : object2dList) {
             if (object2d.getzOrder() == 1) {
-                // if(camera.intersects(object2d)) {
                 object2d.draw(canvas);
-                //}
             }
         }
-        canvas.translate(0, -camera.getViewPortY());
 
+        canvas.translate(0, -camera.getViewPortY());
 
         canvas.translate(camera.getViewPortX(), camera.getViewPortY());
 
         for (Object2d object2d : object2dList) {
             if (object2d.getzOrder() == 0) {
-                // if(camera.intersects(object2d)) {
                 object2d.draw(canvas);
-                //}
             }
         }
-        canvas.translate(-camera.getViewPortX(), -camera.getViewPortY());
 
+        canvas.translate(-camera.getViewPortX(), -camera.getViewPortY());
 
         for (Object2d object2d : object2dList) {
             if (object2d.getzOrder() == 2) {

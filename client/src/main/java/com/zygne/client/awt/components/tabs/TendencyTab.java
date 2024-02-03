@@ -42,8 +42,8 @@ public class TendencyTab extends JPanel implements FuturesView.Callback {
 
     }
 
-    public void setAssets(List<Asset> data, int defaultSelection) {
-        reportView.setAssets(data, defaultSelection);
+    public void setAssets(List<Asset> data) {
+        reportView.setAssets(data);
     }
 
     @Override

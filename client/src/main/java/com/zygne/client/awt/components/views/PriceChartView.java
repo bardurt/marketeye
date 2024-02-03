@@ -4,8 +4,6 @@ import com.zygne.chart.chart.charts.pricechart.PricePanel;
 import com.zygne.chart.chart.model.data.Quote;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.LiquidityLevel;
-import com.zygne.data.domain.model.PriceGap;
-import com.zygne.data.domain.model.PriceImbalance;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,16 +12,16 @@ import java.util.List;
 
 public class PriceChartView extends JPanel {
 
-    private PricePanel pricePanel = new PricePanel(this);
+    private final PricePanel pricePanel = new PricePanel(this);
 
     public PriceChartView() {
         setLayout(new BorderLayout());
         add(pricePanel, BorderLayout.CENTER);
     }
 
-    public void addData(java.util.List<Histogram> data, String symbol) {
+    public void addData(List<Histogram> data, String symbol) {
 
-        java.util.List<Quote> quoteList = new ArrayList<>();
+        List<Quote> quoteList = new ArrayList<>();
 
         for (Histogram e : data) {
 
@@ -42,8 +40,8 @@ public class PriceChartView extends JPanel {
         pricePanel.addWaterMark(symbol);
     }
 
-    public void addVolumeProfile(java.util.List<LiquidityLevel> levels) {
-        java.util.List<Quote> volumeProfileList = new ArrayList<>();
+    public void addVolumeProfile(List<LiquidityLevel> levels) {
+        List<Quote> volumeProfileList = new ArrayList<>();
 
         for (LiquidityLevel e : levels) {
 
@@ -55,62 +53,5 @@ public class PriceChartView extends JPanel {
         }
         pricePanel.addVolumeProfile(volumeProfileList);
 
-    }
-
-
-    public void addPriceGaps(java.util.List<PriceGap> levels) {
-        java.util.List<Quote> volumeProfileList = new ArrayList<>();
-
-        for (PriceGap e : levels) {
-
-            if (!e.isFilled()) {
-                Quote quote = new Quote();
-                quote.setHigh(e.getEnd());
-                quote.setLow(e.getStart());
-                quote.setTimeStamp(e.getTimeStamp());
-                quote.setIndex(e.getIndex());
-                volumeProfileList.add(quote);
-            }
-
-        }
-        pricePanel.addPriceGaps(volumeProfileList);
-
-    }
-
-    public void addPriceImbalances(java.util.List<PriceImbalance> levels) {
-        java.util.List<Quote> volumeProfileList = new ArrayList<>();
-
-        for (PriceImbalance e : levels) {
-            Quote quote = new Quote();
-            quote.setHigh(e.getEnd());
-            quote.setLow(e.getStart());
-            quote.setTimeStamp(e.getTimeStamp());
-            quote.setIndex(e.getIndex());
-            volumeProfileList.add(quote);
-        }
-        pricePanel.addPriceImbalances(volumeProfileList);
-
-    }
-
-    public void addSupply(java.util.List<LiquidityLevel> data) {
-
-        List<Quote> volumeProfileList = new ArrayList<>();
-
-        for (LiquidityLevel e : data) {
-
-            if (e.getPercentile() > 90) {
-                Quote quote = new Quote();
-                quote.setHigh(e.price);
-                quote.setVolume(e.getVolume());
-                quote.setPercentile(e.getPercentile());
-                volumeProfileList.add(quote);
-            }
-        }
-        pricePanel.addPricePressure(volumeProfileList);
-
-    }
-
-    public interface Callback {
-        void createChart();
     }
 }

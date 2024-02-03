@@ -17,14 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PriceChart extends MouseInputAdapter implements Chart,
-        PriceChartMenu.Listener,
-        PriceIndicatorMenu.Listener,
         OptionsMenu.Listener,
         CandleSticksCreator.Callback,
-        PricePressureCreator.Callback,
-        PriceImbalanceCreator.Callback,
         VolumeProfileCreator.Callback,
-        PriceGapCreator.Callback,
         VolumeIndicatorCreator.Callback,
         TimeCreator.Callback,
         VolumeBubbleCreator.Callback {
@@ -63,13 +58,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
     private java.util.List<Object2d> objects = new ArrayList<>();
     private RendererImpl renderer;
     private int percentile = 90;
-
-    private boolean showVolumeProfile = true;
-    private boolean showPricePressure = true;
-    private boolean showPriceImbalance = true;
-    private boolean showPriceGaps = true;
-    private boolean showVolume = true;
-    private boolean showVolumeBubble = true;
 
     private CandleSticksIndicator candleSticksIndicator = null;
     private VolumeProfileIndicator volumeProfileIndicator = null;
@@ -233,10 +221,10 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
         if (scaling) {
             if (dy > 2) {
-                scaleUp(PriceChartMenu.Entity.HEIGHT);
+                scaleUp(0);
             }
             if (dy < -2) {
-                scaleDown(PriceChartMenu.Entity.HEIGHT);
+                scaleDown(0);
             }
 
             scaling = false;
@@ -245,10 +233,10 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
         if (stretching) {
             if (dy > 2) {
-                scaleUp(PriceChartMenu.Entity.WIDTH);
+                scaleUp(1);
             }
             if (dy < -2) {
-                scaleDown(PriceChartMenu.Entity.WIDTH);
+                scaleDown(1);
             }
 
             stretching = false;
@@ -299,25 +287,23 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         topBar.setLabelText(title + " " + percentile + "%");
     }
 
-    @Override
-    public void scaleUp(PriceChartMenu.Entity entity) {
-        switch (entity) {
-            case WIDTH:
-                this.barWidth += 2;
 
+    public void scaleUp(int what) {
+        switch (what) {
+            case 0 -> {
+                this.barWidth += 2;
                 if (this.barWidth > 20) {
                     this.barWidth = 20;
                     return;
                 }
-                break;
-            case HEIGHT:
+            }
+            case 1 -> {
                 this.zoom++;
-
                 if (this.zoom > ZoomHelper.getMax()) {
                     this.zoom = ZoomHelper.getMax();
                     return;
                 }
-                break;
+            }
         }
 
         adjustToZoom();
@@ -325,25 +311,22 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         createCandleSticks();
     }
 
-    @Override
-    public void scaleDown(PriceChartMenu.Entity entity) {
-        switch (entity) {
-            case WIDTH:
+    public void scaleDown(int what) {
+        switch (what) {
+            case 0 -> {
                 this.barWidth -= 2;
-
                 if (this.barWidth < 1) {
                     this.barWidth = 1;
                     return;
                 }
-                break;
-            case HEIGHT:
+            }
+            case 1 -> {
                 this.zoom--;
-
                 if (this.zoom < 0) {
                     this.zoom = 0;
                     return;
                 }
-                break;
+            }
         }
 
         adjustToZoom();
@@ -351,83 +334,11 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         createCandleSticks();
     }
 
-    @Override
-    public void toggleIndicator(PriceIndicatorMenu.Indicator indicator) {
-
-        switch (indicator) {
-            case VOLUME_PROFILE: {
-                showVolumeProfile = !showVolumeProfile;
-                break;
-            }
-            case PRICE_PRESSURE: {
-                showPricePressure = !showPricePressure;
-                break;
-            }
-            case PRICE_IMBALANCE: {
-                showPriceImbalance = !showPriceImbalance;
-                break;
-            }
-            case PRICE_GAPS: {
-                showPriceGaps = !showPriceGaps;
-                break;
-            }
-            case VOLUME: {
-                showVolume = !showVolume;
-                break;
-            }
-            case VOLUME_BUBBLE: {
-                showVolumeBubble = !showVolumeBubble;
-                break;
-            }
-        }
-
-        refresh();
-    }
-
-    @Override
-    public void increase(PriceIndicatorMenu.Indicator indicator) {
-        switch (indicator) {
-            case PRICE_PRESSURE: {
-                pricePressureIndicator.increase();
-                break;
-            }
-            case VOLUME_BUBBLE: {
-                volumeBubbleIndicator.increase();
-                break;
-            }
-            case PRICE_IMBALANCE: {
-                priceImbalanceIndicator.increase();
-                break;
-            }
-
-        }
-    }
-
-    @Override
-    public void decrease(PriceIndicatorMenu.Indicator indicator) {
-        switch (indicator) {
-            case PRICE_PRESSURE: {
-                pricePressureIndicator.decrease();
-                break;
-            }
-            case VOLUME_BUBBLE: {
-                volumeBubbleIndicator.decrease();
-                break;
-            }
-            case PRICE_IMBALANCE: {
-                priceImbalanceIndicator.decrease();
-                break;
-            }
-        }
-    }
 
     @Override
     public void onOptionsSelected(OptionsMenu.OptionItem options) {
-        switch (options) {
-            case CENTER_CHART:
-                centerCamera();
-
-                break;
+        if (options == OptionsMenu.OptionItem.CENTER_CHART) {
+            centerCamera();
         }
     }
 
@@ -437,50 +348,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
         createVolumeProfile();
     }
-
-    public void addPriceImbalances(List<Quote> quotes) {
-        this.priceImbalances.clear();
-        this.priceImbalances.addAll(quotes);
-
-        if (candleSticksIndicator == null) {
-            return;
-        }
-
-        new PriceImbalanceCreator().create(this, this.priceImbalances,
-                candleSticksIndicator.getCandleSticks(),
-                scale,
-                lastBar);
-    }
-
-    public void addPriceGaps(List<Quote> quotes) {
-        this.priceGaps.clear();
-        this.priceGaps.addAll(quotes);
-
-        if (candleSticksIndicator == null) {
-            return;
-        }
-
-        new PriceGapCreator().create(this, this.priceImbalances,
-                candleSticksIndicator.getCandleSticks(),
-                scale,
-                lastBar);
-    }
-
-    public void addPricePressure(List<Quote> quotes) {
-        this.pricePressure.clear();
-        this.pricePressure.addAll(quotes);
-
-        if (candleSticksIndicator == null) {
-            return;
-        }
-
-        new PricePressureCreator().create(this, this.pricePressure,
-                candleSticksIndicator.getCandleSticks(),
-                scale,
-                lastBar,
-                percentile);
-    }
-
 
     private void adjustToZoom() {
 
@@ -505,22 +372,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
         createVolumeProfile();
 
-        new PriceImbalanceCreator().create(this, this.priceImbalances,
-                candleSticksIndicator.getCandleSticks(),
-                scale,
-                lastBar);
-
-        new PricePressureCreator().create(this, pricePressure,
-                candleSticksIndicator.getCandleSticks(),
-                scale,
-                lastBar,
-                percentile);
-
-        new PriceGapCreator().create(this, priceGaps,
-                candleSticksIndicator.getCandleSticks(),
-                scale,
-                lastBar);
-
         new VolumeIndicatorCreator().create(
                 this,
                 candleSticksIndicator.getCandleSticks(),
@@ -531,9 +382,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
                 candleSticksIndicator.getCandleSticks(),
                 canvasHeight,
                 20);
-
-        new VolumeBubbleCreator().create(this,
-                candleSticksIndicator.getCandleSticks());
 
     }
 
@@ -552,31 +400,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
             centerCamera();
             updateIndicators();
         });
-    }
-
-    @Override
-    public void onPricePressureCreated(PricePressureIndicator pricePressureIndicator) {
-        this.pricePressureIndicator = pricePressureIndicator;
-
-        SwingUtilities.invokeLater(() -> {
-            refresh();
-
-        });
-    }
-
-    @Override
-    public void onPriceImbalanceCreated(PriceImbalanceIndicator priceImbalanceIndicator) {
-        this.priceImbalanceIndicator = priceImbalanceIndicator;
-
-        SwingUtilities.invokeLater(() -> {
-            refresh();
-
-        });
-    }
-
-    @Override
-    public void onPriceGapsCreated(PriceGapsIndicator priceGapsIndicator) {
-        refresh();
     }
 
     @Override

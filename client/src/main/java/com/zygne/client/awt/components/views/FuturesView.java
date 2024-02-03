@@ -132,7 +132,7 @@ public class FuturesView extends JPanel {
     }
 
 
-    public void setAssets(List<Asset> data, int defaultSelection) {
+    public void setAssets(List<Asset> data) {
         assetList.clear();
         assetList.addAll(data);
         comboAsset.removeAllItems();

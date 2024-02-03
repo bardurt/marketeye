@@ -95,8 +95,7 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onSupplyCreated(List<LiquidityLevel> filtered, List<LiquidityLevel> raw) {
-        settingsTab.priceChartView.addVolumeProfile(raw);
-        chartPresenter.setSupply(filtered);
+        chartPresenter.setSupply(raw);
     }
 
     @Override
@@ -156,16 +155,18 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     }
 
     @Override
-    public void onChartReady(List<Histogram> histograms, List<PriceGap> priceGaps, List<PriceImbalance> priceImbalances, List<LiquidityLevel> liquidityLevels) {
+    public void onChartReady(List<Histogram> histograms, List<LiquidityLevel> liquidityLevels) {
         settingsTab.priceChartView.addData(histograms, symbol.toUpperCase());
-        settingsTab.priceChartView.addPriceGaps(priceGaps);
-        settingsTab.priceChartView.addPriceImbalances(priceImbalances);
-        settingsTab.priceChartView.addSupply(liquidityLevels);
+        settingsTab.priceChartView.addVolumeProfile(liquidityLevels);
+        loadingView.hideLoading();
+        labelSymbol.setText("Symbol : " + symbol.toUpperCase());
+        labelStatus.setText("");
+        labelLoading.setText("");
     }
 
     @Override
     public void onTendencyAssetsPrepared(List<Asset> assets, int defaultSelection) {
-        tendencyTab.setAssets(assets, defaultSelection);
+        tendencyTab.setAssets(assets);
     }
 
     @Override
