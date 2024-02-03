@@ -221,10 +221,10 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
         if (scaling) {
             if (dy > 2) {
-                scaleUp(0);
+                scaleUp(1);
             }
             if (dy < -2) {
-                scaleDown(0);
+                scaleDown(1);
             }
 
             scaling = false;
@@ -233,10 +233,10 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
         if (stretching) {
             if (dy > 2) {
-                scaleUp(1);
+                scaleUp(0);
             }
             if (dy < -2) {
-                scaleDown(1);
+                scaleDown(0);
             }
 
             stretching = false;
