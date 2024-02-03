@@ -4,7 +4,7 @@ import com.zygne.chart.chart.Chart;
 import com.zygne.chart.chart.RendererImpl;
 import com.zygne.chart.chart.menu.*;
 import com.zygne.chart.chart.model.chart.Camera;
-import com.zygne.chart.chart.model.chart.Canvas;
+import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.model.chart.Object2d;
 import com.zygne.chart.chart.model.chart.TextObject;
 import com.zygne.chart.chart.model.chart.VolumeProfileBar;

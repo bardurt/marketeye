@@ -6,7 +6,7 @@ import com.zygne.chart.chart.menu.*;
 import com.zygne.chart.chart.menu.indicators.*;
 import com.zygne.chart.chart.menu.indicators.creators.*;
 import com.zygne.chart.chart.model.chart.*;
-import com.zygne.chart.chart.model.chart.Canvas;
+import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.model.data.Quote;
 import com.zygne.chart.chart.util.ZoomHelper;
 
@@ -59,8 +59,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
     private TextObject waterMark;
     private TextObject copyright;
     private StatusBar statusBar;
-    private PriceIndicatorMenu priceIndicatorMenu;
-    private OptionsMenu optionsMenu;
     private TopBar topBar;
     private java.util.List<Object2d> objects = new ArrayList<>();
     private RendererImpl renderer;
@@ -90,10 +88,8 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         this.camera.setHeight(canvasHeight);
         this.camera.setWidth(canvasWidth);
 
-
         renderer = new RendererImpl(camera);
 
-        createButtons();
         setUp();
     }
 
@@ -133,27 +129,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         topBar.setLabelText(titleText + " " + percentile + "%");
     }
 
-    private void createButtons() {
-
-        priceIndicatorMenu = new PriceIndicatorMenu();
-        priceIndicatorMenu.setListener(this);
-        priceIndicatorMenu.setX(0);
-        priceIndicatorMenu.setY(2);
-        priceIndicatorMenu.setWidth(100);
-        priceIndicatorMenu.setHeight(120);
-        priceIndicatorMenu.init();
-        priceIndicatorMenu.setzOrder(2);
-
-        optionsMenu = new OptionsMenu();
-        optionsMenu.setListener(this);
-        optionsMenu.setX(220);
-        optionsMenu.setY(2);
-        optionsMenu.setWidth(100);
-        optionsMenu.setHeight(120);
-        optionsMenu.init();
-        optionsMenu.setzOrder(2);
-
-    }
 
     @Override
     public void setBars(List<Quote> bars) {
@@ -204,23 +179,11 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         objects.add(waterMark);
         objects.add(copyright);
 
-        if (showVolumeBubble) {
-            if (volumeBubbleIndicator != null) {
-                objects.add(volumeBubbleIndicator);
-            }
+
+        if (volumeIndicator != null) {
+            objects.add(volumeIndicator);
         }
 
-        if (showPricePressure) {
-            if (pricePressureIndicator != null) {
-                objects.add(pricePressureIndicator);
-            }
-        }
-
-        if (showVolume) {
-            if (volumeIndicator != null) {
-                objects.add(volumeIndicator);
-            }
-        }
 
         if (timeIndicator != null) {
             objects.add(timeIndicator);
@@ -230,21 +193,10 @@ public class PriceChart extends MouseInputAdapter implements Chart,
             objects.add(candleSticksIndicator);
         }
 
-        if (showPriceImbalance) {
-            if (priceImbalanceIndicator != null) {
-                objects.add(priceImbalanceIndicator);
-            }
-        }
-
-        objects.add(priceIndicatorMenu);
-        objects.add(optionsMenu);
         objects.add(priceScale);
 
-
-        if (showVolumeProfile) {
-            if (volumeProfileIndicator != null) {
-                objects.add(volumeProfileIndicator);
-            }
+        if (volumeProfileIndicator != null) {
+            objects.add(volumeProfileIndicator);
         }
 
     }
@@ -301,14 +253,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
             stretching = false;
             return;
-        }
-
-        if (priceIndicatorMenu != null) {
-            priceIndicatorMenu.inside(e.getX(), e.getY());
-        }
-
-        if (optionsMenu != null) {
-            optionsMenu.inside(e.getX(), e.getY());
         }
     }
 

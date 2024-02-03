@@ -2,9 +2,10 @@ package com.zygne.chart.chart.menu;
 
 import com.zygne.chart.chart.model.chart.BoxContainer;
 import com.zygne.chart.chart.model.chart.Button;
-import com.zygne.chart.chart.model.chart.Canvas;
+import com.zygne.chart.chart.Canvas;
 
-public class OptionsMenu extends BoxContainer {
+public class
+OptionsMenu extends BoxContainer {
 
     private Listener listener;
 

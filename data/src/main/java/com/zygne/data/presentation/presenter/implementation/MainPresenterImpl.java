@@ -1,7 +1,5 @@
 package com.zygne.data.presentation.presenter.implementation;
 
-import com.zygne.data.domain.model.DataSize;
-import com.zygne.data.domain.model.enums.TimeInterval;
 import com.zygne.data.presentation.presenter.base.MainPresenter;
 import com.zygne.data.presentation.presenter.implementation.delegates.YahooFinanceDelegate;
 import com.zygne.arch.domain.Logger;
@@ -23,9 +21,9 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter {
     }
 
     @Override
-    public void createReport(String ticker, double percentile, TimeInterval timeInterval, DataSize dataSize) {
+    public void createReport(String ticker) {
         ticker = ticker.replaceAll("\\s+", "");
         logger.clear();
-        delegate.createReport(ticker, percentile, timeInterval, dataSize);
+        delegate.createReport(ticker);
     }
 }

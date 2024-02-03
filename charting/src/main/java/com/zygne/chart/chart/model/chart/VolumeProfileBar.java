@@ -1,5 +1,7 @@
 package com.zygne.chart.chart.model.chart;
 
+import com.zygne.chart.chart.Canvas;
+
 public class VolumeProfileBar extends Object2d {
 
     private TextObject textObject = new TextObject();
@@ -9,7 +11,7 @@ public class VolumeProfileBar extends Object2d {
     private double percentage;
     private ColorSchema initialColorSchema = ColorSchema.BLUE;
     private ColorSchema colorSchema = ColorSchema.BLUE;
-    private ColorSchema highlightSchema = ColorSchema.HIGHLIGHT;
+    private final ColorSchema highlightSchema = ColorSchema.HIGHLIGHT;
     private int padding = 50;
     private int fill;
     private String boxColorHex;
@@ -126,10 +128,6 @@ public class VolumeProfileBar extends Object2d {
         } else {
             this.colorSchema = initialColorSchema;
         }
-    }
-
-    public boolean isCurrentPrice() {
-        return currentPrice;
     }
 
     public void setCurrentPrice(boolean currentPrice) {

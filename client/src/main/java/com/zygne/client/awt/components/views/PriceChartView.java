@@ -1,33 +1,29 @@
-package com.zygne.client.awt.components.tabs;
+package com.zygne.client.awt.components.views;
 
+import com.zygne.chart.chart.charts.pricechart.PricePanel;
+import com.zygne.chart.chart.model.data.Quote;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.LiquidityLevel;
 import com.zygne.data.domain.model.PriceGap;
 import com.zygne.data.domain.model.PriceImbalance;
-import com.zygne.chart.chart.charts.pricechart.PricePanel;
-import com.zygne.chart.chart.model.data.Quote;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChartTab extends JPanel {
+public class PriceChartView extends JPanel {
 
     private PricePanel pricePanel = new PricePanel(this);
 
-    public ChartTab(Callback callback) {
-
-        JButton button = new JButton("Create Chart");
-        button.addActionListener(e -> callback.createChart());
-
+    public PriceChartView() {
         setLayout(new BorderLayout());
         add(pricePanel, BorderLayout.CENTER);
     }
 
-    public void addData(List<Histogram> data, String symbol) {
+    public void addData(java.util.List<Histogram> data, String symbol) {
 
-        List<Quote> quoteList = new ArrayList<>();
+        java.util.List<Quote> quoteList = new ArrayList<>();
 
         for (Histogram e : data) {
 
@@ -47,7 +43,7 @@ public class ChartTab extends JPanel {
     }
 
     public void addVolumeProfile(java.util.List<LiquidityLevel> levels) {
-        List<Quote> volumeProfileList = new ArrayList<>();
+        java.util.List<Quote> volumeProfileList = new ArrayList<>();
 
         for (LiquidityLevel e : levels) {
 
@@ -63,7 +59,7 @@ public class ChartTab extends JPanel {
 
 
     public void addPriceGaps(java.util.List<PriceGap> levels) {
-        List<Quote> volumeProfileList = new ArrayList<>();
+        java.util.List<Quote> volumeProfileList = new ArrayList<>();
 
         for (PriceGap e : levels) {
 
@@ -82,7 +78,7 @@ public class ChartTab extends JPanel {
     }
 
     public void addPriceImbalances(java.util.List<PriceImbalance> levels) {
-        List<Quote> volumeProfileList = new ArrayList<>();
+        java.util.List<Quote> volumeProfileList = new ArrayList<>();
 
         for (PriceImbalance e : levels) {
             Quote quote = new Quote();
@@ -96,7 +92,7 @@ public class ChartTab extends JPanel {
 
     }
 
-    public void addSupply(List<LiquidityLevel> data) {
+    public void addSupply(java.util.List<LiquidityLevel> data) {
 
         List<Quote> volumeProfileList = new ArrayList<>();
 

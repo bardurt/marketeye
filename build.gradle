@@ -2,11 +2,13 @@ plugins {
     id 'java'
 }
 
-
 jar {
     manifest {
         attributes(
                 'Main-Class': 'client.Launcher'
         )
     }
+}
+repositories {
+    mavenCentral()
 }

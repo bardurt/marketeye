@@ -1,5 +1,7 @@
 package com.zygne.chart.chart.model.chart;
 
+import com.zygne.chart.chart.Canvas;
+
 public class VolumeBubble extends Object2d {
 
     private double percentile;

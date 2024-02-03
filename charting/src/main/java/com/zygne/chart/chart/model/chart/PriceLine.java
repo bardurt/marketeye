@@ -1,12 +1,13 @@
 package com.zygne.chart.chart.model.chart;
 
+import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.model.data.PriceBox;
 
 
 public class PriceLine extends Object2d {
 
-    private TextObject textObject = new TextObject();
-    private PriceBox priceBox = new PriceBox();
+    private final TextObject textObject = new TextObject();
+    private final PriceBox priceBox = new PriceBox();
 
     public PriceLine() {
         textObject.setText("");

@@ -1,8 +1,6 @@
 package com.zygne.data.presentation.presenter.implementation.flow;
 
-import com.zygne.data.domain.interactor.implementation.data.GapHistoryInteractorImpl;
 import com.zygne.data.domain.interactor.implementation.data.PriceGapInteractorImpl;
-import com.zygne.data.domain.interactor.implementation.data.base.GapHistoryInteractor;
 import com.zygne.data.domain.interactor.implementation.data.base.PriceGapInteractor;
 import com.zygne.data.domain.model.GapHistory;
 import com.zygne.data.domain.model.Histogram;
@@ -12,8 +10,7 @@ import com.zygne.arch.domain.executor.MainThread;
 
 import java.util.List;
 
-public class PriceGapFlow implements PriceGapInteractor.Callback,
-        GapHistoryInteractor.Callback {
+public class PriceGapFlow implements PriceGapInteractor.Callback {
 
     private final Executor executor;
     private final MainThread mainThread;
@@ -29,28 +26,21 @@ public class PriceGapFlow implements PriceGapInteractor.Callback,
         this.gapType = gapType;
     }
 
-    public void start(){
+    public void start() {
         new PriceGapInteractorImpl(executor, mainThread, this, histogramList).execute();
     }
 
     @Override
     public void onPriceGapsFound(List<PriceGap> data) {
         callback.onPriceGapsGenerated(data, gapType);
-        new GapHistoryInteractorImpl(executor, mainThread, this, histogramList).execute();
     }
 
-    @Override
-    public void onGapHistoryCompleted(GapHistory gapHistory) {
-        callback.onGapHistoryGenerated(gapHistory);
-    }
 
-    public interface Callback{
+    public interface Callback {
         void onPriceGapsGenerated(List<PriceGap> data, GapType gapType);
-        void onGapHistoryGenerated(GapHistory gapHistory);
     }
 
-    public enum GapType{
+    public enum GapType {
         DAILY,
-        INTRA_DAY
     }
 }

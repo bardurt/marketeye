@@ -1,7 +1,7 @@
 package com.zygne.chart.chart.menu;
 
 import com.zygne.chart.chart.model.chart.BoxContainer;
-import com.zygne.chart.chart.model.chart.Canvas;
+import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.model.chart.TextObject;
 
 public class TopBar extends BoxContainer {

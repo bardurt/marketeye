@@ -2,7 +2,7 @@ package com.zygne.chart.chart.menu;
 
 import com.zygne.chart.chart.model.chart.BoxContainer;
 import com.zygne.chart.chart.model.chart.Button;
-import com.zygne.chart.chart.model.chart.Canvas;
+import com.zygne.chart.chart.Canvas;
 
 public class BarSizeMenu extends BoxContainer {
 

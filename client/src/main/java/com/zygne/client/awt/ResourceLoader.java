@@ -2,6 +2,9 @@ package com.zygne.client.awt;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 public class ResourceLoader {
@@ -16,18 +19,31 @@ public class ResourceLoader {
             System.err.println("Couldn't load resource: " + path);
             return null;
         }
+
+
     }
 
     public Image loadImage(String name) {
 
-        java.net.URL imgURL = getResourcePath(name);
-        if (imgURL != null) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream in = null;
+
+        try {
+            in = classLoader.getResourceAsStream(name);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            in.transferTo(out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (in != null) {
             try {
-                Image image = ImageIO.read(getClass().getResource("/" + name));
-                return image;
+                return ImageIO.read(getClass().getResource("/" + name));
             } catch (Exception e) {
-                System.err.println("Couldn't find file: " + imgURL);
+                System.err.println("Couldn't find file: " + name);
             }
+        } else {
+            System.err.println("Input stream for " + name + " is null");
         }
 
         return null;

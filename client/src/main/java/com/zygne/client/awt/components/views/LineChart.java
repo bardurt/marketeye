@@ -1,6 +1,7 @@
 package com.zygne.client.awt.components.views;
 
 
+import com.zygne.data.domain.model.Tendency;
 import com.zygne.data.domain.model.TendencyReport;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -8,7 +9,9 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.block.BlockBorder;
+import org.jfree.chart.plot.Marker;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.TextTitle;
@@ -25,9 +28,12 @@ import java.util.Date;
 
 public class LineChart extends JPanel {
 
-    private String[] colors = new String[]{"#A2A90E", "#2A9AB2", "#23BE59", "#E3A50C", "#BC0349"};
+    private String[] colors = new String[]{"#D93333", "#2A9AB2", "#23BE59", "#E3A50C", "#BC0349"};
     private long x1 = 0;
     private long x2 = 0;
+    private long q1 = 0;
+    private long q2 = 0;
+    private long q3 = 0;
 
     public LineChart() {
         this.setLayout(new GridLayout());
@@ -36,64 +42,28 @@ public class LineChart extends JPanel {
     public void addTendency(String symbol, TendencyReport tendencyReport) {
 
         removeAll();
+
+        q1 = tendencyReport.getQuarter(1);
+        q2 = tendencyReport.getQuarter(2);
+        q3 = tendencyReport.getQuarter(3);
         var dataset = new TimeSeriesCollection();
 
-        if (tendencyReport.currentYear != null) {
-            var series = new TimeSeries("Current Year");
+        for (Tendency t : tendencyReport.tendencies()) {
 
-            for (int i = 0; i < tendencyReport.currentYear.size(); i++) {
+            var series = new TimeSeries(t.name);
 
-                TimeSeriesDataItem item = new TimeSeriesDataItem(new Day(new Date(tendencyReport.currentYear.get(i).timeStamp)), tendencyReport.currentYear.get(i).avg);
-                series.add(item);
-            }
+            for (int i = 0; i < t.data.size(); i++) {
 
-            dataset.addSeries(series);
-        }
-
-        if (tendencyReport.fiveYear != null) {
-            var series = new TimeSeries("5 Year");
-
-            for (int i = 0; i < tendencyReport.fiveYear.size(); i++) {
-
-                TimeSeriesDataItem item = new TimeSeriesDataItem(new Day(new Date(tendencyReport.fiveYear.get(i).timeStamp)), tendencyReport.fiveYear.get(i).avg);
+                TimeSeriesDataItem item = new TimeSeriesDataItem(new Day(new Date(t.data.get(i).timeStamp)), t.data.get(i).value);
                 series.add(item);
             }
 
             x1 = series.getTimePeriod(0).getFirstMillisecond();
             x2 = series.getNextTimePeriod().getLastMillisecond();
-            dataset.addSeries(series);
-        }
 
-        if (tendencyReport.tenYear != null) {
-            var series = new TimeSeries("10 Year");
 
-            for (int i = 0; i < tendencyReport.tenYear.size(); i++) {
-                TimeSeriesDataItem item = new TimeSeriesDataItem(new Day(new Date(tendencyReport.tenYear.get(i).timeStamp)), tendencyReport.tenYear.get(i).avg);
-                series.add(item);
-            }
+            System.out.println("Series size " + series.getTimePeriods().size());
 
-            dataset.addSeries(series);
-
-        }
-
-        if (tendencyReport.fifteenYear != null) {
-            var series = new TimeSeries("15 Year");
-
-            for (int i = 0; i < tendencyReport.fifteenYear.size(); i++) {
-                TimeSeriesDataItem item = new TimeSeriesDataItem(new Day(new Date(tendencyReport.fifteenYear.get(i).timeStamp)), tendencyReport.fifteenYear.get(i).avg);
-                series.add(item);
-            }
-
-            dataset.addSeries(series);
-        }
-
-        if (tendencyReport.twentyYear != null) {
-            var series = new TimeSeries("20 Year");
-
-            for (int i = 0; i < tendencyReport.twentyYear.size(); i++) {
-                TimeSeriesDataItem item = new TimeSeriesDataItem(new Day(new Date(tendencyReport.twentyYear.get(i).timeStamp)), tendencyReport.twentyYear.get(i).avg);
-                series.add(item);
-            }
 
             dataset.addSeries(series);
         }
@@ -127,6 +97,22 @@ public class LineChart extends JPanel {
         DateAxis dateAxis = new DateAxis();
         dateAxis.setDateFormatOverride(new SimpleDateFormat("dd/MM"));
         plot.setDomainAxis(dateAxis);
+        plot.setDomainMinorGridlinesVisible(false);
+
+        Marker m1 = new ValueMarker(q1);
+        m1.setStroke(new BasicStroke(1));
+        m1.setPaint(Color.BLACK);
+        plot.addDomainMarker(m1);
+
+        Marker m2 = new ValueMarker(q2);
+        m2.setStroke(new BasicStroke(1));
+        m2.setPaint(Color.BLACK);
+        plot.addDomainMarker(m2);
+
+        Marker m3 = new ValueMarker(q3);
+        m3.setStroke(new BasicStroke(1));
+        m3.setPaint(Color.BLACK);
+        plot.addDomainMarker(m3);
 
         var renderer = new XYLineAndShapeRenderer(true, false);
         for (int i = 0; i < 5; i++) {
@@ -150,16 +136,17 @@ public class LineChart extends JPanel {
 
         chart.getLegend().setFrame(BlockBorder.NONE);
 
-        chart.setTitle(new TextTitle("Seasonality " + symbol,
+        String name = "";
+
+        if (symbol != null) {
+            name = symbol;
+        }
+
+        chart.setTitle(new TextTitle("Seasonality " + name,
                         new Font("Serif", java.awt.Font.BOLD, 20)
                 )
         );
 
         return chart;
-    }
-
-    public class LineRenderer extends XYLineAndShapeRenderer {
-
-
     }
 }

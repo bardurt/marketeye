@@ -1,10 +1,15 @@
 package com.zygne.chart.chart.model.chart;
 
-public abstract class Object2d extends BoxCollider implements Renderable{
+import com.zygne.chart.chart.Renderable;
 
+public abstract class Object2d extends BoxCollider implements Renderable {
+
+    protected ColorSchema colorSchema = ColorSchema.BLUE;
     private int zOrder = 0;
 
-    public void setColorSchema(VolumeProfileBar.ColorSchema colorSchema){}
+    public void setColorSchema(ColorSchema colorSchema) {
+        this.colorSchema = colorSchema;
+    }
 
     public int getzOrder() {
         return zOrder;

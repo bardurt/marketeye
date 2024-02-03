@@ -4,9 +4,9 @@ import java.util.Calendar;
 
 public class TimeBox {
 
-    private int year;
-    private int month;
-    private int day;
+    private final int year;
+    private final int month;
+    private final int day;
 
     public TimeBox(long timeStamp) {
         Calendar calendar = Calendar.getInstance();
@@ -23,11 +23,8 @@ public class TimeBox {
         calendar.setTimeInMillis(timeStamp);
 
         if (this.year == calendar.get(Calendar.YEAR)) {
-            if (this.month == calendar.get(Calendar.MONTH)+1) {
-                return true;
-            }
+            return this.month == calendar.get(Calendar.MONTH) + 1;
         }
-
 
         return false;
     }

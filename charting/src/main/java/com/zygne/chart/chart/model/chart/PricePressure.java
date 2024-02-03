@@ -1,11 +1,12 @@
 package com.zygne.chart.chart.model.chart;
 
+import com.zygne.chart.chart.Canvas;
+
 public class PricePressure extends Object2d {
 
 
     private ColorSchema initialColorSchema = ColorSchema.YELLOW;
     private ColorSchema colorSchema = ColorSchema.YELLOW;
-    private String boxColorHex;
 
     private double price;
     private long id;
@@ -21,34 +22,11 @@ public class PricePressure extends Object2d {
 
     @Override
     public void draw(Canvas canvas) {
-
-        prepareColors();
-
-
         canvas.setColor(0, 180, 193, 64);
         canvas.drawRectangle(x, y-1, width, height+1, Canvas.Fill.SOLID);
 
-
         canvas.setColor(0, 180, 193,  64);
         canvas.drawRectangle(x, y, width, height, Canvas.Fill.SOLID);
-
-    }
-
-    private void prepareColors() {
-        if (colorSchema == ColorSchema.BLUE) {
-            boxColorHex = "#0093FF";
-        } else if (colorSchema == ColorSchema.RED) {
-            boxColorHex = "#FF0000";
-        } else if (colorSchema == ColorSchema.ORANGE) {
-            boxColorHex = "#FF9E00";
-        } else if (colorSchema == ColorSchema.YELLOW) {
-            boxColorHex = "#FFE800";
-        } else if (colorSchema == ColorSchema.GREEN) {
-            boxColorHex = "#23FF00";
-        } else if (colorSchema == ColorSchema.HIGHLIGHT) {
-            boxColorHex = "#FFFFFF";
-        }
-
     }
 
     public double getPrice() {

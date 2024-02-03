@@ -3,7 +3,6 @@ package com.zygne.data.presentation.presenter.implementation;
 import com.zygne.data.domain.interactor.implementation.data.PriceImbalanceInteractorImpl;
 import com.zygne.data.domain.interactor.implementation.data.base.PriceImbalanceInteractor;
 import com.zygne.data.domain.model.*;
-import com.zygne.data.domain.model.enums.TimeInterval;
 import com.zygne.data.presentation.presenter.base.ChartPresenter;
 import com.zygne.data.presentation.presenter.implementation.flow.DataFlow;
 import com.zygne.data.presentation.presenter.implementation.flow.PriceGapFlow;
@@ -40,14 +39,8 @@ public class ChartPresenterImpl extends BasePresenter implements ChartPresenter,
         }
 
         dataReady = true;
-    }
 
-    @Override
-    public void getChartData(String ticker, TimeInterval timeInterval, DataSize dataSize) {
-
-        if (dataReady) {
-            onDataFetched(histogramList, "");
-        }
+        onDataFetched(histogramList, "");
     }
 
     @Override
@@ -67,10 +60,6 @@ public class ChartPresenterImpl extends BasePresenter implements ChartPresenter,
         new PriceImbalanceInteractorImpl(executor, mainThread, this, histogramList).execute();
     }
 
-    @Override
-    public void onGapHistoryGenerated(GapHistory gapHistory) {
-
-    }
 
     @Override
     public void onPriceImbalanceCompleted(List<PriceImbalance> data) {

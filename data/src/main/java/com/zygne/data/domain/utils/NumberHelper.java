@@ -38,7 +38,6 @@ public class NumberHelper {
     }
 
     public static void main(String[] args){
-
         int days = 88;
         System.out.println("Months " + days + " = " + roundToMonths(days));
     }

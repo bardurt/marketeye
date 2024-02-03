@@ -1,7 +1,6 @@
 package com.zygne.chart.chart;
 
 import com.zygne.chart.chart.model.chart.Camera;
-import com.zygne.chart.chart.model.chart.Canvas;
 import com.zygne.chart.chart.model.chart.Object2d;
 
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.List;
 public class RendererImpl implements Renderer {
 
     private Canvas canvas;
-    private Camera camera;
+    private final Camera camera;
 
     public RendererImpl(Camera camera) {
         this.camera = camera;
@@ -58,7 +57,6 @@ public class RendererImpl implements Renderer {
         canvas.translate(-camera.getViewPortX(), -camera.getViewPortY());
 
 
-
         for (Object2d object2d : object2dList) {
             if (object2d.getzOrder() == 2) {
                 object2d.draw(canvas);
@@ -91,10 +89,6 @@ public class RendererImpl implements Renderer {
             return true;
         }
 
-        if (camera.getHeight() != height) {
-            return true;
-        }
-
-        return false;
+        return camera.getHeight() != height;
     }
 }

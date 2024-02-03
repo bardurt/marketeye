@@ -1,7 +1,6 @@
 package com.zygne.data.presentation.presenter.base;
 
 import com.zygne.data.domain.model.*;
-import com.zygne.data.domain.model.enums.TimeInterval;
 import com.zygne.arch.presentation.view.BaseView;
 
 import java.util.List;
@@ -9,9 +8,6 @@ import java.util.List;
 public interface ChartPresenter {
 
     void setSupply(List<LiquidityLevel> liquidityLevels);
-
-    void getChartData(String ticker, TimeInterval timeInterval, DataSize dataSize);
-
     void setHistograms(List<Histogram> histograms);
 
     interface View extends BaseView {
