@@ -1,14 +1,10 @@
 package com.zygne.chart.chart.model.chart;
 
+import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.model.data.PriceBox;
 
 public class CandleStick extends Object2d {
 
-    private double high;
-    private double low;
-    private double open;
-    private double close;
-    private double scalar;
     private long id;
     private PriceBox priceBox;
     private long volume;
@@ -21,15 +17,10 @@ public class CandleStick extends Object2d {
     private String color;
 
     public void ohlc(double open, double high, double low, double close, long volume, double scalar) {
-        this.high = high;
-        this.low = low;
-        this.open = open;
-        this.close = close;
         this.priceBox = new PriceBox();
         this.priceBox.setEnd(high*scalar);
         this.priceBox.setStart(low*scalar);
         this.volume = volume;
-        this.scalar = scalar;
 
 
         int height = (int) ((high - low) * scalar);
@@ -87,12 +78,9 @@ public class CandleStick extends Object2d {
 
     @Override
     public void draw(Canvas canvas) {
-
         canvas.setColor(color);
-
         canvas.drawRectangle(x, bodyTop, width, bodyHeight, Canvas.Fill.SOLID);
         canvas.drawRectangle(x + width / 2, -y, 1, height, Canvas.Fill.SOLID);
-
     }
 
     public PriceBox getPriceBox() {

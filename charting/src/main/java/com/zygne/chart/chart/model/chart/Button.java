@@ -1,8 +1,10 @@
 package com.zygne.chart.chart.model.chart;
 
+import com.zygne.chart.chart.Canvas;
+
 public class Button extends Object2d {
 
-    private TextObject text;
+    private final TextObject text;
 
     public Button(int x, int y, int width, int height) {
         this.x = x;

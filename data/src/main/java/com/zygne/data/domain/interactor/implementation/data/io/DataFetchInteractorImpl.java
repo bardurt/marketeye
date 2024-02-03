@@ -3,8 +3,6 @@ package com.zygne.data.domain.interactor.implementation.data.io;
 import com.zygne.data.domain.DataBroker;
 import com.zygne.data.domain.interactor.implementation.data.base.DataFetchInteractor;
 import com.zygne.data.domain.model.BarData;
-import com.zygne.data.domain.model.DataSize;
-import com.zygne.data.domain.model.enums.TimeInterval;
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
 import com.zygne.arch.domain.interactor.base.BaseInteractor;
@@ -16,17 +14,15 @@ public class DataFetchInteractorImpl extends BaseInteractor implements DataFetch
 
     private final Callback callback;
     private final String symbol;
-    private final TimeInterval timeInterval;
-    private final DataSize length;
+    private final int years;
     private final DataBroker dataBroker;
     private final List<BarData> data;
 
-    public DataFetchInteractorImpl(Executor executor, MainThread mainThread, Callback callback, String symbol, TimeInterval timeInterval, DataSize length, DataBroker dataBroker) {
+    public DataFetchInteractorImpl(Executor executor, MainThread mainThread, Callback callback, String symbol, int yearsToFetch, DataBroker dataBroker) {
         super(executor, mainThread);
         this.callback = callback;
         this.symbol = symbol;
-        this.timeInterval = timeInterval;
-        this.length = length;
+        this.years = yearsToFetch;
         this.dataBroker = dataBroker;
         data = new ArrayList<>();
     }
@@ -34,7 +30,7 @@ public class DataFetchInteractorImpl extends BaseInteractor implements DataFetch
     @Override
     public void run() {
         dataBroker.setCallback(this);
-        dataBroker.downloadHistoricalBarData(symbol, length, timeInterval, true);
+        dataBroker.downloadHistoricalBarData(symbol, years);
     }
 
     @Override
@@ -48,10 +44,4 @@ public class DataFetchInteractorImpl extends BaseInteractor implements DataFetch
         String timeStamp = data.get(data.size()-1).getTime();
         mainThread.post(() -> callback.onDataFetched(data, timeStamp));
     }
-
-    @Override
-    public void onTickPriceFetched(double price) {
-
-    }
-
 }

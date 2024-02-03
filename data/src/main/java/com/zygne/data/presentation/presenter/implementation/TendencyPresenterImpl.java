@@ -6,7 +6,6 @@ import com.zygne.data.domain.DataBroker;
 import com.zygne.data.domain.interactor.implementation.data.TendencyInteractorImpl;
 import com.zygne.data.domain.interactor.implementation.data.base.TendencyInteractor;
 import com.zygne.data.domain.model.*;
-import com.zygne.data.domain.model.enums.TimeInterval;
 import com.zygne.data.presentation.presenter.base.TendencyPresenter;
 import com.zygne.data.presentation.presenter.implementation.flow.DataFlow;
 import com.zygne.arch.domain.Logger;
@@ -45,7 +44,13 @@ public class TendencyPresenterImpl extends BasePresenter implements
 
     @Override
     public void createTendency(String symbol) {
-        dataFlow.fetchData(dataBroker, symbol, TimeInterval.Day, 22, DataSize.Unit.Year, false);
+        dataFlow.fetchData(dataBroker, symbol, 22);
+    }
+
+    @Override
+    public void createTendency(List<Histogram> data) {
+        logger.log(Logger.LOG_LEVEL.INFO, "Creating Tendency");
+        new TendencyInteractorImpl(executor, mainThread, this, data).execute();
     }
 
     @Override

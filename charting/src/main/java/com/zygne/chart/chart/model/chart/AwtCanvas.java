@@ -1,9 +1,11 @@
 package com.zygne.chart.chart.model.chart;
 
+import com.zygne.chart.chart.Canvas;
+
 import java.awt.*;
 
 public class AwtCanvas implements Canvas {
-    private Graphics2D graphics2D;
+    private final Graphics2D graphics2D;
 
     public AwtCanvas(Graphics graphics) {
         this.graphics2D = (Graphics2D) graphics.create();
@@ -95,7 +97,7 @@ public class AwtCanvas implements Canvas {
     @Override
     public void drawString(String text, int xPos, int yPos, int fontSize, TextStyle textStyle) {
 
-        if(textStyle == TextStyle.BOLD){
+        if (textStyle == TextStyle.BOLD) {
             graphics2D.setFont(new Font("TimesRoman", Font.BOLD, fontSize));
         } else {
             graphics2D.setFont(new Font("TimesRoman", Font.PLAIN, fontSize));

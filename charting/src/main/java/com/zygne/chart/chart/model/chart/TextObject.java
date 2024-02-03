@@ -1,5 +1,7 @@
 package com.zygne.chart.chart.model.chart;
 
+import com.zygne.chart.chart.Canvas;
+
 public class TextObject extends Object2d {
 
     private String color = "#FFFFFF";
@@ -71,22 +73,22 @@ public class TextObject extends Object2d {
 
     private void calculateScalar() {
         switch (fontSize) {
-            case SMALL_EXTRA:
+            case SMALL_EXTRA -> {
                 pointSize = 10;
                 scalar = 6;
-                break;
-            case SMALL:
+            }
+            case SMALL -> {
                 pointSize = 12;
                 scalar = 8;
-                break;
-            case MEDIUM:
+            }
+            case MEDIUM -> {
                 pointSize = 24;
                 scalar = 9;
-                break;
-            case LARGE:
+            }
+            case LARGE -> {
                 pointSize = 72;
                 scalar = 36;
-                break;
+            }
         }
     }
 
@@ -98,8 +100,8 @@ public class TextObject extends Object2d {
         calculateScalar();
 
 
-        int textCenterX = 0;
-        int textCenterY = 0;
+        int textCenterX;
+        int textCenterY;
 
         if (alignment == Alignment.LEFT) {
             textCenterX = x;

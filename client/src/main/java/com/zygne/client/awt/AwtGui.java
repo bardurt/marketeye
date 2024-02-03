@@ -1,14 +1,11 @@
 package com.zygne.client.awt;
 
 import com.zygne.client.Constants;
-import com.zygne.client.awt.components.tabs.ChartTab;
 import com.zygne.client.awt.components.tabs.SettingsTab;
 import com.zygne.client.awt.components.views.LoadingView;
 import com.zygne.client.awt.components.UiLogger;
 import com.zygne.client.awt.components.tabs.TendencyTab;
-import com.zygne.client.awt.components.tabs.VpaTab;
 import com.zygne.data.domain.model.*;
-import com.zygne.data.domain.model.enums.TimeInterval;
 import com.zygne.data.presentation.presenter.base.*;
 import com.zygne.data.presentation.presenter.implementation.*;
 import com.zygne.arch.domain.Logger;
@@ -23,7 +20,6 @@ import java.util.List;
 public class AwtGui extends JPanel implements MainPresenter.View,
         SettingsTab.Callback,
         ChartPresenter.View,
-        ChartTab.Callback,
         TendencyTab.Callback,
         TendencyPresenter.View {
 
@@ -35,15 +31,13 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     private final LoadingView loadingView;
 
     private String symbol;
-    private DataSize dataSize;
 
     private final MainPresenter mainPresenter;
     private final ChartPresenter chartPresenter;
     private final TendencyPresenter tendencyPresenter;
 
     private final SettingsTab settingsTab;
-    private final VpaTab vpaTab;
-    private final ChartTab chartTab;
+    //private final ChartTab chartTab;
     private final TendencyTab tendencyTab;
 
     private final JTabbedPane tabbedPane;
@@ -54,8 +48,6 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         settingsTab = new SettingsTab(this);
-        vpaTab = new VpaTab();
-        chartTab = new ChartTab(this);
         tendencyTab = new TendencyTab(this);
 
         tabbedPane = new JTabbedPane();
@@ -89,6 +81,7 @@ public class AwtGui extends JPanel implements MainPresenter.View,
         labelStatus = new JLabel("");
         statusPanel.add(labelStatus, BorderLayout.WEST);
         statusPanel.add(new JLabel(Constants.VERSION_NAME), BorderLayout.EAST);
+        add(statusPanel, BorderLayout.SOUTH);
 
         Logger logger = new UiLogger(new JavaAwtThread(), labelStatus);
         logger.setUp();
@@ -102,31 +95,15 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onSupplyCreated(List<LiquidityLevel> filtered, List<LiquidityLevel> raw) {
-        vpaTab.addSupply(filtered);
-
-        vpaTab.addVolumeProfile(symbol, raw);
-        chartTab.addVolumeProfile(raw);
-        chartPresenter.setSupply(filtered);
-
+        chartPresenter.setSupply(raw);
     }
 
     @Override
-    public void onComplete(String symbol, String timeFrame, String dateRange) {
+    public void onComplete(String symbol, String dateRange) {
         this.symbol = symbol;
-        labelSymbol.setText("Symbol : " + symbol.toUpperCase() + " " + timeFrame + " - " + dateRange);
+        labelSymbol.setText("Symbol : " + symbol.toUpperCase() + " - " + dateRange);
         labelStatus.setText("");
         labelLoading.setText("");
-        chartPresenter.getChartData(symbol, TimeInterval.Day, dataSize);
-    }
-
-    @Override
-    public void onTimeFramesPrepared(List<TimeInterval> timeIntervals, int defaultSelection) {
-        settingsTab.setTimeFrames(timeIntervals, defaultSelection);
-    }
-
-    @Override
-    public void onDataSizePrepared(List<DataSize> data, int defaultSelection) {
-        settingsTab.setDataSize(data, defaultSelection);
     }
 
     @Override
@@ -145,22 +122,18 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     }
 
     @Override
-    public void generateReport(String symbol, double percentile, TimeInterval timeInterval, DataSize dataSize) {
+    public void generateReport(String symbol) {
         if (mainPresenter != null) {
             this.symbol = symbol.toUpperCase();
-            this.dataSize = dataSize;
-            mainPresenter.createReport(symbol, percentile, timeInterval, dataSize);
+            mainPresenter.createReport(symbol);
         }
     }
 
     @Override
     public void prepareView() {
         tabbedPane.removeAll();
-
         tabbedPane.addTab("Settings", settingsTab);
-        tabbedPane.addTab("VPA", vpaTab);
         tabbedPane.addTab("Tendencies", tendencyTab);
-        tabbedPane.addTab("Chart", chartTab);
     }
 
     @Override
@@ -171,41 +144,29 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     public void launch() {
         JFrame frame = new JFrame(Constants.APP_NAME);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 800);
         frame.add(new AwtGui());
         Image image = resourceLoader.loadImage("icon.png");
-
         if (image != null) {
             frame.setIconImage(image);
         }
-
+        frame.getContentPane().setPreferredSize(new Dimension(1024, 512));
         frame.pack();
         frame.setVisible(true);
     }
 
     @Override
-    public void onChartReady(List<Histogram> histograms, List<PriceGap> priceGaps, List<PriceImbalance> priceImbalances, List<LiquidityLevel> liquidityLevels) {
-        chartTab.addData(histograms, symbol.toUpperCase());
-        chartTab.addPriceGaps(priceGaps);
-        chartTab.addPriceImbalances(priceImbalances);
-        chartTab.addSupply(liquidityLevels);
-    }
-
-    @Override
-    public void createChart() {
-
-        if (symbol == null) {
-            showError("No Symbol for chart!!");
-            return;
-        }
-        if (symbol.isEmpty()) {
-            showError("No Symbol for chart!!");
-        }
+    public void onChartReady(List<Histogram> histograms, List<LiquidityLevel> liquidityLevels) {
+        settingsTab.priceChartView.addData(histograms, symbol.toUpperCase());
+        settingsTab.priceChartView.addVolumeProfile(liquidityLevels);
+        loadingView.hideLoading();
+        labelSymbol.setText("Symbol : " + symbol.toUpperCase());
+        labelStatus.setText("");
+        labelLoading.setText("");
     }
 
     @Override
     public void onTendencyAssetsPrepared(List<Asset> assets, int defaultSelection) {
-        tendencyTab.setAssets(assets, defaultSelection);
+        tendencyTab.setAssets(assets);
     }
 
     @Override

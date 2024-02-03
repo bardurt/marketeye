@@ -2,8 +2,6 @@ package com.zygne.data;
 
 import com.zygne.data.domain.DataBroker;
 import com.zygne.data.domain.model.BarData;
-import com.zygne.data.domain.model.DataSize;
-import com.zygne.data.domain.model.enums.TimeInterval;
 import com.zygne.arch.domain.Logger;
 
 import java.io.BufferedReader;
@@ -25,50 +23,28 @@ public class YahooDataBroker implements DataBroker {
     }
 
     @Override
-    public void downloadHistoricalBarData(String symbol, DataSize dataSize, TimeInterval timeInterval, boolean yearStart) {
+    public void downloadHistoricalBarData(String symbol, int yearsBack) {
 
-        logger.log(Logger.LOG_LEVEL.INFO, symbol + " " + timeInterval + " " + dataSize.getSize() + " " + dataSize.getUnit());
-
-        final int years = dataSize.getSize();
+        logger.log(Logger.LOG_LEVEL.INFO, symbol + " " + yearsBack + " years");
 
         Calendar calendar = Calendar.getInstance();
         String timeEnd = "" + (calendar.getTime().getTime() / 1000);
 
-        if(dataSize.getUnit() == DataSize.Unit.Year) {
-            calendar.add(Calendar.YEAR, years * -1);
-        } else if(dataSize.getUnit() == DataSize.Unit.Month){
-            calendar.add(Calendar.MONTH, years * -1);
-        } else {
-            calendar.add(Calendar.YEAR, years * -1);
-        }
-
-        if(yearStart){
-            calendar.set(Calendar.MONTH, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-        }
+        calendar.add(Calendar.YEAR, yearsBack * -1);
+        calendar.set(Calendar.MONTH, 0);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
 
         String timeStart = "" + (calendar.getTime().getTime() / 1000);
 
         String time = "1d";
 
-        if(timeInterval == TimeInterval.Day){
-            time = "1d";
-        } else  if(timeInterval == TimeInterval.Week){
-            time = "1wk";
-        } else  if(timeInterval == TimeInterval.Month){
-            time = "1mo";
-        }
-
-        final String name = symbol;
-
-
-        String url = "https://query1.finance.yahoo.com/v7/finance/download/" + name + "?period1=" + timeStart + "&period2=" + timeEnd + "&interval=" + time + "&events=history&includeAdjustedClose=true";
+        String url = "https://query1.finance.yahoo.com/v7/finance/download/" + symbol + "?period1=" + timeStart + "&period2=" + timeEnd + "&interval=" + time + "&events=history&includeAdjustedClose=true";
         System.out.println(url);
-        logger.log(Logger.LOG_LEVEL.INFO, "Downloading data for " + name);
+        logger.log(Logger.LOG_LEVEL.INFO, "Downloading data for " + symbol);
 
         Thread t = new Thread(() -> {
             List<BarData> data = downLoadTimeSeries(url);
-            if(callback != null){
+            if (callback != null) {
                 callback.onDataFinished(data);
             }
         });
@@ -82,7 +58,7 @@ public class YahooDataBroker implements DataBroker {
 
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
-        URLConnection urlConnection = null;
+        URLConnection urlConnection;
         try {
             URL content = new URL(url);
 
@@ -136,33 +112,6 @@ public class YahooDataBroker implements DataBroker {
     @Override
     public void removeCallback() {
         this.callback = null;
-    }
-
-
-    public static void main(String[] args){
-
-        DataBroker dataBroker = new YahooDataBroker(new Logger() {
-            @Override
-            public void shutDown() {
-
-            }
-
-            @Override
-            public void setUp() {
-
-            }
-
-            @Override
-            public void log(LOG_LEVEL level, String message) {
-
-            }
-
-            @Override
-            public void clear() {
-
-            }
-        });
-
     }
 
 }

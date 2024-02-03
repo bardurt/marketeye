@@ -4,14 +4,12 @@ import com.zygne.data.YahooDataBroker;
 import com.zygne.data.domain.DataBroker;
 import com.zygne.data.domain.interactor.implementation.data.base.VolumePriceInteractor;
 import com.zygne.data.domain.model.*;
-import com.zygne.data.domain.model.enums.TimeInterval;
 import com.zygne.data.presentation.presenter.base.MainPresenter;
 import com.zygne.data.presentation.presenter.implementation.flow.*;
 import com.zygne.arch.domain.Logger;
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class YahooFinanceDelegate implements MainPresenter,
@@ -22,8 +20,8 @@ public class YahooFinanceDelegate implements MainPresenter,
     private final View view;
     private String ticker;
     private double percentile = 0;
+    private List<Histogram> histogramList;
 
-    private TimeInterval timeInterval = TimeInterval.Day;
     private boolean downloadingData = false;
 
     private final DataFlow dataFlow;
@@ -38,23 +36,11 @@ public class YahooFinanceDelegate implements MainPresenter,
         this.supplyFlow = new SupplyFlow(threadExecutor, mainThread, this);
         this.dataFlow = new DataFlow(threadExecutor, mainThread, this, logger);
 
-        List<TimeInterval> timeIntervals = new ArrayList<>();
-        timeIntervals.add(TimeInterval.Day);
-        view.onTimeFramesPrepared(timeIntervals, 0);
-
-        List<DataSize> dataSize = new ArrayList<>();
-        dataSize.add(new DataSize(1, DataSize.Unit.Year));
-        dataSize.add(new DataSize(2, DataSize.Unit.Year));
-        dataSize.add(new DataSize(3, DataSize.Unit.Year));
-        dataSize.add(new DataSize(5, DataSize.Unit.Year));
-        dataSize.add(new DataSize(10, DataSize.Unit.Year));
-        view.onDataSizePrepared(dataSize, dataSize.size() - 3);
-
         view.prepareView();
     }
 
     @Override
-    public void createReport(String ticker, double percentile, TimeInterval timeInterval, DataSize dataSize) {
+    public void createReport(String ticker) {
 
         if (downloadingData) {
             return;
@@ -65,9 +51,6 @@ public class YahooFinanceDelegate implements MainPresenter,
             return;
         }
 
-        this.percentile = percentile;
-        this.timeInterval = timeInterval;
-
         downloadingData = true;
         this.ticker = ticker.replaceAll("\\s+", "");
 
@@ -75,22 +58,24 @@ public class YahooFinanceDelegate implements MainPresenter,
 
         view.showLoading("Fetching data for " + ticker.toUpperCase() + "");
 
-        dataFlow.fetchData(dataBroker, ticker, timeInterval, dataSize.getSize(), dataSize.getUnit(), false);
+        dataFlow.fetchData(dataBroker, ticker, 12);
     }
 
 
     @Override
     public void onSupplyCompleted(List<LiquidityLevel> filtered, List<LiquidityLevel> raw) {
         downloadingData = false;
+        view.onHistogramCreated(histogramList);
         view.onSupplyCreated(filtered, raw);
         view.hideLoading();
-        view.onComplete(ticker, timeInterval.toString(), dateRange);
+        view.onComplete(ticker, dateRange);
     }
 
     @Override
     public void onDataFetched(List<Histogram> data, String time) {
         this.dateRange = time;
-        view.onHistogramCreated(data);
+        this.histogramList = data;
+
         supplyFlow.start(data, percentile, VolumePriceInteractor.PriceStructure.OHLCM);
     }
 

@@ -2,6 +2,7 @@ package com.zygne.data.domain.interactor.implementation.data;
 
 import com.zygne.data.domain.interactor.implementation.data.base.TendencyInteractor;
 import com.zygne.data.domain.model.Histogram;
+import com.zygne.data.domain.model.Tendency;
 import com.zygne.data.domain.model.TendencyEntry;
 import com.zygne.data.domain.model.TendencyReport;
 import com.zygne.data.domain.utils.TimeHelper;
@@ -10,14 +11,13 @@ import com.zygne.arch.domain.executor.MainThread;
 import com.zygne.arch.domain.interactor.base.BaseInteractor;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class TendencyInteractorImpl extends BaseInteractor implements TendencyInteractor {
 
-    private Callback callback;
-    private List<Histogram> histogramList;
-    private List<Long> timeStamps = new ArrayList<>();
+    private final Callback callback;
+    private final List<Histogram> histogramList;
+    private final List<Long> timeStamps = new ArrayList<>();
 
     public TendencyInteractorImpl(Executor executor, MainThread mainThread,
                                   Callback callback, List<Histogram> histogramList) {
@@ -28,41 +28,43 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
 
     @Override
     public void run() {
-        Collections.sort(histogramList, new Histogram.TimeComparator());
+        histogramList.sort(new Histogram.TimeComparator());
 
         int endYear = TimeHelper.getYearFromTimeStamp(System.currentTimeMillis());
         int yearToFetch = TimeHelper.getYearFromTimeStamp(histogramList.get(0).timeStamp);
 
         List<List<Histogram>> histogramsByYear = new ArrayList<>();
-        List<Histogram> currentYearOfHistogram = new ArrayList<>();
+        List<Histogram> histogramYear = new ArrayList<>();
 
         int minLength = Integer.MAX_VALUE;
 
-        for (int i = 0; i < histogramList.size(); i++) {
-            int year = TimeHelper.getYearFromTimeStamp(histogramList.get(i).timeStamp);
-
+        for (Histogram histogram : histogramList) {
+            int year = TimeHelper.getYearFromTimeStamp(histogram.timeStamp);
 
             if (year == yearToFetch) {
-                currentYearOfHistogram.add(histogramList.get(i));
+                histogramYear.add(histogram);
             } else {
                 yearToFetch++;
                 if (year != endYear) {
-                    if (minLength > currentYearOfHistogram.size()) {
-                        minLength = currentYearOfHistogram.size();
+                    if (minLength > histogramYear.size()) {
+                        minLength = histogramYear.size();
                     }
                 }
-                histogramsByYear.add(currentYearOfHistogram);
-                currentYearOfHistogram = new ArrayList<>();
+                histogramsByYear.add(histogramYear);
+                histogramYear = new ArrayList<>();
             }
         }
-        histogramsByYear.add(currentYearOfHistogram);
+
+        histogramsByYear.add(histogramYear);
 
         List<List<Histogram>> normalList = new ArrayList<>();
 
-        List<Histogram> currentYear = new ArrayList<>();
-        currentYear.addAll(histogramsByYear.remove(histogramsByYear.size() - 1));
+        List<Histogram> currentYear = new ArrayList<>(histogramsByYear.remove(histogramsByYear.size() - 1));
+
+        // remove first year, to ensure complete data
         histogramsByYear.remove(0);
 
+        // normalize the list to make sure all have same size
         for (List<Histogram> current : histogramsByYear) {
             if (current.size() > minLength) {
                 List<Histogram> data = current.subList(0, minLength - 1);
@@ -85,50 +87,24 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
             currentYearAvg.get(i).timeStamp = avgList.get(0).get(i).timeStamp;
         }
 
-        for(TendencyEntry h : avgList.get(0)){
+        for (TendencyEntry h : avgList.get(0)) {
             timeStamps.add(h.timeStamp);
         }
 
-        List<TendencyEntry> fiveYearAvg = null;
-        try {
-            fiveYearAvg = getAverageFor(avgList, minLength, 5);
-        } catch (Exception e) {
-            e.printStackTrace();
+        TendencyReport report = new TendencyReport(new ArrayList<>());
+        report.tendencies().add(new Tendency("Current Year", currentYearAvg));
+
+        if (avgList.size() >= 20) {
+            report.tendencies().add(new Tendency("5 Year", getAverageFor(avgList, minLength, 5)));
+            report.tendencies().add(new Tendency("10 Year", getAverageFor(avgList, minLength, 10)));
+            report.tendencies().add(new Tendency("20 Year", getAverageFor(avgList, minLength, 20)));
+        } else if (avgList.size() >= 7) {
+            report.tendencies().add(new Tendency("3 Year", getAverageFor(avgList, minLength, 3)));
+            report.tendencies().add(new Tendency("5 Year", getAverageFor(avgList, minLength, 5)));
+            report.tendencies().add(new Tendency("7 Year", getAverageFor(avgList, minLength, 7)));
         }
 
-        List<TendencyEntry> tenYearAvg = null;
-
-        try {
-            tenYearAvg = getAverageFor(avgList, minLength, 10);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        List<TendencyEntry> fifteenYearAvg = null;
-
-        try {
-            fifteenYearAvg = getAverageFor(avgList, minLength, 15);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        List<TendencyEntry> twentyYearAvg = null;
-
-        try {
-            twentyYearAvg = getAverageFor(avgList, minLength, 20);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        TendencyReport t = new TendencyReport();
-        t.currentYear = currentYearAvg;
-        t.fiveYear = fiveYearAvg;
-        t.tenYear = tenYearAvg;
-        t.fifteenYear = fifteenYearAvg;
-        t.twentyYear = twentyYearAvg;
-
-        mainThread.post(() -> callback.omTendencyReportCreated(t));
-
+        mainThread.post(() -> callback.omTendencyReportCreated(report));
     }
 
     private List<TendencyEntry> getAverageFor(List<List<TendencyEntry>> data, int minLength, int years) {
@@ -144,13 +120,14 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
         for (int i = 0; i < minLength; i++) {
             TendencyEntry current = new TendencyEntry();
             double sum = 0.0d;
+
             for (int j = max; j > end; j--) {
-                sum += data.get(j).get(i).avg;
+                sum += data.get(j).get(i).value;
             }
 
-            sum = sum / years;
+            double avg = sum / years;
             current.timeStamp = timeStamps.get(i);
-            current.avg = sum;
+            current.value = avg;
 
             yearAvg.add(current);
         }
@@ -162,7 +139,7 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
     private List<TendencyEntry> getChange(List<Histogram> data) {
         List<TendencyEntry> avgByYearList = new ArrayList<>();
         TendencyEntry start = new TendencyEntry();
-        start.avg = 0;
+        start.value = 0;
         start.timeStamp = data.get(0).timeStamp;
         avgByYearList.add(start);
         double startValue = data.get(0).open;
@@ -171,7 +148,7 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
             double change = ((endValue - startValue) / startValue) * 100;
 
             TendencyEntry currentAvg = new TendencyEntry();
-            currentAvg.avg = change;
+            currentAvg.value = change;
             currentAvg.timeStamp = data.get(j).timeStamp;
             avgByYearList.add(currentAvg);
 

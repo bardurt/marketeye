@@ -4,7 +4,7 @@ import com.zygne.chart.chart.Chart;
 import com.zygne.chart.chart.RendererImpl;
 import com.zygne.chart.chart.menu.*;
 import com.zygne.chart.chart.model.chart.*;
-import com.zygne.chart.chart.model.chart.Canvas;
+import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.model.data.PriceBox;
 import com.zygne.chart.chart.model.data.Quote;
 import com.zygne.chart.chart.model.data.VolumeProfileGroup;

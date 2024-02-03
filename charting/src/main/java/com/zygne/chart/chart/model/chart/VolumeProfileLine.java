@@ -1,19 +1,17 @@
 package com.zygne.chart.chart.model.chart;
 
+import com.zygne.chart.chart.Canvas;
+
 public class VolumeProfileLine extends Object2d {
 
-    private ColorSchema initialColorSchema = ColorSchema.BLUE;
     private ColorSchema colorSchema = ColorSchema.BLUE;
     private String boxColorHex;
 
     @Override
     public void draw(Canvas canvas) {
-
         prepareColors();
-
         canvas.setColor(boxColorHex);
         canvas.drawRectangle(x, y, width, height, Canvas.Fill.SOLID);
-
     }
 
     private void prepareColors() {
@@ -30,14 +28,10 @@ public class VolumeProfileLine extends Object2d {
         } else if (colorSchema == ColorSchema.HIGHLIGHT) {
             boxColorHex = "#FFFFFF";
         }
-
     }
-
 
     @Override
     public void setColorSchema(ColorSchema colorSchema) {
-        this.initialColorSchema = colorSchema;
-        this.colorSchema = initialColorSchema;
+        this.colorSchema = colorSchema;
     }
-
 }

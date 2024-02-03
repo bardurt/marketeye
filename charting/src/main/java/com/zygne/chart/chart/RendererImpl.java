@@ -1,7 +1,6 @@
 package com.zygne.chart.chart;
 
 import com.zygne.chart.chart.model.chart.Camera;
-import com.zygne.chart.chart.model.chart.Canvas;
 import com.zygne.chart.chart.model.chart.Object2d;
 
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.List;
 public class RendererImpl implements Renderer {
 
     private Canvas canvas;
-    private Camera camera;
+    private final Camera camera;
 
     public RendererImpl(Camera camera) {
         this.camera = camera;
@@ -28,48 +27,42 @@ public class RendererImpl implements Renderer {
         canvas.setColor("#02123B");
         canvas.drawRectangle(0, 0, camera.getWidth(), camera.getHeight(), Canvas.Fill.SOLID);
 
-        for (Object2d object2d : object2dList) {
-            if (object2d.getzOrder() == -1) {
-                object2d.draw(canvas);
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == -1) {
+                object2dList.get(i).draw(canvas);
             }
         }
 
         canvas.translate(0, camera.getViewPortY());
 
-        for (Object2d object2d : object2dList) {
-            if (object2d.getzOrder() == 1) {
-                // if(camera.intersects(object2d)) {
-                object2d.draw(canvas);
-                //}
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == 1) {
+                object2dList.get(i).draw(canvas);
             }
         }
+
         canvas.translate(0, -camera.getViewPortY());
 
-
         canvas.translate(camera.getViewPortX(), camera.getViewPortY());
-
-        for (Object2d object2d : object2dList) {
-            if (object2d.getzOrder() == 0) {
-                // if(camera.intersects(object2d)) {
-                object2d.draw(canvas);
-                //}
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == 0) {
+                object2dList.get(i).draw(canvas);
             }
         }
+
         canvas.translate(-camera.getViewPortX(), -camera.getViewPortY());
 
-
-
-        for (Object2d object2d : object2dList) {
-            if (object2d.getzOrder() == 2) {
-                object2d.draw(canvas);
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == 2) {
+                object2dList.get(i).draw(canvas);
             }
         }
 
         canvas.translate(camera.getViewPortX(), 0);
 
-        for (Object2d object2d : object2dList) {
-            if (object2d.getzOrder() == 3) {
-                object2d.draw(canvas);
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == 3) {
+                object2dList.get(i).draw(canvas);
             }
         }
         canvas.translate(-camera.getViewPortX(), 0);
@@ -91,10 +84,6 @@ public class RendererImpl implements Renderer {
             return true;
         }
 
-        if (camera.getHeight() != height) {
-            return true;
-        }
-
-        return false;
+        return camera.getHeight() != height;
     }
 }

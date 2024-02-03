@@ -1,4 +1,4 @@
-package com.zygne.chart.chart.model.chart;
+package com.zygne.chart.chart;
 
 public interface Renderable {
 

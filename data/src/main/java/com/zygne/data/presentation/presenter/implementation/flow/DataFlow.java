@@ -5,9 +5,7 @@ import com.zygne.data.domain.interactor.implementation.data.*;
 import com.zygne.data.domain.interactor.implementation.data.base.*;
 import com.zygne.data.domain.interactor.implementation.data.io.*;
 import com.zygne.data.domain.model.BarData;
-import com.zygne.data.domain.model.DataSize;
 import com.zygne.data.domain.model.Histogram;
-import com.zygne.data.domain.model.enums.TimeInterval;
 import com.zygne.arch.domain.Logger;
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
@@ -34,12 +32,12 @@ public class DataFlow implements DataFetchInteractor.Callback,
         this.logger = logger;
     }
 
-    public void fetchData(DataBroker dataBroker, String ticker, TimeInterval timeInterval, int timeFrame, DataSize.Unit unit, boolean cache) {
+    public void fetchData(DataBroker dataBroker, String ticker, int years) {
         this.ticker = ticker;
         this.downloadedData.clear();
 
         logger.log(Logger.LOG_LEVEL.INFO, "Download data for " + ticker.toUpperCase());
-        new DataFetchInteractorImpl(executor, mainThread, this, ticker, timeInterval, new DataSize(timeFrame, unit), dataBroker).execute();
+        new DataFetchInteractorImpl(executor, mainThread, this, ticker, years, dataBroker).execute();
     }
 
 

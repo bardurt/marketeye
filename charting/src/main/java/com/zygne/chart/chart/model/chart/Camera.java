@@ -1,9 +1,11 @@
 package com.zygne.chart.chart.model.chart;
 
+import com.zygne.chart.chart.Canvas;
+
 public class Camera extends Object2d {
 
-    private int viewPortX = 0;
-    private int viewPortY = 0;
+    private int viewPortX;
+    private int viewPortY;
     private int paddingWidth = 0;
     private int paddingHeight = 0;
     private double zoom = 1;
