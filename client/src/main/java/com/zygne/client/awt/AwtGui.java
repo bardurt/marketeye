@@ -132,7 +132,7 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     @Override
     public void prepareView() {
         tabbedPane.removeAll();
-        tabbedPane.addTab("Settings", settingsTab);
+        tabbedPane.addTab("Price Chart", settingsTab);
         tabbedPane.addTab("Tendencies", tendencyTab);
     }
 
