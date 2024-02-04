@@ -10,7 +10,6 @@ import java.util.List;
 public interface TendencyPresenter {
 
     void createTendency(String symbol);
-    void createTendency(List<Histogram> data);
 
     interface View extends BaseView {
         void onTendencyAssetsPrepared(List<Asset> assets, int defaultSelection);

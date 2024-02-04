@@ -48,12 +48,6 @@ public class TendencyPresenterImpl extends BasePresenter implements
     }
 
     @Override
-    public void createTendency(List<Histogram> data) {
-        logger.log(Logger.LOG_LEVEL.INFO, "Creating Tendency");
-        new TendencyInteractorImpl(executor, mainThread, this, data).execute();
-    }
-
-    @Override
     public void onDataFetched(List<Histogram> data, String time) {
         logger.log(Logger.LOG_LEVEL.INFO, "Creating Tendency");
         new TendencyInteractorImpl(executor, mainThread, this, data).execute();
