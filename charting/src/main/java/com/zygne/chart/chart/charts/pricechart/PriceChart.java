@@ -21,8 +21,7 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         CandleSticksCreator.Callback,
         VolumeProfileCreator.Callback,
         VolumeIndicatorCreator.Callback,
-        TimeCreator.Callback,
-        VolumeBubbleCreator.Callback {
+        TimeCreator.Callback {
 
     private static final int DEFAULT_HEIGHT = 640;
     private static final int DEFAULT_WIDTH = 720;
@@ -38,36 +37,29 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
     private int loadY;
 
-    private java.util.List<Quote> bars = new ArrayList<>();
-    private java.util.List<Quote> pricePressure = new ArrayList<>();
-    private java.util.List<Quote> priceImbalances = new ArrayList<>();
-    private java.util.List<Quote> priceGaps = new ArrayList<>();
-    private java.util.List<Quote> volumeProfile = new ArrayList<>();
+    private final List<Quote> bars = new ArrayList<>();
+    private final List<Quote> volumeProfile = new ArrayList<>();
 
     private int canvasHeight = DEFAULT_HEIGHT;
     private int canvasWidth = DEFAULT_WIDTH;
-    private Camera camera;
+    private final Camera camera;
     private int startY;
     private int startX;
     private String waterMarkText = "";
     private String titleText = "";
     private TextObject waterMark;
     private TextObject copyright;
-    private StatusBar statusBar;
     private TopBar topBar;
-    private java.util.List<Object2d> objects = new ArrayList<>();
-    private RendererImpl renderer;
-    private int percentile = 90;
+    private final List<Object2d> objects = new ArrayList<>();
+    private final RendererImpl renderer;
+    private final int percentile = 90;
 
     private CandleSticksIndicator candleSticksIndicator = null;
     private VolumeProfileIndicator volumeProfileIndicator = null;
-    private PriceImbalanceIndicator priceImbalanceIndicator = null;
-    private PricePressureIndicator pricePressureIndicator = null;
     private VolumeIndicator volumeIndicator = null;
     private TimeIndicator timeIndicator = null;
-    private VolumeBubbleIndicator volumeBubbleIndicator = null;
 
-    private PriceScale priceScale = new PriceScale();
+    private final PriceScale priceScale = new PriceScale();
 
     public PriceChart() {
         this.camera = new Camera(0, 0);
@@ -94,7 +86,7 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         copyright.setzOrder(-1);
         this.copyright.setColor("#00306C");
 
-        statusBar = new StatusBar();
+        StatusBar statusBar = new StatusBar();
         statusBar.setWidth(canvasWidth);
         statusBar.setHeight(canvasHeight);
         statusBar.setLabelWidth(labelWidth);
@@ -232,15 +224,14 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         }
 
         if (stretching) {
-            if (dy > 2) {
+            if (dx > 2) {
                 scaleUp(0);
             }
-            if (dy < -2) {
+            if (dx < -2) {
                 scaleDown(0);
             }
 
             stretching = false;
-            return;
         }
     }
 
@@ -261,9 +252,9 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         int dy = startY - e.getY();
         int dx = startX - e.getX();
 
-        int y = (int) (camera.getViewPortY() - (dy / 100));
+        int y = camera.getViewPortY() - (dy / 100);
 
-        int x = (int) (camera.getViewPortX() - (dx / 100));
+        int x = camera.getViewPortX() - (dx / 100);
 
         camera.setViewPortY(y);
         camera.setViewPortX(x);
@@ -359,12 +350,9 @@ public class PriceChart extends MouseInputAdapter implements Chart,
     private void updateIndicators() {
         priceScale.setScale(scale);
 
-        priceImbalanceIndicator = null;
-        pricePressureIndicator = null;
         volumeIndicator = null;
         volumeProfileIndicator = null;
         timeIndicator = null;
-        volumeBubbleIndicator = null;
 
         if (candleSticksIndicator == null) {
             return;
@@ -421,12 +409,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         refresh();
     }
 
-    @Override
-    public void onVolumeBubbleIndicatorCreated(VolumeBubbleIndicator volumeBubbleIndicator) {
-        this.volumeBubbleIndicator = volumeBubbleIndicator;
-        this.volumeBubbleIndicator.setzOrder(0);
-        refresh();
-    }
 
     private void createVolumeProfile() {
         if (volumeProfileIndicator != null) {
@@ -455,9 +437,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
     private void reset() {
         bars.clear();
-        pricePressure.clear();
-        priceImbalances.clear();
-        priceGaps.clear();
     }
 
     private void centerCamera() {

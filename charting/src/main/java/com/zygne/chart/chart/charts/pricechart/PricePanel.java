@@ -44,7 +44,7 @@ public class PricePanel extends JPanel {
         priceChart.setTitle(waterMark);
     }
 
-    private class ChartThread implements Runnable{
+    private static class ChartThread implements Runnable{
 
         private Component component;
 

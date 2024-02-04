@@ -15,18 +15,14 @@ public class VolumeIndicatorCreator {
 
             List<VolumeBar> volumeBars = new ArrayList<>();
 
-
             long highestVolume = 0;
             for (CandleStick e : candleSticks) {
-
                 if (e.getVolumeSma() > highestVolume) {
                     highestVolume = e.getVolumeSma();
                 }
             }
 
-
             for (CandleStick e : candleSticks) {
-
                 double percent = e.getVolumeSma() / (double) highestVolume;
                 int barHeight = (int) (height * percent);
                 if (barHeight < 2) {
@@ -40,9 +36,7 @@ public class VolumeIndicatorCreator {
                 volumeBar.setHeight(barHeight);
 
                 volumeBars.add(volumeBar);
-
             }
-
 
             VolumeIndicator indicator = new VolumeIndicator(volumeBars);
             indicator.setzOrder(3);
@@ -50,11 +44,9 @@ public class VolumeIndicatorCreator {
             callback.onVolumeIndicatorCreated(indicator);
         };
 
-
         Thread t = new Thread(r);
 
         t.start();
-
     }
 
     public interface Callback {
