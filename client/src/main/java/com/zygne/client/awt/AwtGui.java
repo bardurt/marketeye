@@ -37,7 +37,6 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     private final TendencyPresenter tendencyPresenter;
 
     private final SettingsTab settingsTab;
-    //private final ChartTab chartTab;
     private final TendencyTab tendencyTab;
 
     private final JTabbedPane tabbedPane;
@@ -132,8 +131,8 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     @Override
     public void prepareView() {
         tabbedPane.removeAll();
-        tabbedPane.addTab("Settings", settingsTab);
-        tabbedPane.addTab("Tendencies", tendencyTab);
+        tabbedPane.addTab("Price Chart", settingsTab);
+        tabbedPane.addTab("Seasonality", tendencyTab);
     }
 
     @Override
