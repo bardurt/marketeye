@@ -219,7 +219,8 @@ public class VolumeProfileChart extends MouseInputAdapter implements Chart,
     }
 
     @Override
-    public void setBars(List<Quote> bars) {
+    public void setSeries(List<List<Quote>> series) {
+        List<Quote> bars = series.get(0);
         this.currentPrice = null;
         this.grouping = -1;
         this.quotes.clear();
@@ -230,6 +231,11 @@ public class VolumeProfileChart extends MouseInputAdapter implements Chart,
         setUp();
         createBars();
         refresh();
+    }
+
+    @Override
+    public void setSeriesName(List<String> names) {
+
     }
 
     @Override

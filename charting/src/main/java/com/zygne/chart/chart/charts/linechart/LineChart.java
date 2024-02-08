@@ -1,12 +1,17 @@
-package com.zygne.chart.chart.charts.pricechart;
+package com.zygne.chart.chart.charts.linechart;
 
+import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.Chart;
 import com.zygne.chart.chart.RendererImpl;
-import com.zygne.chart.chart.menu.*;
+import com.zygne.chart.chart.menu.OptionsMenu;
+import com.zygne.chart.chart.menu.PriceScale;
+import com.zygne.chart.chart.menu.StatusBar;
+import com.zygne.chart.chart.menu.TopBar;
 import com.zygne.chart.chart.menu.indicators.*;
 import com.zygne.chart.chart.menu.indicators.creators.*;
-import com.zygne.chart.chart.model.chart.*;
-import com.zygne.chart.chart.Canvas;
+import com.zygne.chart.chart.model.chart.Camera;
+import com.zygne.chart.chart.model.chart.Object2d;
+import com.zygne.chart.chart.model.chart.TextObject;
 import com.zygne.chart.chart.model.data.Quote;
 import com.zygne.chart.chart.util.ZoomHelper;
 
@@ -16,29 +21,25 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PriceChart extends MouseInputAdapter implements Chart,
+public class LineChart extends MouseInputAdapter implements Chart,
         OptionsMenu.Listener,
-        CandleSticksCreator.Callback,
-        VolumeProfileCreator.Callback,
-        VolumeIndicatorCreator.Callback,
+        LineCreator.Callback,
         TimeCreator.Callback {
 
     private static final int DEFAULT_HEIGHT = 640;
     private static final int DEFAULT_WIDTH = 720;
     private final int labelWidth = 60;
     private double scale = 1;
-    private int barWidth = 1;
-    private int barSeparator = 0;
+    private int barWidth = 5;
     private int lastBar = 0;
     private boolean scaling = false;
     private boolean stretching = false;
 
-    int zoom = 6;
+    int zoom = 12;
 
     private int loadY;
 
-    private final List<Quote> bars = new ArrayList<>();
-    private final List<Quote> volumeProfile = new ArrayList<>();
+    private final List<List<Quote>> bars = new ArrayList<>();
 
     private int canvasHeight = DEFAULT_HEIGHT;
     private int canvasWidth = DEFAULT_WIDTH;
@@ -54,20 +55,18 @@ public class PriceChart extends MouseInputAdapter implements Chart,
     private final RendererImpl renderer;
     private final int percentile = 90;
 
-    private CandleSticksIndicator candleSticksIndicator = null;
-    private VolumeProfileIndicator volumeProfileIndicator = null;
-    private VolumeIndicator volumeIndicator = null;
+    private LineIndicator lineIndicator = null;
     private TimeIndicator timeIndicator = null;
 
     private final PriceScale priceScale = new PriceScale();
 
-    public PriceChart() {
+    public LineChart() {
         this.camera = new Camera(0, 0);
         this.camera.setX(0);
         this.camera.setY(0);
         this.camera.setHeight(canvasHeight);
         this.camera.setWidth(canvasWidth);
-
+        this.priceScale.setNegative(true);
         renderer = new RendererImpl(camera);
 
         setUp();
@@ -111,26 +110,11 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
 
     @Override
-    public void setSeries(List<List<Quote>> series) {
+    public void setSeries(List<List<Quote>> bars) {
         reset();
-        List<Quote> bars = series.get(0);
-
-        double high = bars.get(0).getHigh();
-
-        if (high > 1000) {
-            this.zoom = 4;
-        } else if (high > 100) {
-            this.zoom = 10;
-        } else if (high > 20) {
-            this.zoom = 12;
-        } else {
-            this.zoom = 10;
-        }
-
         adjustToZoom();
         this.bars.clear();
         this.bars.addAll(bars);
-        this.bars.sort(new Quote.TimeComparator());
         createCandleSticks();
     }
 
@@ -165,25 +149,15 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         objects.add(waterMark);
         objects.add(copyright);
 
-
-        if (volumeIndicator != null) {
-            objects.add(volumeIndicator);
-        }
-
-
         if (timeIndicator != null) {
             objects.add(timeIndicator);
         }
 
-        if (candleSticksIndicator != null) {
-            objects.add(candleSticksIndicator);
+        if (lineIndicator != null) {
+            objects.add(lineIndicator);
         }
 
         objects.add(priceScale);
-
-        if (volumeProfileIndicator != null) {
-            objects.add(volumeProfileIndicator);
-        }
 
     }
 
@@ -339,13 +313,6 @@ public class PriceChart extends MouseInputAdapter implements Chart,
         }
     }
 
-    public void addVolumeProfile(List<Quote> quotes) {
-        this.volumeProfile.clear();
-        this.volumeProfile.addAll(quotes);
-
-        createVolumeProfile();
-    }
-
     private void adjustToZoom() {
 
         System.out.println("Zoom " + zoom);
@@ -355,28 +322,17 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
     private void updateIndicators() {
         priceScale.setScale(scale);
-
-        volumeIndicator = null;
-        volumeProfileIndicator = null;
         timeIndicator = null;
 
-        if (candleSticksIndicator == null) {
+        if (lineIndicator == null) {
             return;
         }
 
-        createVolumeProfile();
-
-        new VolumeIndicatorCreator().create(
-                this,
-                candleSticksIndicator.getCandleSticks(),
-                150,
-                canvasHeight - 20);
-
         new TimeCreator().create(this,
-                candleSticksIndicator.getCandleSticks(),
+                lineIndicator.getLines().get(2),
                 canvasHeight,
-                20);
-
+                20,
+                barWidth);
     }
 
     private void adjustCamera() {
@@ -384,11 +340,10 @@ public class PriceChart extends MouseInputAdapter implements Chart,
     }
 
     @Override
-    public void onCandleSticksIndicatorCreated(CandleSticksIndicator candleSticksIndicator, int x, int y) {
-        this.candleSticksIndicator = candleSticksIndicator;
+    public void onLineIndicatorCreated(LineIndicator lineIndicator, int x, int y) {
+        this.lineIndicator = lineIndicator;
         this.lastBar = x;
         this.loadY = y;
-
         SwingUtilities.invokeLater(() -> {
             refresh();
             centerCamera();
@@ -397,47 +352,22 @@ public class PriceChart extends MouseInputAdapter implements Chart,
     }
 
     @Override
-    public void onVolumeIndicatorCreated(VolumeIndicator volumeIndicator) {
-        this.volumeIndicator = volumeIndicator;
-        refresh();
-    }
-
-    @Override
-    public void onVolumeProfileCreated(VolumeProfileIndicator volumeProfileIndicator) {
-        this.volumeProfileIndicator = volumeProfileIndicator;
-        this.volumeProfileIndicator.setzOrder(1);
-        refresh();
-    }
-
-    @Override
     public void onTimeIndicatorCreated(TimeIndicator timeIndicator) {
         this.timeIndicator = timeIndicator;
-        refresh();
+        SwingUtilities.invokeLater(() -> {
+            refresh();
+        });
     }
 
-
-    private void createVolumeProfile() {
-        if (volumeProfileIndicator != null) {
-            volumeProfileIndicator = null;
-        }
-
-        new VolumeProfileCreator().create(this,
-                this.volumeProfile,
-                scale,
-                150,
-                camera.getWidth() - 200
-        );
-    }
 
     private void createCandleSticks() {
-        candleSticksIndicator = null;
+        lineIndicator = null;
 
-        new CandleSticksCreator().create(
+        new LineCreator().create(
                 this,
                 bars,
                 scale,
-                barWidth,
-                barSeparator
+                barWidth
         );
     }
 
@@ -447,7 +377,7 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
     private void centerCamera() {
         System.out.println("x " + lastBar + " y" + loadY);
-        camera.setViewPortY((-loadY - camera.getHeight() / 2) * -1);
-        camera.setViewPortX((lastBar - camera.getWidth() / 2) * -1);
+        camera.setViewPortY(canvasHeight);
+        camera.setViewPortX(0);
     }
 }

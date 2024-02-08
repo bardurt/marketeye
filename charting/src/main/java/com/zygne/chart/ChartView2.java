@@ -1,26 +1,27 @@
 package com.zygne.chart;
 
+import com.zygne.chart.chart.charts.linechart.LinePanel;
 import com.zygne.chart.chart.charts.pricechart.PricePanel;
 import com.zygne.chart.chart.model.data.Quote;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ChartView2 extends JPanel {
 
-     private PricePanel chartPanel;
-     private JButton buttonZoomIn;
-     private JButton buttonZoomOut;
+    private LinePanel chartPanel;
+    private JButton buttonZoomIn;
+    private JButton buttonZoomOut;
 
     public ChartView2() {
         setPreferredSize(new Dimension(1280, 720));
         setLayout(new BorderLayout());
-        chartPanel = new PricePanel(this);
+        chartPanel = new LinePanel(this);
         chartPanel.addQuotes(generateBars());
         add(chartPanel, BorderLayout.CENTER);
-        chartPanel.addWaterMark("Hello");
 
         buttonZoomIn = new JButton("Zoom in");
     }
@@ -53,11 +54,11 @@ public class ChartView2 extends JPanel {
         return data;
     }
 
-    private List<Quote> generateQuotesVp(ArrayList<Float> values){
+    private List<Quote> generateQuotesVp(ArrayList<Float> values) {
 
         List<Quote> quoteList = new ArrayList<>();
 
-        for(int i = 0; i < values.size(); i++){
+        for (int i = 0; i < values.size(); i++) {
             Quote q = new Quote();
             q.setLow(values.get(i));
             q.setHigh(values.get(i));
@@ -71,18 +72,18 @@ public class ChartView2 extends JPanel {
     }
 
 
-    private List<Quote> generateQuotes(){
+    private List<Quote> generateQuotes() {
 
         List<Quote> quoteList = new ArrayList<>();
         int timeStamp = 1;
         int last = 0;
 
-        for(int i = 0; i < 10; i ++){
+        for (int i = 0; i < 10; i++) {
             Quote q = new Quote();
 
             last = 80 + i;
             q.setHigh(last);
-            q.setLow(last- 1);
+            q.setLow(last - 1);
             q.setTimeStamp(timeStamp);
 
             quoteList.add(q);
@@ -90,12 +91,12 @@ public class ChartView2 extends JPanel {
             timeStamp++;
         }
 
-        for(int i = 0; i < 5; i ++){
+        for (int i = 0; i < 5; i++) {
             Quote q = new Quote();
 
             last--;
             q.setHigh(last);
-            q.setLow(last- 1);
+            q.setLow(last - 1);
             q.setTimeStamp(timeStamp);
 
             quoteList.add(q);
@@ -103,11 +104,11 @@ public class ChartView2 extends JPanel {
             timeStamp++;
         }
 
-        for(int i = 0; i < 4; i ++){
+        for (int i = 0; i < 4; i++) {
             Quote q = new Quote();
             last++;
             q.setHigh(last);
-            q.setLow(last- 1);
+            q.setLow(last - 1);
             q.setTimeStamp(timeStamp);
 
             quoteList.add(q);
@@ -115,11 +116,11 @@ public class ChartView2 extends JPanel {
             timeStamp++;
         }
 
-        for(int i = 0; i < 8; i ++){
+        for (int i = 0; i < 8; i++) {
             Quote q = new Quote();
             last--;
             q.setHigh(last);
-            q.setLow(last- 1);
+            q.setLow(last - 1);
             q.setTimeStamp(timeStamp);
 
             quoteList.add(q);
@@ -130,42 +131,29 @@ public class ChartView2 extends JPanel {
         return quoteList;
     }
 
-    private List<Quote> generateBars(){
-        List<Quote> quoteList = new ArrayList<>();
+    private List<List<Quote>> generateBars() {
 
-        Quote q1 = new Quote();
-        q1.setOpen(10.11);
-        q1.setHigh(11.01);
-        q1.setLow(9.55);
-        q1.setClose(9.8);
+        List<List<Quote>> data = new ArrayList<>();
 
-        quoteList.add(q1);
+        double startPrice = 10;
 
-        Quote q2 = new Quote();
-        q2.setOpen(9.90);
-        q2.setHigh(10.1);
-        q2.setLow(8.2);
-        q2.setClose(9.5);
-
-        quoteList.add(q2);
-
-        Quote q3 = new Quote();
-        q3.setOpen(9.5);
-        q3.setHigh(10.5);
-        q3.setLow(7);
-        q3.setClose(8.5);
-
-        quoteList.add(q3);
-
-        Quote q4 = new Quote();
-        q4.setOpen(9);
-        q4.setHigh(12.5);
-        q4.setLow(8.5);
-        q4.setClose(10);
-
-        quoteList.add(q4);
+        for (int i = 0; i < 4; i++) {
+            startPrice = 10 + i;
+            List<Quote> quoteList = new ArrayList<>();
+            for (int j = 0; j < 20; j++) {
 
 
-        return quoteList;
+                Quote q1 = new Quote();
+                q1.setOpen(j);
+                q1.setHigh(j);
+                q1.setLow(j);
+                q1.setClose(startPrice);
+                quoteList.add(q1);
+                startPrice += 0.5;
+            }
+            data.add(quoteList);
+        }
+
+        return data;
     }
 }

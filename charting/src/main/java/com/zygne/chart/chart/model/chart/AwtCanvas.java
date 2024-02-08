@@ -63,9 +63,26 @@ public class AwtCanvas implements Canvas {
     }
 
     @Override
-    public void drawLine(int x1, int y1, int x2, int y2, LineStyle lineStyle) {
+    public void drawLine(int x1, int y1, int x2, int y2, LineStyle lineStyle, LineWidth lineWidth) {
+
+        int lineSize = 1;
+
+        switch (lineWidth) {
+
+            case SMALL -> {
+                lineSize = 1;
+            }
+            case MEDIUM -> {
+                lineSize = 3;
+            }
+            case LARGE -> {
+                lineSize = 6;
+            }
+        }
+
 
         if (lineStyle == LineStyle.SOLID) {
+            graphics2D.setStroke(new BasicStroke(lineSize));
             graphics2D.drawLine(x1, y1, x2, y2);
         } else {
 
@@ -74,7 +91,7 @@ public class AwtCanvas implements Canvas {
             defaultStroke = graphics2D.getStroke();
 
             // Set the stroke of the copy, not the original
-            Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
+            Stroke dashed = new BasicStroke(lineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
                     0, new float[]{9}, 1);
             graphics2D.setStroke(dashed);
             graphics2D.drawLine(x1, y1, x2, y2);

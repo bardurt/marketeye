@@ -25,6 +25,7 @@ public abstract class Object2d extends BoxCollider implements Renderable {
         YELLOW,
         BLUE,
         GREEN,
+        WHITE,
         HIGHLIGHT
     }
 

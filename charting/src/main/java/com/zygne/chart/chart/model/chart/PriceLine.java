@@ -30,7 +30,7 @@ public class PriceLine extends Object2d {
         textObject.draw(canvas);
 
         canvas.setColor("#ABABAB");
-        canvas.drawLine(getLeft(), getBottom(), getRight(), getBottom(), Canvas.LineStyle.SOLID);
+        canvas.drawLine(getLeft(), getBottom(), getRight(), getBottom(), Canvas.LineStyle.SOLID, Canvas.LineWidth.SMALL);
 
     }
 }

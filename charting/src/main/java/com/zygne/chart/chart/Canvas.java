@@ -18,7 +18,7 @@ public interface Canvas {
 
     void drawCircle(int x, int y, int width, int height, Fill fill);
 
-    void drawLine(int x1, int y1, int x2, int y2, LineStyle lineStyle);
+    void drawLine(int x1, int y1, int x2, int y2, LineStyle lineStyle, LineWidth lineWidth);
 
     void drawString(String text, int xPos, int yPos);
 
@@ -29,6 +29,12 @@ public interface Canvas {
     enum LineStyle {
         SOLID,
         DASHED
+    }
+
+    enum LineWidth{
+        SMALL,
+        MEDIUM,
+        LARGE,
     }
 
     enum Fill {
