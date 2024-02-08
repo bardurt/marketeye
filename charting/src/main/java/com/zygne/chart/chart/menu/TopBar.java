@@ -31,7 +31,7 @@ public class TopBar extends BoxContainer {
         canvas.drawRectangle(0, 0, canvasWidth, statusBarHeight, Canvas.Fill.SOLID);
 
         canvas.setColor("#FFFFFF");
-        canvas.drawLine(0, statusBarHeight, canvasWidth, statusBarHeight, Canvas.LineStyle.SOLID);
+        canvas.drawLine(0, statusBarHeight, canvasWidth, statusBarHeight, Canvas.LineStyle.SOLID, Canvas.LineWidth.SMALL);
 
         statusText.draw(canvas);
         labelText.draw(canvas);

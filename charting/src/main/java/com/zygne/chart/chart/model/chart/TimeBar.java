@@ -12,6 +12,12 @@ public class TimeBar extends Object2d {
         this.textObject.setAlignment(TextObject.Alignment.LEFT);
     }
 
+    public void setText(String text, TextObject.FontSize fontSize) {
+        this.textObject.setFontSize(fontSize);
+        this.textObject.setText(text);
+        this.textObject.setAlignment(TextObject.Alignment.LEFT);
+    }
+
     @Override
     public void draw(Canvas canvas) {
         textObject.setX(x);

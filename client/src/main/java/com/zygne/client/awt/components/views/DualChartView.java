@@ -7,14 +7,14 @@ import java.awt.*;
 
 public class DualChartView  extends JPanel {
 
-    private LineChart leftChart;
-    private LineChart rightChart;
+    private LineChart2 leftChart;
+    private LineChart2 rightChart;
 
     public DualChartView(){
         setLayout(new GridLayout(0, 2));
 
-        leftChart = new LineChart();
-        rightChart = new LineChart();
+        leftChart = new LineChart2();
+        rightChart = new LineChart2();
 
         add(leftChart);
         add(rightChart);

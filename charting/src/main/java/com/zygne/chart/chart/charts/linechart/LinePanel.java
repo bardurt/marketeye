@@ -1,5 +1,4 @@
-package com.zygne.chart.chart.charts.pricechart;
-
+package com.zygne.chart.chart.charts.linechart;
 import com.zygne.chart.chart.model.chart.AwtCanvas;
 import com.zygne.chart.chart.model.data.Quote;
 
@@ -7,14 +6,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class PricePanel extends JPanel {
+public class LinePanel extends JPanel {
 
-    private final PriceChart priceChart;
+    private final LineChart lineChart;
 
-    public PricePanel(JPanel parent){
-        this.priceChart = new PriceChart();
-        addMouseMotionListener(priceChart);
-        addMouseListener(priceChart);
+    public LinePanel(JPanel parent){
+        this.lineChart = new LineChart();
+        addMouseMotionListener(lineChart);
+        addMouseListener(lineChart);
 
         ChartThread charThread = new ChartThread(parent);
 
@@ -25,23 +24,16 @@ public class PricePanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        priceChart.draw(new AwtCanvas(g));
+        lineChart.draw(new AwtCanvas(g));
     }
 
     public void addQuotes(List<List<Quote>> quotes){
-        priceChart.setSeries(quotes);
+        lineChart.setSeries(quotes);
     }
 
-    public void addVolumeProfile(List<Quote> quotes){
-        priceChart.addVolumeProfile(quotes);
-    }
 
     public void addWaterMark(String waterMark) {
-        priceChart.setWaterMark(waterMark);
-    }
-
-    public void addTitle(String waterMark) {
-        priceChart.setTitle(waterMark);
+        lineChart.setWaterMark(waterMark);
     }
 
     private static class ChartThread implements Runnable{

@@ -7,18 +7,18 @@ import java.awt.*;
 
 public class SingleChartView  extends JPanel {
 
-    private LineChart lineChart;
+    private LineChart2 lineChart2;
 
     public SingleChartView(){
         setLayout(new GridLayout());
 
-        lineChart = new LineChart();
+        lineChart2 = new LineChart2();
 
-        add(lineChart);
+        add(lineChart2);
     }
 
     public void addTendency(String symbol, TendencyReport tendencyReport) {
-        lineChart.addTendency(symbol, tendencyReport);
+        lineChart2.addTendency(symbol, tendencyReport);
         invalidate();
         validate();
         repaint();

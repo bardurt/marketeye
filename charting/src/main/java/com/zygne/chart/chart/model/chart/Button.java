@@ -32,8 +32,8 @@ public class Button extends Object2d {
         canvas.drawRectangle(posX, posY, boxWith, boxHeight, Canvas.Fill.OUTLINE);
 
         canvas.setColor("#FFFFFF");
-        canvas.drawLine(posX, posY, posX + boxWith, posY, Canvas.LineStyle.SOLID);
-        canvas.drawLine(posX, posY, posX, posY + boxHeight, Canvas.LineStyle.SOLID);
+        canvas.drawLine(posX, posY, posX + boxWith, posY, Canvas.LineStyle.SOLID, Canvas.LineWidth.SMALL);
+        canvas.drawLine(posX, posY, posX, posY + boxHeight, Canvas.LineStyle.SOLID, Canvas.LineWidth.SMALL);
 
         canvas.setColor("#000000");
 

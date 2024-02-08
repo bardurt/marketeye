@@ -26,7 +26,7 @@ public class StatusBar extends BoxContainer {
         canvas.drawRectangle(0, statusBarTop, canvasWidth, statusBarHeight, Canvas.Fill.SOLID);
 
 
-        canvas.drawLine(0, statusBarTop, canvasWidth, statusBarTop, Canvas.LineStyle.SOLID);
+        canvas.drawLine(0, statusBarTop, canvasWidth, statusBarTop, Canvas.LineStyle.SOLID, Canvas.LineWidth.SMALL);
 
         TextObject label = new TextObject();
         label.setX(5);
@@ -43,7 +43,7 @@ public class StatusBar extends BoxContainer {
         int index = 0;
 
         canvas.setColor("#C4C4C4");
-        canvas.drawLine(labelWidth, 0, labelWidth, statusBarTop, Canvas.LineStyle.DASHED);
+        canvas.drawLine(labelWidth, 0, labelWidth, statusBarTop, Canvas.LineStyle.DASHED, Canvas.LineWidth.SMALL);
         while (index < 3){
             TextObject textObject = new TextObject();
             int x = (int) (labelWidth + ((chartWith- labelWidth) * scalar));
@@ -54,7 +54,7 @@ public class StatusBar extends BoxContainer {
             textObject.draw(canvas);
 
             canvas.setColor("#C4C4C4");
-            canvas.drawLine(x, 0, x, statusBarTop, Canvas.LineStyle.DASHED);
+            canvas.drawLine(x, 0, x, statusBarTop, Canvas.LineStyle.DASHED, Canvas.LineWidth.SMALL);
 
             index++;
 

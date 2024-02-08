@@ -161,7 +161,8 @@ public class VolumePriceChart extends MouseInputAdapter implements Chart,
     }
 
     @Override
-    public void setBars(List<Quote> bars) {
+    public void setSeries(List<List<Quote>> series) {
+        List<Quote> bars = series.get(0);
         this.quotes.clear();
         this.quotes.addAll(bars);
         this.bars.clear();
@@ -171,6 +172,11 @@ public class VolumePriceChart extends MouseInputAdapter implements Chart,
         setUp();
         refresh();
         component.repaint();
+    }
+
+    @Override
+    public void setSeriesName(List<String> names) {
+
     }
 
     @Override

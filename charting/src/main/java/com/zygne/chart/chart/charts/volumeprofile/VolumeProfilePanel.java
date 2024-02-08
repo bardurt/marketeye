@@ -25,8 +25,8 @@ public class VolumeProfilePanel extends JPanel {
         volumeProfileChart.draw(new AwtCanvas(g));
     }
 
-    public void addQuotes(List<Quote> quotes){
-        volumeProfileChart.setBars(quotes);
+    public void addQuotes(List<List<Quote>> quotes){
+        volumeProfileChart.setSeries(quotes);
         parent.repaint();
     }
 

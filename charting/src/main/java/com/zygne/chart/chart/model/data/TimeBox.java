@@ -13,7 +13,7 @@ public class TimeBox {
         calendar.setTimeInMillis(timeStamp);
 
         year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH)+1;
+        month = calendar.get(Calendar.MONTH) + 1;
         day = calendar.get(Calendar.DAY_OF_MONTH);
     }
 
@@ -33,11 +33,39 @@ public class TimeBox {
         return year;
     }
 
+    public String getYearString() {
+        return "" + year;
+    }
+
     public int getMonth() {
         return month;
     }
 
+    public String getMonthString(){
+        String value = "";
+
+        if(month < 10){
+            value = "0"+month;
+        } else {
+            value =""+month;
+        }
+
+        return value;
+    }
+
     public int getDay() {
         return day;
+    }
+
+    public String getDayString(){
+        String value = "";
+
+        if(day < 10){
+            value = "0"+day;
+        } else {
+            value =""+day;
+        }
+
+        return value;
     }
 }

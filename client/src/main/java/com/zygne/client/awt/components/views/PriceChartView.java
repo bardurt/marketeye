@@ -36,7 +36,10 @@ public class PriceChartView extends JPanel {
             quote.setVolumeSmaPercentile(e.volumeSmaPercentile);
             quoteList.add(quote);
         }
-        pricePanel.addQuotes(quoteList);
+
+        List<List<Quote>> series = new ArrayList<>();
+        series.add(quoteList);
+        pricePanel.addQuotes(series);
         pricePanel.addWaterMark(symbol);
     }
 

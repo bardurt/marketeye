@@ -25,8 +25,8 @@ public class VolumePricePanel extends JPanel {
         volumePriceChart.draw(new AwtCanvas(g));
     }
 
-    public void addQuotes(List<Quote> quotes){
-        volumePriceChart.setBars(quotes);
+    public void addQuotes(List<List<Quote>> quotes){
+        volumePriceChart.setSeries(quotes);
         parent.repaint();
     }
 

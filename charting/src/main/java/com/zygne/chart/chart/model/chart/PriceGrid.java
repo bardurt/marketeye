@@ -9,7 +9,7 @@ public class PriceGrid extends Object2d {
     public void draw(Canvas canvas) {
         canvas.setColor("#ffffff");
         for(int i= 0; i < 30; i++){
-            canvas.drawLine(x, i*100, width, i*100, Canvas.LineStyle.DASHED);
+            canvas.drawLine(x, i*100, width, i*100, Canvas.LineStyle.DASHED, Canvas.LineWidth.SMALL);
         }
 
     }

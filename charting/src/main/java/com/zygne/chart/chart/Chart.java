@@ -6,8 +6,9 @@ import java.util.List;
 
 public interface Chart  {
     void draw(Canvas g);
-    void setBars(List<Quote> bars);
     void setWaterMark(String waterMark);
     void setTitle(String title);
+    void setSeries(List<List<Quote>> series);
+    void setSeriesName(List<String> names);
     void setCurrentPrice(double price);
 }
