@@ -1,11 +1,7 @@
-package com.zygne.client.awt.components.views;
+package com.zygne.client.swing.components.views;
 
-import com.zygne.chart.chart.charts.ChartPanel;
-import com.zygne.chart.chart.charts.linechart.LineChart;
 import com.zygne.chart.chart.charts.linechart.LinePanel;
 import com.zygne.chart.chart.model.data.LineData;
-import com.zygne.chart.chart.model.data.LineItem;
-import com.zygne.chart.chart.model.data.Quote;
 import com.zygne.chart.chart.model.data.Serie;
 import com.zygne.data.domain.model.Tendency;
 import com.zygne.data.domain.model.TendencyReport;

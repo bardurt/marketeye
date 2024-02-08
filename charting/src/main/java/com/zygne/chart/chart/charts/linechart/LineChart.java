@@ -3,15 +3,11 @@ package com.zygne.chart.chart.charts.linechart;
 import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.Chart;
 import com.zygne.chart.chart.RendererImpl;
-import com.zygne.chart.chart.menu.OptionsMenu;
-import com.zygne.chart.chart.menu.PriceScale;
-import com.zygne.chart.chart.menu.StatusBar;
-import com.zygne.chart.chart.menu.TopBar;
+import com.zygne.chart.chart.menu.*;
 import com.zygne.chart.chart.menu.indicators.*;
 import com.zygne.chart.chart.menu.indicators.creators.*;
 import com.zygne.chart.chart.model.chart.*;
 import com.zygne.chart.chart.model.data.Serie;
-import com.zygne.chart.chart.util.ZoomHelper;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -22,19 +18,17 @@ import java.util.List;
 public class LineChart extends MouseInputAdapter implements Chart,
         OptionsMenu.Listener,
         LineCreator.Callback,
-        TimeCreator.Callback {
+        TimeCreator.Callback,
+        Zoom.Callback {
 
     private static final int DEFAULT_HEIGHT = 640;
     private static final int DEFAULT_WIDTH = 720;
-    private static final int MAX_BAR_WIDTH = 30;
     private final int labelWidth = 60;
-    private double scale = 1;
-    private int barWidth = 5;
+    private double scale = 20;
+    private int barWidth = 12;
     private int lastBar = 0;
     private boolean scaling = false;
     private boolean stretching = false;
-
-    int zoom = 12;
 
     private int loadY;
 
@@ -52,6 +46,7 @@ public class LineChart extends MouseInputAdapter implements Chart,
     private TopBar topBar;
     private final List<Object2d> objects = new ArrayList<>();
     private final RendererImpl renderer;
+    private final Zoom zoom;
     private final int percentile = 90;
 
     private LineIndicator lineIndicator = null;
@@ -68,6 +63,7 @@ public class LineChart extends MouseInputAdapter implements Chart,
         this.camera.setWidth(canvasWidth);
         this.priceScale.setNegative(true);
         renderer = new RendererImpl(camera);
+        zoom = new Zoom(this);
 
         setUp();
     }
@@ -112,7 +108,6 @@ public class LineChart extends MouseInputAdapter implements Chart,
     @Override
     public void setSeries(List<List<Serie>> series) {
         reset();
-        adjustToZoom();
         this.bars.clear();
         this.bars.addAll(series);
         createCandleSticks();
@@ -257,47 +252,24 @@ public class LineChart extends MouseInputAdapter implements Chart,
     public void scaleUp(int what) {
         switch (what) {
             case 0 -> {
-                this.barWidth += 2;
-                if (this.barWidth > MAX_BAR_WIDTH) {
-                    this.barWidth = MAX_BAR_WIDTH;
-                    return;
-                }
+                zoom.stretch();
             }
             case 1 -> {
-                this.zoom++;
-                if (this.zoom > ZoomHelper.getMax()) {
-                    this.zoom = ZoomHelper.getMax();
-                    return;
-                }
+                zoom.zoomIn();
             }
         }
-
-        adjustToZoom();
-
-        createCandleSticks();
     }
 
     public void scaleDown(int what) {
         switch (what) {
             case 0 -> {
-                this.barWidth -= 2;
-                if (this.barWidth < 1) {
-                    this.barWidth = 1;
-                    return;
-                }
+                zoom.shrink();
             }
             case 1 -> {
-                this.zoom--;
-                if (this.zoom < 0) {
-                    this.zoom = 0;
-                    return;
-                }
+                zoom.zoomOut();
             }
         }
 
-        adjustToZoom();
-
-        createCandleSticks();
     }
 
 
@@ -306,13 +278,6 @@ public class LineChart extends MouseInputAdapter implements Chart,
         if (options == OptionsMenu.OptionItem.CENTER_CHART) {
             centerCamera();
         }
-    }
-
-    private void adjustToZoom() {
-
-        System.out.println("Zoom " + zoom);
-
-        scale = ZoomHelper.getScalar(zoom);
     }
 
     private void updateIndicators() {
@@ -325,7 +290,7 @@ public class LineChart extends MouseInputAdapter implements Chart,
 
         new TimeCreator().create(this,
                 lineIndicator.getLines().get(2),
-                canvasHeight-10,
+                canvasHeight - 10,
                 20,
                 barWidth);
     }
@@ -341,7 +306,7 @@ public class LineChart extends MouseInputAdapter implements Chart,
         this.loadY = y;
 
         int textX = 5;
-        for(Line l : lineIndicator.getLines()){
+        for (Line l : lineIndicator.getLines()) {
             TextObject t1 = new TextObject(textX, 10, 20, 20);
             t1.setText(l.getName());
             t1.setColorSchema(l.getColorSchema());
@@ -369,7 +334,6 @@ public class LineChart extends MouseInputAdapter implements Chart,
 
     private void createCandleSticks() {
         lineIndicator = null;
-
         new LineCreator().create(
                 this,
                 bars,
@@ -383,7 +347,19 @@ public class LineChart extends MouseInputAdapter implements Chart,
     }
 
     private void centerCamera() {
-        camera.setViewPortY(canvasHeight/2);
+        camera.setViewPortY(canvasHeight / 2);
         camera.setViewPortX(0);
+    }
+
+    @Override
+    public void onZoomLevelSet(double scalar) {
+        scale = scalar;
+        createCandleSticks();
+    }
+
+    @Override
+    public void onStretchSet(double scalar) {
+        barWidth = (int) scalar;
+        createCandleSticks();
     }
 }

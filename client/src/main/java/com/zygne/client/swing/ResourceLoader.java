@@ -1,9 +1,8 @@
-package com.zygne.client.awt;
+package com.zygne.client.swing;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 

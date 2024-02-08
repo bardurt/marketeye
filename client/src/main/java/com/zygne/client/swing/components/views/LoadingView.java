@@ -1,6 +1,6 @@
-package com.zygne.client.awt.components.views;
+package com.zygne.client.swing.components.views;
 
-import com.zygne.client.awt.StringUtils;
+import com.zygne.client.swing.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;

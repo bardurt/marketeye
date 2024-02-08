@@ -8,7 +8,7 @@ import java.util.List;
 
 public class VolumeProfileIndicator extends Object2d {
 
-    private List<VolumeProfileLine> volumeProfileLines;
+    private final List<VolumeProfileLine> volumeProfileLines;
 
     public VolumeProfileIndicator(List<VolumeProfileLine> volumeProfileLines) {
         this.volumeProfileLines = volumeProfileLines;

@@ -65,7 +65,7 @@ public class TimeCreator {
             TimeBar timeBar = new TimeBar();
             timeBar.setX(line.getPoint(0).getX());
             timeBar.setY(y - height);
-            timeBar.setText(timeBox.getDayString() + "/" + timeBox.getMonthString(), TextObject.FontSize.SMALL);
+            timeBar.setText(timeBox.getDayString() + "\n" + timeBox.getMonthName(), TextObject.FontSize.SMALL);
             timeBar.setHeight(height);
             timeBar.setWidth(barWidth);
 

@@ -1,4 +1,4 @@
-package com.zygne.client.awt;
+package com.zygne.client.swing;
 
 public class StringUtils {
 

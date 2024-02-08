@@ -1,4 +1,4 @@
-package com.zygne.client.awt.components.views;
+package com.zygne.client.swing.components.views;
 
 import com.zygne.chart.chart.charts.pricechart.PricePanel;
 import com.zygne.chart.chart.model.data.Quote;

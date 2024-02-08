@@ -158,7 +158,5 @@ public class TextObject extends Object2d {
             canvas.drawString(text, textCenterX, textCenterY, pointSize, Canvas.TextStyle.BOLD);
         }
 
-
-
     }
 }

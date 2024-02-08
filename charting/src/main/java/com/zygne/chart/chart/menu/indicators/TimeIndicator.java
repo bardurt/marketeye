@@ -8,7 +8,7 @@ import java.util.List;
 
 public class TimeIndicator extends Object2d {
 
-    private List<TimeBar> timeBarList;
+    private final List<TimeBar> timeBarList;
 
     public TimeIndicator(List<TimeBar> timeBarList) {
         this.timeBarList = timeBarList;

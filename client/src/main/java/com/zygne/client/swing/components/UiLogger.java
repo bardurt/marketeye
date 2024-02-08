@@ -1,4 +1,4 @@
-package com.zygne.client.awt.components;
+package com.zygne.client.swing.components;
 
 
 import com.zygne.arch.domain.Logger;

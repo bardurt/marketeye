@@ -34,13 +34,11 @@ public class RendererImpl implements Renderer {
         }
 
         canvas.translate(0, camera.getViewPortY());
-
         for (int i = 0; i < object2dList.size(); i++) {
             if (object2dList.get(i).getzOrder() == 1) {
                 object2dList.get(i).draw(canvas);
             }
         }
-
         canvas.translate(0, -camera.getViewPortY());
 
         canvas.translate(camera.getViewPortX(), camera.getViewPortY());
