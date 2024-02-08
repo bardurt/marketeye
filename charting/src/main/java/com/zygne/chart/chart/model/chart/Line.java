@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Line extends Object2d {
+
+
     private List<Point2d> point2dList = new ArrayList<>();
     private String color;
-
+    private String name;
     private Canvas.LineWidth lineWidth = Canvas.LineWidth.MEDIUM;
     private Canvas.LineStyle lineStyle = Canvas.LineStyle.SOLID;
 
@@ -39,28 +41,36 @@ public class Line extends Object2d {
         }
         switch (colorSchema) {
             case WHITE -> {
-                color = "#EFF5F0";
+                color = Colors.WHITE;
             }
             case RED -> {
-                color = "#D93333";
+                color = Colors.RED;
             }
             case ORANGE -> {
-                color = "#D9B333";
+                color = Colors.ORANGE;
             }
             case YELLOW -> {
-                color = "#E4EB00";
+                color = Colors.YELLOW;
             }
             case BLUE -> {
-                color = "#00B2EB";
+                color = Colors.BLUE;
             }
             case GREEN -> {
-                color = "#00EB35";
+                color = Colors.GREEN;
             }
             case HIGHLIGHT -> {
                 color = "#B2E1BD";
             }
         }
 
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

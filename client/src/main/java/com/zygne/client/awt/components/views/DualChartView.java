@@ -7,8 +7,8 @@ import java.awt.*;
 
 public class DualChartView  extends JPanel {
 
-    private LineChart2 leftChart;
-    private LineChart2 rightChart;
+    private final LineChart2 leftChart;
+    private final LineChart2 rightChart;
 
     public DualChartView(){
         setLayout(new GridLayout(0, 2));

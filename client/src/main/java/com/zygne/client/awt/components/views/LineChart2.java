@@ -1,8 +1,12 @@
 package com.zygne.client.awt.components.views;
 
+import com.zygne.chart.chart.charts.ChartPanel;
 import com.zygne.chart.chart.charts.linechart.LineChart;
 import com.zygne.chart.chart.charts.linechart.LinePanel;
+import com.zygne.chart.chart.model.data.LineData;
+import com.zygne.chart.chart.model.data.LineItem;
 import com.zygne.chart.chart.model.data.Quote;
+import com.zygne.chart.chart.model.data.Serie;
 import com.zygne.data.domain.model.Tendency;
 import com.zygne.data.domain.model.TendencyReport;
 
@@ -14,31 +18,31 @@ import java.util.List;
 
 public class LineChart2 extends JPanel {
 
-    private LineChart lineChart;
-
     public LineChart2() {
         this.setLayout(new GridLayout());
     }
 
     public void addTendency(String symbol, TendencyReport tendencyReport) {
         removeAll();
-        List<List<Quote>> dataset = new ArrayList<List<Quote>>();
+        List<List<Serie>> dataset = new ArrayList<>();
         for (Tendency t : tendencyReport.tendencies()) {
-
-            List<Quote> quoteList = new ArrayList<>();
+            String name = t.name;
+            List<Serie> quoteList = new ArrayList<>();
             for (int i = 0; i < t.data.size(); i++) {
 
-                Quote q = new Quote();
-                q.setClose(t.data.get(i).value);
-                q.setTimeStamp(t.data.get(i).timeStamp);
-                quoteList.add(q);
+                LineData item = new LineData();
+                item.setY(t.data.get(i).value);
+                item.setTimeStamp(t.data.get(i).timeStamp);
+                item.setName(name);
+                quoteList.add(item);
             }
-
             dataset.add(quoteList);
         }
 
         LinePanel linePanel = new LinePanel(this);
-        linePanel.addQuotes(dataset);
+        linePanel.addTitle(symbol);
+        linePanel.addSeries(dataset);
+
         add(linePanel);
         invalidate();
         validate();

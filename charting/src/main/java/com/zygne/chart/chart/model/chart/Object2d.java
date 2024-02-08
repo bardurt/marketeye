@@ -11,6 +11,10 @@ public abstract class Object2d extends BoxCollider implements Renderable {
         this.colorSchema = colorSchema;
     }
 
+    public ColorSchema getColorSchema() {
+        return colorSchema;
+    }
+
     public int getzOrder() {
         return zOrder;
     }

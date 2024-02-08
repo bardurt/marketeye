@@ -79,6 +79,8 @@ public class TimeCreator {
                 whenToAdd = 6;
             } else if (barWidth < 15) {
                 whenToAdd = 3;
+            } else if (barWidth < 20) {
+                whenToAdd = 2;
             }
 
             for (int i = 1; i < line.getPoints().size(); i++) {
@@ -96,7 +98,7 @@ public class TimeCreator {
                 timeBar = new TimeBar();
                 timeBar.setX(point2d.getX());
                 timeBar.setY(y - height);
-                timeBar.setText(timeBox.getDayString() + "/" + timeBox.getMonthString(), TextObject.FontSize.SMALL);
+                timeBar.setText(timeBox.getDayString() + "\n" + timeBox.getMonthName(), TextObject.FontSize.SMALL);
                 timeBar.setHeight(height);
             }
 

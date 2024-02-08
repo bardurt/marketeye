@@ -2,67 +2,11 @@ package com.zygne.chart.chart.model.data;
 
 import java.util.Comparator;
 
-public class Quote {
+public class Quote extends BarSerie {
 
-    private double open;
-    private double high;
-    private double low;
-    private double close;
-    private long volume;
-    private long timeStamp;
     private double percentile;
-    private boolean currentPrice;
-    private int index;
     private long volumeSma;
     private double volumeSmaPercentile;
-
-    public double getOpen() {
-        return open;
-    }
-
-    public void setOpen(double open) {
-        this.open = open;
-    }
-
-    public double getHigh() {
-        return high;
-    }
-
-    public void setHigh(double high) {
-        this.high = high;
-    }
-
-    public double getLow() {
-        return low;
-    }
-
-    public void setLow(double low) {
-        this.low = low;
-    }
-
-    public double getClose() {
-        return close;
-    }
-
-    public void setClose(double close) {
-        this.close = close;
-    }
-
-    public long getVolume() {
-        return volume;
-    }
-
-    public void setVolume(long volume) {
-        this.volume = volume;
-    }
-
-    public long getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
-    }
 
     public double getPercentile() {
         return percentile;
@@ -70,26 +14,6 @@ public class Quote {
 
     public void setPercentile(double percentile) {
         this.percentile = percentile;
-    }
-
-    public boolean isCurrentPrice() {
-        return currentPrice;
-    }
-
-    public void setCurrentPrice(boolean currentPrice) {
-        this.currentPrice = currentPrice;
-    }
-
-    public double getRange(){
-        return high - low;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
     }
 
     public long getVolumeSma() {

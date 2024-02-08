@@ -8,6 +8,21 @@ public class TimeBox {
     private final int month;
     private final int day;
 
+    private static final String[] MONTH_SHORT = new String[]{
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+    };
+
     public TimeBox(long timeStamp) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeStamp);
@@ -51,6 +66,10 @@ public class TimeBox {
         }
 
         return value;
+    }
+
+    public String getMonthName(){
+        return MONTH_SHORT[month-1];
     }
 
     public int getDay() {

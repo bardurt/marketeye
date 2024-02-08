@@ -9,10 +9,8 @@ import com.zygne.chart.chart.menu.StatusBar;
 import com.zygne.chart.chart.menu.TopBar;
 import com.zygne.chart.chart.menu.indicators.*;
 import com.zygne.chart.chart.menu.indicators.creators.*;
-import com.zygne.chart.chart.model.chart.Camera;
-import com.zygne.chart.chart.model.chart.Object2d;
-import com.zygne.chart.chart.model.chart.TextObject;
-import com.zygne.chart.chart.model.data.Quote;
+import com.zygne.chart.chart.model.chart.*;
+import com.zygne.chart.chart.model.data.Serie;
 import com.zygne.chart.chart.util.ZoomHelper;
 
 import javax.swing.*;
@@ -28,6 +26,7 @@ public class LineChart extends MouseInputAdapter implements Chart,
 
     private static final int DEFAULT_HEIGHT = 640;
     private static final int DEFAULT_WIDTH = 720;
+    private static final int MAX_BAR_WIDTH = 30;
     private final int labelWidth = 60;
     private double scale = 1;
     private int barWidth = 5;
@@ -39,7 +38,7 @@ public class LineChart extends MouseInputAdapter implements Chart,
 
     private int loadY;
 
-    private final List<List<Quote>> bars = new ArrayList<>();
+    private final List<List<Serie>> bars = new ArrayList<>();
 
     private int canvasHeight = DEFAULT_HEIGHT;
     private int canvasWidth = DEFAULT_WIDTH;
@@ -57,6 +56,7 @@ public class LineChart extends MouseInputAdapter implements Chart,
 
     private LineIndicator lineIndicator = null;
     private TimeIndicator timeIndicator = null;
+    private List<TextObject> seriesNames = new ArrayList<>();
 
     private final PriceScale priceScale = new PriceScale();
 
@@ -110,21 +110,12 @@ public class LineChart extends MouseInputAdapter implements Chart,
 
 
     @Override
-    public void setSeries(List<List<Quote>> bars) {
+    public void setSeries(List<List<Serie>> series) {
         reset();
         adjustToZoom();
         this.bars.clear();
-        this.bars.addAll(bars);
+        this.bars.addAll(series);
         createCandleSticks();
-    }
-
-    @Override
-    public void setSeriesName(List<String> names) {
-
-    }
-
-    @Override
-    public void setCurrentPrice(double price) {
     }
 
     @Override
@@ -155,6 +146,10 @@ public class LineChart extends MouseInputAdapter implements Chart,
 
         if (lineIndicator != null) {
             objects.add(lineIndicator);
+        }
+
+        if (!seriesNames.isEmpty()) {
+            objects.addAll(seriesNames);
         }
 
         objects.add(priceScale);
@@ -263,8 +258,8 @@ public class LineChart extends MouseInputAdapter implements Chart,
         switch (what) {
             case 0 -> {
                 this.barWidth += 2;
-                if (this.barWidth > 20) {
-                    this.barWidth = 20;
+                if (this.barWidth > MAX_BAR_WIDTH) {
+                    this.barWidth = MAX_BAR_WIDTH;
                     return;
                 }
             }
@@ -330,7 +325,7 @@ public class LineChart extends MouseInputAdapter implements Chart,
 
         new TimeCreator().create(this,
                 lineIndicator.getLines().get(2),
-                canvasHeight,
+                canvasHeight-10,
                 20,
                 barWidth);
     }
@@ -344,6 +339,18 @@ public class LineChart extends MouseInputAdapter implements Chart,
         this.lineIndicator = lineIndicator;
         this.lastBar = x;
         this.loadY = y;
+
+        int textX = 5;
+        for(Line l : lineIndicator.getLines()){
+            TextObject t1 = new TextObject(textX, 10, 20, 20);
+            t1.setText(l.getName());
+            t1.setColorSchema(l.getColorSchema());
+            t1.setFontSize(TextObject.FontSize.MEDIUM);
+            t1.setzOrder(-1);
+
+            seriesNames.add(t1);
+            textX += 120;
+        }
         SwingUtilities.invokeLater(() -> {
             refresh();
             centerCamera();
@@ -376,8 +383,7 @@ public class LineChart extends MouseInputAdapter implements Chart,
     }
 
     private void centerCamera() {
-        System.out.println("x " + lastBar + " y" + loadY);
-        camera.setViewPortY(canvasHeight);
+        camera.setViewPortY(canvasHeight/2);
         camera.setViewPortX(0);
     }
 }
