@@ -1,8 +1,8 @@
-package com.zygne.client.awt.components.tabs;
+package com.zygne.client.swing.components.tabs;
 
-import com.zygne.client.awt.components.views.DualChartView;
-import com.zygne.client.awt.components.views.FuturesView;
-import com.zygne.client.awt.components.views.SingleChartView;
+import com.zygne.client.swing.components.views.DualChartView;
+import com.zygne.client.swing.components.views.FuturesView;
+import com.zygne.client.swing.components.views.SingleChartView;
 import com.zygne.data.domain.model.*;
 
 import javax.swing.*;

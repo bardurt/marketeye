@@ -1,12 +1,12 @@
 package com.zygne.client;
 
 
-import com.zygne.client.awt.AwtGui;
+import com.zygne.client.swing.SwingGui;
 
 public class Launcher {
 
     public static void main(String[] args) {
-        new AwtGui().launch();
+        new SwingGui().launch();
     }
 
 }

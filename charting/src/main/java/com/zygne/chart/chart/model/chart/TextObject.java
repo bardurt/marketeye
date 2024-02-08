@@ -5,6 +5,7 @@ import com.zygne.chart.chart.Canvas;
 public class TextObject extends Object2d {
 
     private String color = "#FFFFFF";
+    private boolean useColorScheme = false;
 
     public enum FontSize {
         SMALL_EXTRA,
@@ -93,6 +94,12 @@ public class TextObject extends Object2d {
     }
 
     @Override
+    public void setColorSchema(ColorSchema colorSchema) {
+        super.setColorSchema(colorSchema);
+        useColorScheme = true;
+    }
+
+    @Override
     public void draw(Canvas canvas) {
         if(text == null){
             return;
@@ -114,7 +121,42 @@ public class TextObject extends Object2d {
             textCenterY = y + height / 2 + (scalar / 2);
         }
 
+        if(useColorScheme){
+            switch (colorSchema) {
+                case WHITE -> {
+                    color = Colors.WHITE;
+                }
+                case RED -> {
+                    color = Colors.RED;
+                }
+                case ORANGE -> {
+                    color = Colors.ORANGE;
+                }
+                case YELLOW -> {
+                    color = Colors.YELLOW;
+                }
+                case BLUE -> {
+                    color = Colors.BLUE;
+                }
+                case GREEN -> {
+                    color = Colors.GREEN;
+                }
+                case HIGHLIGHT -> {
+                    color = "#B2E1BD";
+                }
+            }
+        }
         canvas.setColor(color);
-        canvas.drawString(text, textCenterX, textCenterY, pointSize, Canvas.TextStyle.BOLD);
+
+        if(text.contains("\n")){
+            String[] parts = text.split("\n");
+            String part1 = parts[0];
+            String part2 = parts[1];
+            canvas.drawString(part1, textCenterX, textCenterY-7, pointSize, Canvas.TextStyle.BOLD);
+            canvas.drawString(part2, textCenterX, textCenterY+7, pointSize, Canvas.TextStyle.BOLD);
+        } else {
+            canvas.drawString(text, textCenterX, textCenterY, pointSize, Canvas.TextStyle.BOLD);
+        }
+
     }
 }

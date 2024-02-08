@@ -34,13 +34,11 @@ public class RendererImpl implements Renderer {
         }
 
         canvas.translate(0, camera.getViewPortY());
-
         for (int i = 0; i < object2dList.size(); i++) {
             if (object2dList.get(i).getzOrder() == 1) {
                 object2dList.get(i).draw(canvas);
             }
         }
-
         canvas.translate(0, -camera.getViewPortY());
 
         canvas.translate(camera.getViewPortX(), camera.getViewPortY());
@@ -66,6 +64,12 @@ public class RendererImpl implements Renderer {
             }
         }
         canvas.translate(-camera.getViewPortX(), 0);
+
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == 4) {
+                object2dList.get(i).draw(canvas);
+            }
+        }
 
         canvas.setColor("#000000");
         canvas.drawRectangle(0, 0, camera.getWidth(), camera.getHeight(), Canvas.Fill.OUTLINE);

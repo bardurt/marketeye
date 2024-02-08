@@ -11,7 +11,7 @@ import java.util.List;
 public class LineIndicator extends Object2d {
 
     private static final int MAX_SIZE = 5;
-    private List<Line> lines = new ArrayList<>();
+    private final List<Line> lines = new ArrayList<>();
 
     public void addLine(Line line) {
 

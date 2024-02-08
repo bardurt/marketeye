@@ -8,6 +8,7 @@ import com.zygne.chart.chart.menu.indicators.creators.*;
 import com.zygne.chart.chart.model.chart.*;
 import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.model.data.Quote;
+import com.zygne.chart.chart.model.data.Serie;
 import com.zygne.chart.chart.util.ZoomHelper;
 
 import javax.swing.*;
@@ -111,11 +112,17 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
 
     @Override
-    public void setSeries(List<List<Quote>> series) {
+    public void setSeries(List<List<Serie>> series) {
         reset();
-        List<Quote> bars = series.get(0);
+        List<Serie> bars = series.get(0);
 
-        double high = bars.get(0).getHigh();
+        List<Quote> quotes = new ArrayList<>();
+
+        for(Serie s : bars){
+            quotes.add((Quote) s);
+        }
+
+        double high = quotes.get(0).getHigh();
 
         if (high > 1000) {
             this.zoom = 4;
@@ -129,18 +136,9 @@ public class PriceChart extends MouseInputAdapter implements Chart,
 
         adjustToZoom();
         this.bars.clear();
-        this.bars.addAll(bars);
+        this.bars.addAll(quotes);
         this.bars.sort(new Quote.TimeComparator());
         createCandleSticks();
-    }
-
-    @Override
-    public void setSeriesName(List<String> names) {
-
-    }
-
-    @Override
-    public void setCurrentPrice(double price) {
     }
 
     @Override

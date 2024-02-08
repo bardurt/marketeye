@@ -1,8 +1,7 @@
-package com.zygne.client.awt.components.tabs;
+package com.zygne.client.swing.components.tabs;
 
-import com.zygne.client.awt.ResourceLoader;
-import com.zygne.client.awt.components.views.PriceChartView;
-import com.zygne.client.awt.components.views.StocksView;
+import com.zygne.client.swing.components.views.PriceChartView;
+import com.zygne.client.swing.components.views.StocksView;
 
 import javax.swing.*;
 import java.awt.*;

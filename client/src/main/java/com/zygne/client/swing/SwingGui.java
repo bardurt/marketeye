@@ -1,10 +1,10 @@
-package com.zygne.client.awt;
+package com.zygne.client.swing;
 
-import com.zygne.client.Constants;
-import com.zygne.client.awt.components.tabs.SettingsTab;
-import com.zygne.client.awt.components.views.LoadingView;
-import com.zygne.client.awt.components.UiLogger;
-import com.zygne.client.awt.components.tabs.TendencyTab;
+import com.zygne.client.ProjectProps;
+import com.zygne.client.swing.components.tabs.SettingsTab;
+import com.zygne.client.swing.components.views.LoadingView;
+import com.zygne.client.swing.components.UiLogger;
+import com.zygne.client.swing.components.tabs.TendencyTab;
 import com.zygne.data.domain.model.*;
 import com.zygne.data.presentation.presenter.base.*;
 import com.zygne.data.presentation.presenter.implementation.*;
@@ -17,7 +17,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class AwtGui extends JPanel implements MainPresenter.View,
+public class SwingGui extends JPanel implements MainPresenter.View,
         SettingsTab.Callback,
         ChartPresenter.View,
         TendencyTab.Callback,
@@ -41,7 +41,7 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
     private final JTabbedPane tabbedPane;
 
-    public AwtGui() {
+    public SwingGui() {
         super(new BorderLayout());
         setSize(880, 880);
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -79,13 +79,13 @@ public class AwtGui extends JPanel implements MainPresenter.View,
 
         labelStatus = new JLabel("");
         statusPanel.add(labelStatus, BorderLayout.WEST);
-        statusPanel.add(new JLabel(Constants.VERSION_NAME), BorderLayout.EAST);
+        statusPanel.add(new JLabel(ProjectProps.readProperty("version")), BorderLayout.EAST);
         add(statusPanel, BorderLayout.SOUTH);
 
-        Logger logger = new UiLogger(new JavaAwtThread(), labelStatus);
+        Logger logger = new UiLogger(new JavaSwingThread(), labelStatus);
         logger.setUp();
 
-        MainThread mainThread = new JavaAwtThread();
+        MainThread mainThread = new JavaSwingThread();
         Executor executor = ThreadExecutor.getInstance();
         chartPresenter = new ChartPresenterImpl(executor, mainThread, this, logger);
         tendencyPresenter = new TendencyPresenterImpl(executor, mainThread, this, logger);
@@ -141,9 +141,9 @@ public class AwtGui extends JPanel implements MainPresenter.View,
     }
 
     public void launch() {
-        JFrame frame = new JFrame(Constants.APP_NAME);
+        JFrame frame = new JFrame(ProjectProps.readProperty("name"));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new AwtGui());
+        frame.add(new SwingGui());
         Image image = resourceLoader.loadImage("icon.png");
         if (image != null) {
             frame.setIconImage(image);

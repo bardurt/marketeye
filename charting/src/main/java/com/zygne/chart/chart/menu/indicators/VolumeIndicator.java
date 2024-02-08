@@ -8,7 +8,7 @@ import java.util.List;
 
 public class VolumeIndicator extends Object2d {
 
-    private List<VolumeBar> volumeBarList;
+    private final List<VolumeBar> volumeBarList;
 
     public VolumeIndicator(List<VolumeBar> volumeBarList) {
         this.volumeBarList = volumeBarList;

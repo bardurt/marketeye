@@ -1,7 +1,8 @@
-package com.zygne.client.awt.components.views;
+package com.zygne.client.swing.components.views;
 
 import com.zygne.chart.chart.charts.pricechart.PricePanel;
 import com.zygne.chart.chart.model.data.Quote;
+import com.zygne.chart.chart.model.data.Serie;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.LiquidityLevel;
 
@@ -21,7 +22,7 @@ public class PriceChartView extends JPanel {
 
     public void addData(List<Histogram> data, String symbol) {
 
-        List<Quote> quoteList = new ArrayList<>();
+        List<Serie> quoteList = new ArrayList<>();
 
         for (Histogram e : data) {
 
@@ -37,9 +38,9 @@ public class PriceChartView extends JPanel {
             quoteList.add(quote);
         }
 
-        List<List<Quote>> series = new ArrayList<>();
+        List<List<Serie>> series = new ArrayList<>();
         series.add(quoteList);
-        pricePanel.addQuotes(series);
+        pricePanel.addSeries(series);
         pricePanel.addWaterMark(symbol);
     }
 

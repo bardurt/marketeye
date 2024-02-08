@@ -1,13 +1,18 @@
 package com.zygne.chart.chart.charts.pricechart;
 
+import com.zygne.chart.chart.charts.ChartPanel;
 import com.zygne.chart.chart.model.chart.AwtCanvas;
 import com.zygne.chart.chart.model.data.Quote;
+import com.zygne.chart.chart.model.data.Serie;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class PricePanel extends JPanel {
+import static com.sun.java.accessibility.util.AWTEventMonitor.addMouseListener;
+import static com.sun.java.accessibility.util.AWTEventMonitor.addMouseMotionListener;
+
+public class PricePanel extends ChartPanel {
 
     private final PriceChart priceChart;
 
@@ -28,35 +33,33 @@ public class PricePanel extends JPanel {
         priceChart.draw(new AwtCanvas(g));
     }
 
-    public void addQuotes(List<List<Quote>> quotes){
-        priceChart.setSeries(quotes);
+    @Override
+    public void addSeries(List<List<Serie>> series){
+        priceChart.setSeries(series);
     }
 
+    @Override
     public void addVolumeProfile(List<Quote> quotes){
         priceChart.addVolumeProfile(quotes);
     }
 
+    @Override
     public void addWaterMark(String waterMark) {
         priceChart.setWaterMark(waterMark);
     }
 
-    public void addTitle(String waterMark) {
-        priceChart.setTitle(waterMark);
+    @Override
+    public void addTitle(String title) {
+        priceChart.setTitle(title);
     }
 
-    private static class ChartThread implements Runnable{
-
-        private Component component;
-
-        public ChartThread(Component component) {
-            this.component = component;
-        }
+    private record ChartThread(Component component) implements Runnable {
 
         @Override
         public void run() {
 
-            while (true){
-                EventQueue.invokeLater(() -> component.repaint());
+            while (true) {
+                EventQueue.invokeLater(component::repaint);
 
                 try {
                     Thread.sleep(20);

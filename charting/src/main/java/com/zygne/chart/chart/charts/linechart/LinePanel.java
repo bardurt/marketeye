@@ -1,12 +1,14 @@
 package com.zygne.chart.chart.charts.linechart;
+import com.zygne.chart.chart.charts.ChartPanel;
 import com.zygne.chart.chart.model.chart.AwtCanvas;
 import com.zygne.chart.chart.model.data.Quote;
+import com.zygne.chart.chart.model.data.Serie;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class LinePanel extends JPanel {
+public class LinePanel extends ChartPanel {
 
     private final LineChart lineChart;
 
@@ -27,28 +29,33 @@ public class LinePanel extends JPanel {
         lineChart.draw(new AwtCanvas(g));
     }
 
-    public void addQuotes(List<List<Quote>> quotes){
-        lineChart.setSeries(quotes);
+    @Override
+    public void addSeries(List<List<Serie>> series){
+        lineChart.setSeries(series);
     }
 
-
+    @Override
     public void addWaterMark(String waterMark) {
         lineChart.setWaterMark(waterMark);
     }
 
-    private static class ChartThread implements Runnable{
+    @Override
+    public void addVolumeProfile(List<Quote> quotes) {
 
-        private Component component;
+    }
 
-        public ChartThread(Component component) {
-            this.component = component;
-        }
+    @Override
+    public void addTitle(String title) {
+        lineChart.setTitle(title);
+    }
+
+    private record ChartThread(Component component) implements Runnable {
 
         @Override
         public void run() {
 
-            while (true){
-                EventQueue.invokeLater(() -> component.repaint());
+            while (true) {
+                EventQueue.invokeLater(component::repaint);
 
                 try {
                     Thread.sleep(20);
