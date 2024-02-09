@@ -25,7 +25,6 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
     private final ResourceLoader resourceLoader = new ResourceLoader();
 
-    private final JLabel labelSymbol;
     private final JLabel labelStatus;
     private final JLabel labelLoading;
     private final LoadingView loadingView;
@@ -56,9 +55,6 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridy = 0;
         constraints.gridx = 0;
-        labelSymbol = new JLabel("Symbol");
-
-        infoPanel.add(labelSymbol, constraints);
 
         JPanel loadingPanel = new JPanel(new BorderLayout());
 
@@ -100,7 +96,6 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     @Override
     public void onComplete(String symbol, String dateRange) {
         this.symbol = symbol;
-        labelSymbol.setText("Symbol : " + symbol.toUpperCase() + " - " + dateRange);
         labelStatus.setText("");
         labelLoading.setText("");
     }
@@ -155,10 +150,8 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onChartReady(List<Histogram> histograms, List<LiquidityLevel> liquidityLevels) {
-        settingsTab.priceChartView.addData(histograms, symbol.toUpperCase());
-        settingsTab.priceChartView.addVolumeProfile(liquidityLevels);
+        settingsTab.priceChartView.addData(histograms, liquidityLevels, symbol.toUpperCase());
         loadingView.hideLoading();
-        labelSymbol.setText("Symbol : " + symbol.toUpperCase());
         labelStatus.setText("");
         labelLoading.setText("");
     }

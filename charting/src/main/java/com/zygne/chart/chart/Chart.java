@@ -4,9 +4,12 @@ import com.zygne.chart.chart.model.data.Serie;
 
 import java.util.List;
 
-public interface Chart  {
-    void draw(Canvas g);
-    void setWaterMark(String waterMark);
-    void setTitle(String title);
-    void setSeries(List<List<Serie>> series);
+public interface Chart {
+    public void draw(Canvas g);
+
+    public void setWaterMark(String waterMark);
+
+    public void setTitle(String title);
+
+    public void setSeries(List<List<Serie>> series);
 }

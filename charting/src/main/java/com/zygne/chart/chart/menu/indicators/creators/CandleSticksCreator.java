@@ -2,14 +2,14 @@ package com.zygne.chart.chart.menu.indicators.creators;
 
 import com.zygne.chart.chart.menu.indicators.CandleSticksIndicator;
 import com.zygne.chart.chart.model.chart.CandleStick;
-import com.zygne.chart.chart.model.data.Quote;
+import com.zygne.chart.chart.model.data.BarSerie;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CandleSticksCreator {
 
-    public void create(Callback callback, List<Quote> quoteList, double scalar, int barWidth, int separator) {
+    public void create(Callback callback, List<BarSerie> quoteList, double scalar, int barWidth, int separator) {
 
         Runnable r = () -> {
 
@@ -17,7 +17,7 @@ public class CandleSticksCreator {
 
             int x = 0;
             int loadY = (int) (quoteList.get(quoteList.size()-1).getHigh() * scalar);
-            for (Quote e : quoteList) {
+            for (BarSerie e : quoteList) {
 
                 CandleStick b = new CandleStick();
                 b.ohlc(e.getOpen(),
@@ -39,11 +39,8 @@ public class CandleSticksCreator {
                 candleSticks.add(b);
                 candleSticks.add(b);
 
-
-
                 x += barWidth;
                 x += 1;
-
             }
 
             int lastBar = x;

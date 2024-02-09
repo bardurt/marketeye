@@ -7,52 +7,40 @@ import com.zygne.chart.chart.menu.*;
 import com.zygne.chart.chart.menu.indicators.*;
 import com.zygne.chart.chart.menu.indicators.creators.*;
 import com.zygne.chart.chart.model.chart.*;
+import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;
 
 import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LineChart extends MouseInputAdapter implements Chart,
-        OptionsMenu.Listener,
+public class LineChart extends JPanel implements Chart,
         LineCreator.Callback,
         TimeCreator.Callback,
-        Zoom.Callback {
+        Zoom.Callback,
+        ChartControls.Callback{
 
     private static final int DEFAULT_HEIGHT = 640;
     private static final int DEFAULT_WIDTH = 720;
-    private final int labelWidth = 60;
     private double scale = 20;
     private int barWidth = 12;
-    private int lastBar = 0;
-    private boolean scaling = false;
-    private boolean stretching = false;
 
-    private int loadY;
-
-    private final List<List<Serie>> bars = new ArrayList<>();
+    private final List<List<Serie>> lineData = new ArrayList<>();
 
     private int canvasHeight = DEFAULT_HEIGHT;
     private int canvasWidth = DEFAULT_WIDTH;
     private final Camera camera;
-    private int startY;
-    private int startX;
     private String waterMarkText = "";
-    private String titleText = "";
     private TextObject waterMark;
     private TextObject copyright;
-    private TopBar topBar;
     private final List<Object2d> objects = new ArrayList<>();
     private final RendererImpl renderer;
     private final Zoom zoom;
-    private final int percentile = 90;
 
     private LineIndicator lineIndicator = null;
     private TimeIndicator timeIndicator = null;
-    private List<TextObject> seriesNames = new ArrayList<>();
-
+    private final List<TextObject> seriesNames = new ArrayList<>();
     private final PriceScale priceScale = new PriceScale();
 
     public LineChart() {
@@ -64,8 +52,15 @@ public class LineChart extends MouseInputAdapter implements Chart,
         this.priceScale.setNegative(true);
         renderer = new RendererImpl(camera);
         zoom = new Zoom(this);
+        ChartControls chartControls = new ChartControls(this);
 
+        addMouseMotionListener(chartControls);
+        addMouseListener(chartControls);
         setUp();
+
+        ChartRunner chartRunner = new ChartRunner(this);
+        Thread t = new Thread(chartRunner);
+        t.start();
     }
 
     private void setUp() {
@@ -84,6 +79,7 @@ public class LineChart extends MouseInputAdapter implements Chart,
         StatusBar statusBar = new StatusBar();
         statusBar.setWidth(canvasWidth);
         statusBar.setHeight(canvasHeight);
+        int labelWidth = 60;
         statusBar.setLabelWidth(labelWidth);
         statusBar.setzOrder(2);
 
@@ -93,24 +89,26 @@ public class LineChart extends MouseInputAdapter implements Chart,
         priceScale.setHeight(camera.getHeight());
         priceScale.setzOrder(1);
         priceScale.setScale(scale);
-
-        topBar = new TopBar();
-        topBar.setX(0);
-        topBar.setY(0);
-        topBar.setWidth(canvasWidth);
-        topBar.setHeight(canvasHeight);
-        topBar.setzOrder(2);
-        topBar.init();
-        topBar.setLabelText(titleText + " " + percentile + "%");
     }
-
 
     @Override
     public void setSeries(List<List<Serie>> series) {
+        if (series.isEmpty()) {
+            return;
+        }
+
+        for (List<Serie> items : series) {
+            if (!(items.get(0) instanceof LineSerie)) {
+                throw new RuntimeException("Chart only works with " + LineSerie.class.getName());
+            }
+        }
+
         reset();
-        this.bars.clear();
-        this.bars.addAll(series);
-        createCandleSticks();
+        this.lineData.clear();
+        this.lineData.addAll(series);
+        createChartData();
+
+        zoom.reset();
     }
 
     @Override
@@ -152,89 +150,6 @@ public class LineChart extends MouseInputAdapter implements Chart,
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        startY = e.getY();
-        startX = e.getX();
-
-        if (startX > camera.getWidth() - 50) {
-            scaling = true;
-        } else if (startY > camera.getHeight() - 50) {
-            stretching = true;
-        } else {
-            int x = e.getX();
-            int y = e.getY();
-
-            int mouseX = (int) camera.getMouseX(x);
-            int mouseY = (int) camera.getMouseY(y);
-            System.out.println("mouse x " + mouseX + " mouse y " + mouseY);
-        }
-
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-
-        int dy = startY - e.getY();
-        int dx = startX - e.getX();
-
-        if (scaling) {
-            if (dy > 2) {
-                scaleUp(1);
-            }
-            if (dy < -2) {
-                scaleDown(1);
-            }
-
-            scaling = false;
-            return;
-        }
-
-        if (stretching) {
-            if (dx > 2) {
-                scaleUp(0);
-            }
-            if (dx < -2) {
-                scaleDown(0);
-            }
-
-            stretching = false;
-        }
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        if (scaling || stretching) {
-            return;
-        }
-
-        int dy = startY - e.getY();
-        int dx = startX - e.getX();
-
-        int y = camera.getViewPortY() - (dy / 100);
-
-        int x = camera.getViewPortX() - (dx / 100);
-
-        camera.setViewPortY(y);
-        camera.setViewPortX(x);
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-    }
-
-    @Override
     public void setWaterMark(String waterMark) {
         this.waterMarkText = waterMark;
         this.waterMark.setText(waterMarkText);
@@ -244,40 +159,6 @@ public class LineChart extends MouseInputAdapter implements Chart,
 
     @Override
     public void setTitle(String title) {
-        this.titleText = title;
-        topBar.setLabelText(title + " " + percentile + "%");
-    }
-
-
-    public void scaleUp(int what) {
-        switch (what) {
-            case 0 -> {
-                zoom.stretch();
-            }
-            case 1 -> {
-                zoom.zoomIn();
-            }
-        }
-    }
-
-    public void scaleDown(int what) {
-        switch (what) {
-            case 0 -> {
-                zoom.shrink();
-            }
-            case 1 -> {
-                zoom.zoomOut();
-            }
-        }
-
-    }
-
-
-    @Override
-    public void onOptionsSelected(OptionsMenu.OptionItem options) {
-        if (options == OptionsMenu.OptionItem.CENTER_CHART) {
-            centerCamera();
-        }
     }
 
     private void updateIndicators() {
@@ -295,16 +176,9 @@ public class LineChart extends MouseInputAdapter implements Chart,
                 barWidth);
     }
 
-    private void adjustCamera() {
-        camera.setViewPortY((-loadY - camera.getHeight()) * -1);
-    }
-
     @Override
-    public void onLineIndicatorCreated(LineIndicator lineIndicator, int x, int y) {
+    public void onLineIndicatorCreated(LineIndicator lineIndicator) {
         this.lineIndicator = lineIndicator;
-        this.lastBar = x;
-        this.loadY = y;
-
         int textX = 5;
         for (Line l : lineIndicator.getLines()) {
             TextObject t1 = new TextObject(textX, 10, 20, 20);
@@ -326,24 +200,22 @@ public class LineChart extends MouseInputAdapter implements Chart,
     @Override
     public void onTimeIndicatorCreated(TimeIndicator timeIndicator) {
         this.timeIndicator = timeIndicator;
-        SwingUtilities.invokeLater(() -> {
-            refresh();
-        });
+        SwingUtilities.invokeLater(this::refresh);
     }
 
 
-    private void createCandleSticks() {
+    private void createChartData() {
         lineIndicator = null;
         new LineCreator().create(
                 this,
-                bars,
+                lineData,
                 scale,
                 barWidth
         );
     }
 
     private void reset() {
-        bars.clear();
+        lineData.clear();
     }
 
     private void centerCamera() {
@@ -351,15 +223,62 @@ public class LineChart extends MouseInputAdapter implements Chart,
         camera.setViewPortX(0);
     }
 
+
     @Override
-    public void onZoomLevelSet(double scalar) {
-        scale = scalar;
-        createCandleSticks();
+    public void onZoomChanged(Zoom.ZoomDetails zoomDetails) {
+        scale = zoomDetails.zoomLevel();
+        barWidth = (int) zoomDetails.stretchLevel();
+        createChartData();
     }
 
     @Override
-    public void onStretchSet(double scalar) {
-        barWidth = (int) scalar;
-        createCandleSticks();
+    public void onDragLeft(int dist) {
+        zoom.stretch();
     }
+
+    @Override
+    public void onDragRight(int dist) {
+        zoom.shrink();
+    }
+
+    @Override
+    public void onDragUp(int dist) {
+        zoom.zoomIn();
+    }
+
+    @Override
+    public void onDragDown(int dist) {
+        zoom.zoomOut();
+    }
+
+    @Override
+    public void onDrag(int dx, int dy) {
+        int y = camera.getViewPortY() - (dy / 100);
+
+        int x = camera.getViewPortX() - (dx / 100);
+
+        camera.setViewPortY(y);
+        camera.setViewPortX(x);
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        this.draw(new AwtCanvas(g));
+    }
+
+    private record ChartRunner(Component component) implements Runnable {
+
+        @Override
+        public void run() {
+            while (true) {
+                EventQueue.invokeLater(component::repaint);
+                try {
+                    Thread.sleep(35);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+    }
+
 }

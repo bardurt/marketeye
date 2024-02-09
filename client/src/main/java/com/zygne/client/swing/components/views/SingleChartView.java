@@ -19,9 +19,6 @@ public class SingleChartView  extends JPanel {
 
     public void addTendency(String symbol, TendencyReport tendencyReport) {
         lineChart2.addTendency(symbol, tendencyReport);
-        invalidate();
-        validate();
-        repaint();
     }
 
 }

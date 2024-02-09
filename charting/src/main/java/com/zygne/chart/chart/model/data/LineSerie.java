@@ -1,8 +1,8 @@
 package com.zygne.chart.chart.model.data;
 
-public abstract class LineItem extends Serie {
-    protected double x = 0d;
-    protected double y = 0d;
+public class LineSerie extends Serie {
+    private double x = 0d;
+    private double y = 0d;
 
     public double getX() {
         return x;

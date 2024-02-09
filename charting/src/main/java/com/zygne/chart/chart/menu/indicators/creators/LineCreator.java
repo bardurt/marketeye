@@ -5,7 +5,7 @@ import com.zygne.chart.chart.menu.indicators.LineIndicator;
 import com.zygne.chart.chart.model.chart.Line;
 import com.zygne.chart.chart.model.chart.Object2d;
 import com.zygne.chart.chart.model.chart.Point2d;
-import com.zygne.chart.chart.model.data.LineItem;
+import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class LineCreator {
     public void create(Callback callback, List<List<Serie>> quoteList, double scalar, int barWidth) {
 
         Runnable r = () -> {
-            int x = 0;
+            int x;
             int maxSize = 0;
             LineIndicator lineIndicator = new LineIndicator();
             List<Line> lines = new ArrayList<>();
@@ -28,7 +28,7 @@ public class LineCreator {
                 line.setName(quotes.get(0).getName());
                 for (Serie e : quotes) {
 
-                    LineItem s = (LineItem) e;
+                    LineSerie s = (LineSerie) e;
 
                     Point2d point2d = new Point2d(x, (int) (s.getY() * scalar) * -1);
                     point2d.setTimeStamp(e.getTimeStamp());
@@ -62,9 +62,7 @@ public class LineCreator {
                 lineIndicator.addLine(l);
             }
 
-            int lastBar = x;
-
-            callback.onLineIndicatorCreated(lineIndicator, lastBar, 0);
+            callback.onLineIndicatorCreated(lineIndicator);
         };
 
 
@@ -75,6 +73,6 @@ public class LineCreator {
     }
 
     public interface Callback {
-        void onLineIndicatorCreated(LineIndicator lineIndicator, int x, int y);
+        void onLineIndicatorCreated(LineIndicator lineIndicator);
     }
 }

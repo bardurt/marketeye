@@ -2,9 +2,7 @@ package com.zygne.chart.chart.menu.indicators.creators;
 
 import com.zygne.chart.chart.menu.indicators.VolumeProfileIndicator;
 import com.zygne.chart.chart.model.chart.VolumeProfileLine;
-import com.zygne.chart.chart.model.data.PriceBox;
-import com.zygne.chart.chart.model.data.Quote;
-import com.zygne.chart.chart.model.data.VolumeProfileGroup;
+import com.zygne.chart.chart.model.data.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +16,7 @@ public class VolumeProfileCreator {
     private long highestValue;
     private int y = 0;
 
-    public void create(Callback callback, List<Quote> quoteList, double scalar, int indicatorWidth, int x) {
+    public void create(Callback callback, List<VolumeSerie> quoteList, double scalar, int indicatorWidth, int x) {
 
         Runnable r = () -> {
 
@@ -26,14 +24,14 @@ public class VolumeProfileCreator {
 
             this.grouping = barHeight / scale;
 
-            if(grouping < 0.01){
+            if (grouping < 0.01) {
                 grouping = 0.01;
             }
 
-            Collections.sort(quoteList, new Quote.PriceComparator(Quote.PriceComparator.SORT_ORDER_HIGH));
+            Collections.sort(quoteList, new VolumeSerie.PriceComparator());
             Collections.reverse(quoteList);
-            double maxValue = (quoteList.get(0).getHigh() * 1.05);
-            double minValue = ((quoteList.get(quoteList.size() - 1)).getHigh());
+            double maxValue = (quoteList.get(0).getPrice() * 1.05);
+            double minValue = ((quoteList.get(quoteList.size() - 1)).getPrice());
 
 
             List<VolumeProfileGroup> volumeProfileGroups = new ArrayList<>();
@@ -51,12 +49,12 @@ public class VolumeProfileCreator {
 
 
             for (int i = 0; i < quoteList.size(); i++) {
-                Quote q = quoteList.get(i);
+                VolumeSerie q = quoteList.get(i);
 
                 for (int j = 0; j < volumeProfileGroups.size(); j++) {
                     VolumeProfileGroup g = volumeProfileGroups.get(j);
 
-                    if (g.getPriceBox().inside(q.getHigh())) {
+                    if (g.getPriceBox().inside(q.getPrice())) {
                         g.setVolume(g.getVolume() + q.getVolume());
                     }
                 }

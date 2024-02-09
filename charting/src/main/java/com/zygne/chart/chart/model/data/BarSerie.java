@@ -1,50 +1,86 @@
 package com.zygne.chart.chart.model.data;
 
-public abstract class BarSerie extends Serie {
+import java.util.Comparator;
 
-    protected double open;
-    protected double high;
-    protected double low;
-    protected double close;
-    protected long volume;
+public class BarSerie extends QuoteSerie {
 
-    public double getOpen() {
-        return open;
+    private double percentile;
+    private long volumeSma;
+    private double volumeSmaPercentile;
+
+    public double getPercentile() {
+        return percentile;
     }
 
-    public void setOpen(double open) {
-        this.open = open;
+    public void setPercentile(double percentile) {
+        this.percentile = percentile;
     }
 
-    public double getHigh() {
-        return high;
+    public long getVolumeSma() {
+        return volumeSma;
     }
 
-    public void setHigh(double high) {
-        this.high = high;
+    public void setVolumeSma(long volumeSma) {
+        this.volumeSma = volumeSma;
     }
 
-    public double getLow() {
-        return low;
+    public double getVolumeSmaPercentile() {
+        return volumeSmaPercentile;
     }
 
-    public void setLow(double low) {
-        this.low = low;
+    public void setVolumeSmaPercentile(double volumeSmaPercentile) {
+        this.volumeSmaPercentile = volumeSmaPercentile;
     }
 
-    public double getClose() {
-        return close;
+    public static final class VolumeComparator implements Comparator<BarSerie> {
+
+        @Override
+        public int compare(BarSerie o1, BarSerie o2) {
+            return Long.compare(o1.volume, o2.volume);
+        }
     }
 
-    public void setClose(double close) {
-        this.close = close;
+    public static final class PriceComparator implements Comparator<BarSerie> {
+
+        public static final int SORT_ORDER_OPEN = 1;
+        public static final int SORT_ORDER_HIGH = 2;
+        public static final int SORT_ORDER_LOW = 3;
+        public static final int SORT_ORDER_CLOSE = 4;
+
+        private int sortOrder = SORT_ORDER_CLOSE;
+
+        public PriceComparator() {
+        }
+
+        public PriceComparator(int sortOrder) {
+            this.sortOrder = sortOrder;
+        }
+
+        @Override
+        public int compare(BarSerie o1, BarSerie o2) {
+
+            if(sortOrder == SORT_ORDER_OPEN){
+                return Double.compare(o1.getOpen(), o2.getOpen());
+            } else if (sortOrder == SORT_ORDER_HIGH){
+                return Double.compare(o1.getHigh(), o2.getHigh());
+            } else if(sortOrder == SORT_ORDER_LOW){
+                return Double.compare(o1.getLow(), o2.getLow());
+            } else {
+                return Double.compare(o1.getClose(), o2.getClose());
+            }
+        }
     }
 
-    public long getVolume() {
-        return volume;
+    public static final class TimeComparator implements Comparator<BarSerie> {
+
+        @Override
+        public int compare(BarSerie o1, BarSerie o2) {
+            return Long.compare(o1.getTimeStamp(), o2.getTimeStamp());
+        }
     }
 
-    public void setVolume(long volume) {
-        this.volume = volume;
+    @Override
+    public String toString() {
+        return "O " + open + ",  H " + high + ", L " + low + ", C " + close;
     }
 }
