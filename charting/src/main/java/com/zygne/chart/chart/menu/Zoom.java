@@ -52,6 +52,12 @@ public class Zoom {
         this.callback = callback;
     }
 
+    public void reset(){
+        currentZoom = 10;
+        currentStretch = 10;
+        update();
+    }
+
     public void zoomIn() {
 
         if (currentZoom >= zoomScales.length - 1) {
@@ -60,7 +66,7 @@ public class Zoom {
         }
         currentZoom++;
 
-        getZoomLevel();
+        update();
     }
 
     public void zoomOut() {
@@ -71,45 +77,43 @@ public class Zoom {
         }
         currentZoom--;
 
-        getZoomLevel();
+        update();
     }
 
-    private void getZoomLevel() {
-        double level = zoomScales[currentZoom];
-        callback.onZoomLevelSet(level);
-    }
 
-    public void stretch(){
-        if(currentStretch >= stretchScale.length-1){
-            currentStretch = stretchScale.length-1;
+    public void stretch() {
+        if (currentStretch >= stretchScale.length - 1) {
+            currentStretch = stretchScale.length - 1;
             return;
         }
 
         currentStretch++;
 
-        getStretchLevel();
+        update();
     }
 
-    public void shrink(){
-        if(currentStretch <= 0){
+    public void shrink() {
+        if (currentStretch <= 0) {
             currentStretch = 0;
             return;
         }
 
         currentStretch--;
 
-        getStretchLevel();
+        update();
     }
 
-    private void getStretchLevel(){
-        double level = stretchScale[currentStretch];
-        System.out.println("Stretch " + level);
-        callback.onStretchSet(level);
+    private void update() {
+        double stretchLevel = stretchScale[currentStretch];
+        double zoomLevel = zoomScales[currentZoom];
+
+        callback.onZoomChanged(new ZoomDetails(zoomLevel, stretchLevel));
     }
 
     public interface Callback {
-        void onZoomLevelSet(double scalar);
-
-        void onStretchSet(double scalar);
+        void onZoomChanged(ZoomDetails zoomDetails);
     }
+
+    public record ZoomDetails(double zoomLevel, double stretchLevel){}
+
 }

@@ -1,8 +1,9 @@
 package com.zygne.client.swing.components.views;
 
-import com.zygne.chart.chart.charts.pricechart.PricePanel;
-import com.zygne.chart.chart.model.data.Quote;
+import com.zygne.chart.chart.charts.pricechart.PriceChart;
+import com.zygne.chart.chart.model.data.BarSerie;
 import com.zygne.chart.chart.model.data.Serie;
+import com.zygne.chart.chart.model.data.VolumeSerie;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.LiquidityLevel;
 
@@ -13,20 +14,20 @@ import java.util.List;
 
 public class PriceChartView extends JPanel {
 
-    private final PricePanel pricePanel = new PricePanel(this);
+    private final PriceChart pricePanel = new PriceChart();
 
     public PriceChartView() {
         setLayout(new BorderLayout());
         add(pricePanel, BorderLayout.CENTER);
     }
 
-    public void addData(List<Histogram> data, String symbol) {
+    public void addData(List<Histogram> data, List<LiquidityLevel> levels, String symbol) {
 
         List<Serie> quoteList = new ArrayList<>();
 
         for (Histogram e : data) {
 
-            Quote quote = new Quote();
+            BarSerie quote = new BarSerie();
             quote.setHigh(e.high);
             quote.setOpen(e.open);
             quote.setLow(e.low);
@@ -40,22 +41,21 @@ public class PriceChartView extends JPanel {
 
         List<List<Serie>> series = new ArrayList<>();
         series.add(quoteList);
-        pricePanel.addSeries(series);
-        pricePanel.addWaterMark(symbol);
-    }
 
-    public void addVolumeProfile(List<LiquidityLevel> levels) {
-        List<Quote> volumeProfileList = new ArrayList<>();
+        List<Serie> volumeProfileList = new ArrayList<>();
 
         for (LiquidityLevel e : levels) {
 
-            Quote quote = new Quote();
-            quote.setHigh(e.price);
+            VolumeSerie quote = new VolumeSerie();
+            quote.setPrice(e.price);
             quote.setVolume(e.getVolume());
-            quote.setPercentile(e.getPercentile());
             volumeProfileList.add(quote);
         }
-        pricePanel.addVolumeProfile(volumeProfileList);
 
+        series.add(volumeProfileList);
+
+        pricePanel.setSeries(series);
+        pricePanel.setWaterMark(symbol);
     }
+
 }

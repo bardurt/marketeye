@@ -52,14 +52,11 @@ public class FuturesView extends JPanel {
         constraints.gridx = 1;
         constraints.gridy = 1;
         optionsPanel.add(dualChart, constraints);
-        dualChart.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == 2) {
-                    callback.toggleDualChart(false);
-                } else {
-                    callback.toggleDualChart(true);
-                }
+        dualChart.addItemListener(e -> {
+            if (e.getStateChange() == 2) {
+                callback.toggleDualChart(false);
+            } else {
+                callback.toggleDualChart(true);
             }
         });
 

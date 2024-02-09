@@ -1,7 +1,7 @@
 package com.zygne.client.swing.components.views;
 
-import com.zygne.chart.chart.charts.linechart.LinePanel;
-import com.zygne.chart.chart.model.data.LineData;
+import com.zygne.chart.chart.charts.linechart.LineChart;
+import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;
 import com.zygne.data.domain.model.Tendency;
 import com.zygne.data.domain.model.TendencyReport;
@@ -26,7 +26,7 @@ public class LineChart2 extends JPanel {
             List<Serie> quoteList = new ArrayList<>();
             for (int i = 0; i < t.data.size(); i++) {
 
-                LineData item = new LineData();
+                LineSerie item = new LineSerie();
                 item.setY(t.data.get(i).value);
                 item.setTimeStamp(t.data.get(i).timeStamp);
                 item.setName(name);
@@ -35,9 +35,9 @@ public class LineChart2 extends JPanel {
             dataset.add(quoteList);
         }
 
-        LinePanel linePanel = new LinePanel(this);
-        linePanel.addTitle(symbol);
-        linePanel.addSeries(dataset);
+        LineChart linePanel = new LineChart();
+        linePanel.setTitle(symbol);
+        linePanel.setSeries(dataset);
 
         add(linePanel);
         invalidate();

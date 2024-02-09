@@ -36,10 +36,8 @@ public class TendencyTab extends JPanel implements FuturesView.Callback {
         chartPanel = new JPanel(new GridLayout(0, 1));
         chartPanel.add(singleChartView);
 
-
         add(reportView, BorderLayout.NORTH);
         add(chartPanel, BorderLayout.CENTER);
-
     }
 
     public void setAssets(List<Asset> data) {
@@ -67,9 +65,6 @@ public class TendencyTab extends JPanel implements FuturesView.Callback {
             chartPanel.add(singleChartView);
         }
 
-        invalidate();
-        validate();
-        repaint();
     }
 
     @Override
@@ -90,9 +85,6 @@ public class TendencyTab extends JPanel implements FuturesView.Callback {
         } else {
             singleChartView.addTendency(symbol, tendencyReport);
         }
-
-        invalidate();
-        repaint();
     }
 
     public interface Callback {
