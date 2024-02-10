@@ -8,6 +8,11 @@ A small application that fetches data from Yahoo Finance and allows the user to 
 The application uses compiled data for <b>Commitments of Traders (COT)</b> from <b>Commodity Futures Trading Commission (CFTC)</b>, the compiled COT data comes from this project : https://github.com/bardurt/cftccot
 
 ### Preview
-![alt text](https://github.com/bardurt/stockanalyser/blob/master/images/preview_1.png)
+#### Chart
+![Chart](https://github.com/bardurt/stockanalyser/blob/master/images/preview_1.png)
 
-![alt text](https://github.com/bardurt/stockanalyser/blob/master/images/preview_2.png)
+#### Seasonality
+![Seasonality](https://github.com/bardurt/stockanalyser/blob/master/images/preview_2.png)
+
+#### Commitment of Traders
+![Commitment of Traders](https://github.com/bardurt/stockanalyser/blob/master/images/preview_3.png)
