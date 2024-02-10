@@ -1,4 +1,6 @@
 # MarketEye
+
+![logo](https://github.com/bardurt/marketeye/blob/master/client/src/main/resources/icon.png)
 ### About
 A small application that fetches data from Yahoo Finance and allows the user to visualize the price chart, and, fetch the seasonal tendency for a given market.
 
