@@ -1,9 +1,9 @@
 package com.zygne.data.presentation.presenter.implementation.flow;
 
 import com.zygne.data.domain.DataBroker;
+import com.zygne.data.domain.FinanceData;
 import com.zygne.data.domain.interactor.implementation.data.*;
 import com.zygne.data.domain.interactor.implementation.data.base.*;
-import com.zygne.data.domain.interactor.implementation.data.io.*;
 import com.zygne.data.domain.model.BarData;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.arch.domain.Logger;
@@ -16,14 +16,11 @@ import java.util.List;
 public class DataFlow implements DataFetchInteractor.Callback,
         HistogramInteractor.Callback {
 
-
     private final Callback callback;
     private final Executor executor;
     private final MainThread mainThread;
-    private Logger logger;
-    private String ticker;
+    private final Logger logger;
     private final List<BarData> downloadedData = new ArrayList<>();
-
 
     public DataFlow(Executor executor, MainThread mainThread, Callback callback, Logger logger) {
         this.callback = callback;
@@ -33,17 +30,16 @@ public class DataFlow implements DataFetchInteractor.Callback,
     }
 
     public void fetchData(DataBroker dataBroker, String ticker, int years) {
-        this.ticker = ticker;
         this.downloadedData.clear();
-
         logger.log(Logger.LOG_LEVEL.INFO, "Download data for " + ticker.toUpperCase());
         new DataFetchInteractorImpl(executor, mainThread, this, ticker, years, dataBroker).execute();
     }
 
-
     @Override
-    public void onDataFetched(List<BarData> entries, String timestamp) {
-        downloadedData.addAll(entries);
+    public void onDataFetched(List<FinanceData> entries) {
+        for (FinanceData e : entries) {
+            downloadedData.add((BarData) e);
+        }
         logger.log(Logger.LOG_LEVEL.INFO, "Generating histogram");
         new HistogramInteractorImpl(executor, mainThread, this, downloadedData).execute();
     }
@@ -51,10 +47,6 @@ public class DataFlow implements DataFetchInteractor.Callback,
     @Override
     public void onDataFetchError(String message) {
         callback.onDataError();
-    }
-
-    @Override
-    public void onStatusUpdate(String message) {
     }
 
     @Override
@@ -66,7 +58,6 @@ public class DataFlow implements DataFetchInteractor.Callback,
 
     public interface Callback {
         void onDataFetched(List<Histogram> data, String time);
-
         void onDataError();
     }
 }

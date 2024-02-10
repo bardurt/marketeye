@@ -9,6 +9,5 @@ public final class Colors {
     public static final String YELLOW = "#C3C33F";
     public static final String ORANGE = "#D9B333";
 
-
     private Colors(){}
 }

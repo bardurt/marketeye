@@ -21,25 +21,23 @@ public class TendencyPresenterImpl extends BasePresenter implements
         DataFlow.Callback,
         TendencyInteractor.Callback {
 
-    private View view;
-    private DataFlow dataFlow;
+    private final View view;
+    private final DataFlow dataFlow;
     private final Logger logger;
     private final DataBroker dataBroker;
-
 
     public TendencyPresenterImpl(Executor executor, MainThread mainThread, View view, Logger logger) {
         super(executor, mainThread);
         this.view = view;
         this.logger = logger;
         this.dataBroker = new YahooDataBroker(logger);
-        setUp();
         this.dataFlow = new DataFlow(executor, mainThread, this, logger);
+        setUp();
     }
 
     private void setUp() {
         List<Asset> assets = new ArrayList<>(Assets.assetList);
         view.onTendencyAssetsPrepared(assets, 0);
-
     }
 
     @Override

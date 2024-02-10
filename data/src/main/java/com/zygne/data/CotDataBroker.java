@@ -1,9 +1,9 @@
 package com.zygne.data;
 
+import com.zygne.arch.domain.Logger;
 import com.zygne.data.domain.DataBroker;
 import com.zygne.data.domain.FinanceData;
-import com.zygne.data.domain.model.BarData;
-import com.zygne.arch.domain.Logger;
+import com.zygne.data.domain.model.CotData;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,15 +11,14 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-public class YahooDataBroker implements DataBroker {
+public class CotDataBroker implements DataBroker {
 
     private Callback callback;
     private final Logger logger;
 
-    public YahooDataBroker(Logger logger) {
+    public CotDataBroker(Logger logger) {
         this.logger = logger;
     }
 
@@ -28,23 +27,11 @@ public class YahooDataBroker implements DataBroker {
 
         logger.log(Logger.LOG_LEVEL.INFO, symbol + " " + yearsBack + " years");
 
-        Calendar calendar = Calendar.getInstance();
-        String timeEnd = "" + (calendar.getTime().getTime() / 1000);
-
-        calendar.add(Calendar.YEAR, yearsBack * -1);
-        calendar.set(Calendar.MONTH, 0);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-
-        String timeStart = "" + (calendar.getTime().getTime() / 1000);
-
-        String time = "1d";
-
-        String url = "https://query1.finance.yahoo.com/v7/finance/download/" + symbol + "?period1=" + timeStart + "&period2=" + timeEnd + "&interval=" + time + "&events=history&includeAdjustedClose=true";
-        System.out.println(url);
+        System.out.println(symbol);
         logger.log(Logger.LOG_LEVEL.INFO, "Downloading data for " + symbol);
 
         Thread t = new Thread(() -> {
-            List<FinanceData> data = downLoadTimeSeries(url);
+            List<FinanceData> data = downloadData(symbol);
             if (callback != null) {
                 callback.onDataFinished(data);
             }
@@ -53,7 +40,7 @@ public class YahooDataBroker implements DataBroker {
         t.start();
     }
 
-    private List<FinanceData> downLoadTimeSeries(String url) {
+    private List<FinanceData> downloadData(String url) {
 
         List<FinanceData> lines = new ArrayList<>();
 
@@ -63,7 +50,6 @@ public class YahooDataBroker implements DataBroker {
         try {
             URL content = new URL(url);
 
-            // establish connection to file in URL
             urlConnection = content.openConnection();
 
             inputStreamReader = new InputStreamReader(urlConnection.getInputStream());
@@ -73,12 +59,8 @@ public class YahooDataBroker implements DataBroker {
             String line;
 
             while ((line = bufferedReader.readLine()) != null) {
-
-                BarData barData = BarData.fromStream(line);
-                if (barData != null) {
-                    lines.add(barData);
-                }
-
+                CotData d = CotData.fromStream(line);
+                lines.add(d);
             }
 
         } catch (Exception e) {
@@ -112,6 +94,33 @@ public class YahooDataBroker implements DataBroker {
     @Override
     public void removeCallback() {
         this.callback = null;
+    }
+
+    public static void main(String[] args) {
+
+        CotDataBroker cotDataBroker = new CotDataBroker(new Logger() {
+            @Override
+            public void shutDown() {
+
+            }
+
+            @Override
+            public void setUp() {
+
+            }
+
+            @Override
+            public void log(LOG_LEVEL level, String message) {
+                System.out.println(message);
+            }
+
+            @Override
+            public void clear() {
+
+            }
+        });
+
+        cotDataBroker.downloadData("", 1);
     }
 
 }

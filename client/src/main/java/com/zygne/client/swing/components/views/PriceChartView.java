@@ -1,7 +1,7 @@
 package com.zygne.client.swing.components.views;
 
 import com.zygne.chart.chart.charts.pricechart.PriceChart;
-import com.zygne.chart.chart.model.data.BarSerie;
+import com.zygne.chart.chart.model.data.CandleSerie;
 import com.zygne.chart.chart.model.data.Serie;
 import com.zygne.chart.chart.model.data.VolumeSerie;
 import com.zygne.data.domain.model.Histogram;
@@ -27,7 +27,7 @@ public class PriceChartView extends JPanel {
 
         for (Histogram e : data) {
 
-            BarSerie quote = new BarSerie();
+            CandleSerie quote = new CandleSerie();
             quote.setHigh(e.high);
             quote.setOpen(e.open);
             quote.setLow(e.low);

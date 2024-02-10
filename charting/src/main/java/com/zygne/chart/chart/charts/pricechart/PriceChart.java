@@ -2,26 +2,21 @@ package com.zygne.chart.chart.charts.pricechart;
 
 import com.zygne.chart.chart.Chart;
 import com.zygne.chart.chart.RendererImpl;
-import com.zygne.chart.chart.charts.linechart.LineChart;
 import com.zygne.chart.chart.menu.*;
 import com.zygne.chart.chart.menu.indicators.*;
 import com.zygne.chart.chart.menu.indicators.creators.*;
 import com.zygne.chart.chart.model.chart.*;
 import com.zygne.chart.chart.Canvas;
-import com.zygne.chart.chart.model.data.BarSerie;
+import com.zygne.chart.chart.model.data.CandleSerie;
 import com.zygne.chart.chart.model.data.Serie;
 import com.zygne.chart.chart.model.data.VolumeSerie;
-import com.zygne.chart.chart.util.ZoomHelper;
 
 import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PriceChart extends JPanel implements Chart,
-        OptionsMenu.Listener,
         CandleSticksCreator.Callback,
         VolumeProfileCreator.Callback,
         VolumeIndicatorCreator.Callback,
@@ -37,7 +32,7 @@ public class PriceChart extends JPanel implements Chart,
 
     private int loadY;
 
-    private final List<BarSerie> bars = new ArrayList<>();
+    private final List<CandleSerie> bars = new ArrayList<>();
     private final List<VolumeSerie> volumeProfile = new ArrayList<>();
 
     private int canvasHeight = DEFAULT_HEIGHT;
@@ -132,20 +127,20 @@ public class PriceChart extends JPanel implements Chart,
         reset();
         List<Serie> bars = series.get(0);
 
-        if (!(bars.get(0) instanceof BarSerie)) {
-            throw new RuntimeException("Series items at [0] should be of type " + BarSerie.class.getName());
+        if (!(bars.get(0) instanceof CandleSerie)) {
+            throw new RuntimeException("Series items at [0] should be of type " + CandleSerie.class.getName());
         }
 
-        List<BarSerie> quotes = new ArrayList<>();
+        List<CandleSerie> quotes = new ArrayList<>();
 
         for (Serie s : bars) {
-            quotes.add((BarSerie) s);
+            quotes.add((CandleSerie) s);
         }
 
 
         this.bars.clear();
         this.bars.addAll(quotes);
-        this.bars.sort(new BarSerie.TimeComparator());
+        this.bars.sort(new CandleSerie.TimeComparator());
 
         if (series.size() == 2) {
             List<Serie> volumeProfileItems = series.get(1);
@@ -222,14 +217,6 @@ public class PriceChart extends JPanel implements Chart,
     public void setTitle(String title) {
         this.titleText = title;
         topBar.setLabelText(title + " " + percentile + "%");
-    }
-
-
-    @Override
-    public void onOptionsSelected(OptionsMenu.OptionItem options) {
-        if (options == OptionsMenu.OptionItem.CENTER_CHART) {
-            centerCamera();
-        }
     }
 
     private void updateIndicators() {

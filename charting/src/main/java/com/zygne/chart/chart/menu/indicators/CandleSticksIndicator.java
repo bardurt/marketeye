@@ -8,7 +8,7 @@ import java.util.List;
 
 public class CandleSticksIndicator extends Object2d {
 
-    private List<CandleStick> candleSticks;
+    private final List<CandleStick> candleSticks;
 
     public CandleSticksIndicator(List<CandleStick> candleSticks) {
         this.candleSticks = candleSticks;
@@ -16,10 +16,6 @@ public class CandleSticksIndicator extends Object2d {
 
     public List<CandleStick> getCandleSticks() {
         return candleSticks;
-    }
-
-    public void setCandleSticks(List<CandleStick> candleSticks) {
-        this.candleSticks = candleSticks;
     }
 
     @Override

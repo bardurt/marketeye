@@ -1,29 +1,85 @@
 package com.zygne.data.presentation.presenter.implementation;
 
+import com.zygne.data.YahooDataBroker;
+import com.zygne.data.domain.DataBroker;
+import com.zygne.data.domain.interactor.implementation.data.base.VolumePriceInteractor;
+import com.zygne.data.domain.model.Histogram;
+import com.zygne.data.domain.model.LiquidityLevel;
 import com.zygne.data.presentation.presenter.base.MainPresenter;
-import com.zygne.data.presentation.presenter.implementation.delegates.YahooFinanceDelegate;
 import com.zygne.arch.domain.Logger;
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
 import com.zygne.arch.presentation.presenter.base.BasePresenter;
+import com.zygne.data.presentation.presenter.implementation.flow.DataFlow;
+import com.zygne.data.presentation.presenter.implementation.flow.SupplyFlow;
 
-public class MainPresenterImpl extends BasePresenter implements MainPresenter {
+import java.util.List;
 
-    private final MainPresenter delegate;
-    private final Logger logger;
+public class MainPresenterImpl extends BasePresenter implements MainPresenter,
+        SupplyFlow.Callback,
+        DataFlow.Callback {
+
+    private final DataBroker dataBroker;
+    private final View view;
+    private String ticker;
+    private List<Histogram> histogramList;
+    private boolean downloadingData = false;
+    private final DataFlow dataFlow;
+    private final SupplyFlow supplyFlow;
+    private String dateRange = "";
 
     public MainPresenterImpl(Executor executor, MainThread mainThread, MainPresenter.View view, Logger logger) {
         super(executor, mainThread);
         this.mainThread = mainThread;
-        this.logger = logger;
+        this.dataBroker = new YahooDataBroker(logger);
+        this.view = view;
+        this.view.showError("");
+        this.supplyFlow = new SupplyFlow(executor, mainThread, this);
+        this.dataFlow = new DataFlow(executor, mainThread, this, logger);
 
-        delegate = new YahooFinanceDelegate(executor, mainThread, view, logger);
+        view.prepareView();
     }
 
     @Override
     public void createReport(String ticker) {
-        ticker = ticker.replaceAll("\\s+", "");
-        logger.clear();
-        delegate.createReport(ticker);
+
+        if (downloadingData) {
+            return;
+        }
+
+        if (ticker.isEmpty()) {
+            view.showError("No Symbol name!");
+            return;
+        }
+
+        downloadingData = true;
+        this.ticker = ticker.replaceAll("\\s+", "");
+
+        view.showError("");
+
+        view.showLoading("Fetching data for " + ticker.toUpperCase() + "");
+
+        dataFlow.fetchData(dataBroker, ticker, 5);
+    }
+
+    @Override
+    public void onSupplyCompleted(List<LiquidityLevel> liquidityLevels) {
+        downloadingData = false;
+        view.hideLoading();
+        view.onComplete(histogramList, liquidityLevels, ticker, dateRange);
+    }
+
+    @Override
+    public void onDataFetched(List<Histogram> data, String time) {
+        this.dateRange = time;
+        this.histogramList = data;
+        supplyFlow.start(data, VolumePriceInteractor.PriceStructure.OHLCM);
+    }
+
+    @Override
+    public void onDataError() {
+        view.hideLoading();
+        view.showError("Unable to fetch data");
+        downloadingData = false;
     }
 }

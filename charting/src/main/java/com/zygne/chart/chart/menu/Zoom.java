@@ -71,7 +71,7 @@ public class Zoom {
 
     public void zoomOut() {
 
-        if (currentZoom < 0) {
+        if (currentZoom <= 0) {
             currentZoom = 0;
             return;
         }
@@ -79,7 +79,6 @@ public class Zoom {
 
         update();
     }
-
 
     public void stretch() {
         if (currentStretch >= stretchScale.length - 1) {

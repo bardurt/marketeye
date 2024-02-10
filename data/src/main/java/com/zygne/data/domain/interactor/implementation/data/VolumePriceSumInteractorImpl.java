@@ -34,10 +34,8 @@ public class VolumePriceSumInteractorImpl extends BaseInteractor implements Volu
 
             if (map.get(tag) != null) {
                 map.get(tag).totalSize += e.getSize();
-                map.get(tag).hits += 1;
             } else {
                 VolumePriceSum vps = new VolumePriceSum(e.getPrice(), e.getSize());
-                vps.hits = 1;
                 map.put(tag, vps);
             }
         }

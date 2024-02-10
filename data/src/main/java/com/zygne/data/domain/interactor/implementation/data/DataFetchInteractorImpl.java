@@ -1,6 +1,7 @@
-package com.zygne.data.domain.interactor.implementation.data.io;
+package com.zygne.data.domain.interactor.implementation.data;
 
 import com.zygne.data.domain.DataBroker;
+import com.zygne.data.domain.FinanceData;
 import com.zygne.data.domain.interactor.implementation.data.base.DataFetchInteractor;
 import com.zygne.data.domain.model.BarData;
 import com.zygne.arch.domain.executor.Executor;
@@ -10,13 +11,13 @@ import com.zygne.arch.domain.interactor.base.BaseInteractor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataFetchInteractorImpl extends BaseInteractor implements DataFetchInteractor, DataBroker.Callback  {
+public class DataFetchInteractorImpl extends BaseInteractor implements DataFetchInteractor, DataBroker.Callback {
 
     private final Callback callback;
     private final String symbol;
     private final int years;
     private final DataBroker dataBroker;
-    private final List<BarData> data;
+    private final List<FinanceData> data;
 
     public DataFetchInteractorImpl(Executor executor, MainThread mainThread, Callback callback, String symbol, int yearsToFetch, DataBroker dataBroker) {
         super(executor, mainThread);
@@ -30,18 +31,21 @@ public class DataFetchInteractorImpl extends BaseInteractor implements DataFetch
     @Override
     public void run() {
         dataBroker.setCallback(this);
-        dataBroker.downloadHistoricalBarData(symbol, years);
+        dataBroker.downloadData(symbol, years);
     }
 
     @Override
-    public void onDataFinished(List<BarData> data) {
+    public void onDataFinished(List<FinanceData> data) {
         dataBroker.removeCallback();
-        if(data.isEmpty()){
+        if (data.isEmpty()) {
             mainThread.post(() -> callback.onDataFetchError("No data found for " + symbol));
             return;
         }
-        this.data.addAll(data);
-        String timeStamp = data.get(data.size()-1).getTime();
-        mainThread.post(() -> callback.onDataFetched(data, timeStamp));
+
+        for (FinanceData d : data) {
+            this.data.add((BarData) d);
+        }
+
+        mainThread.post(() -> callback.onDataFetched(this.data));
     }
 }

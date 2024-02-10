@@ -2,18 +2,6 @@ package com.zygne.client.swing;
 
 public class StringUtils {
 
-    public static String repeat(String value, int count){
-        if(count <= 0){
-            return value;
-        }
-
-        if(value.isEmpty()){
-            return value;
-        }
-
-        return value.repeat(count);
-    }
-
     public static String repeatAndPad(String value, int count, int maxCount){
         if(count <= 0){
             return value;

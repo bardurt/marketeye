@@ -1,6 +1,7 @@
 package com.zygne.client.swing;
 
 import com.zygne.client.ProjectProps;
+import com.zygne.client.swing.components.tabs.CotTab;
 import com.zygne.client.swing.components.tabs.SettingsTab;
 import com.zygne.client.swing.components.views.LoadingView;
 import com.zygne.client.swing.components.UiLogger;
@@ -19,24 +20,21 @@ import java.util.List;
 
 public class SwingGui extends JPanel implements MainPresenter.View,
         SettingsTab.Callback,
-        ChartPresenter.View,
         TendencyTab.Callback,
-        TendencyPresenter.View {
-
-    private final ResourceLoader resourceLoader = new ResourceLoader();
+        TendencyPresenter.View,
+        CotPresenter.View {
 
     private final JLabel labelStatus;
     private final JLabel labelLoading;
     private final LoadingView loadingView;
 
-    private String symbol;
-
     private final MainPresenter mainPresenter;
-    private final ChartPresenter chartPresenter;
     private final TendencyPresenter tendencyPresenter;
+    private final CotPresenter cotPresenter;
 
     private final SettingsTab settingsTab;
     private final TendencyTab tendencyTab;
+    private final CotTab cotTab;
 
     private final JTabbedPane tabbedPane;
 
@@ -47,8 +45,10 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
         settingsTab = new SettingsTab(this);
         tendencyTab = new TendencyTab(this);
+        cotTab = new CotTab();
 
         tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Settings", settingsTab);
         tabbedPane.addTab("Settings", settingsTab);
 
         JPanel infoPanel = new JPanel(new GridBagLayout());
@@ -65,7 +65,6 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         loadingPanel.add(loadingView, BorderLayout.CENTER);
 
         constraints.gridy = 1;
-        constraints.gridx = 0;
         infoPanel.add(loadingView, constraints);
 
         add(infoPanel, BorderLayout.NORTH);
@@ -83,21 +82,16 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
         MainThread mainThread = new JavaSwingThread();
         Executor executor = ThreadExecutor.getInstance();
-        chartPresenter = new ChartPresenterImpl(executor, mainThread, this, logger);
         tendencyPresenter = new TendencyPresenterImpl(executor, mainThread, this, logger);
         mainPresenter = new MainPresenterImpl(executor, mainThread, this, logger);
+        cotPresenter = new CotPresenterImpl(executor, mainThread, this, logger);
     }
 
     @Override
-    public void onSupplyCreated(List<LiquidityLevel> filtered, List<LiquidityLevel> raw) {
-        chartPresenter.setSupply(raw);
-    }
-
-    @Override
-    public void onComplete(String symbol, String dateRange) {
-        this.symbol = symbol;
+    public void onComplete(List<Histogram> histograms, List<LiquidityLevel> liquidityLevels, String symbol, String dateRange) {
         labelStatus.setText("");
         labelLoading.setText("");
+        settingsTab.priceChartView.addData(histograms, liquidityLevels, symbol.toUpperCase());
     }
 
     @Override
@@ -118,7 +112,6 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     @Override
     public void generateReport(String symbol) {
         if (mainPresenter != null) {
-            this.symbol = symbol.toUpperCase();
             mainPresenter.createReport(symbol);
         }
     }
@@ -128,32 +121,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         tabbedPane.removeAll();
         tabbedPane.addTab("Price Chart", settingsTab);
         tabbedPane.addTab("Seasonality", tendencyTab);
-    }
-
-    @Override
-    public void onHistogramCreated(List<Histogram> histograms) {
-        chartPresenter.setHistograms(histograms);
-    }
-
-    public void launch() {
-        JFrame frame = new JFrame(ProjectProps.readProperty("name"));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new SwingGui());
-        Image image = resourceLoader.loadImage("icon.png");
-        if (image != null) {
-            frame.setIconImage(image);
-        }
-        frame.getContentPane().setPreferredSize(new Dimension(1024, 512));
-        frame.pack();
-        frame.setVisible(true);
-    }
-
-    @Override
-    public void onChartReady(List<Histogram> histograms, List<LiquidityLevel> liquidityLevels) {
-        settingsTab.priceChartView.addData(histograms, liquidityLevels, symbol.toUpperCase());
-        loadingView.hideLoading();
-        labelStatus.setText("");
-        labelLoading.setText("");
+        tabbedPane.addTab("CFTC COT", cotTab);
     }
 
     @Override
@@ -164,10 +132,26 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     @Override
     public void generateTendency(String symbol) {
         tendencyPresenter.createTendency(symbol);
+        cotPresenter.createReport(symbol);
     }
 
     @Override
     public void onTendencyReportCreated(TendencyReport tendencyReport) {
         tendencyTab.addTendency(tendencyReport);
+    }
+
+
+    @Override
+    public void onCotDataReady(List<CotData> cotData) {
+        cotTab.setCotData(cotData);
+    }
+
+    public void launch() {
+        JFrame frame = new JFrame(ProjectProps.readProperty("name"));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(new SwingGui());
+        frame.getContentPane().setPreferredSize(new Dimension(1024, 512));
+        frame.pack();
+        frame.setVisible(true);
     }
 }

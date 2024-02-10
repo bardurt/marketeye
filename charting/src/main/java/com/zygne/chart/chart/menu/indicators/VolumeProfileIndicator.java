@@ -16,11 +16,7 @@ public class VolumeProfileIndicator extends Object2d {
 
     @Override
     public void draw(Canvas canvas) {
-
-        int i = 0;
         for(VolumeProfileLine e : volumeProfileLines){
-
-            i++;
             e.draw(canvas);
         }
     }

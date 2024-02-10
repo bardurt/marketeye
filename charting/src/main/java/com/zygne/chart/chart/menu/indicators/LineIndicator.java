@@ -7,7 +7,6 @@ import com.zygne.chart.chart.model.chart.Object2d;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class LineIndicator extends Object2d {
 
     private static final int MAX_SIZE = 5;
