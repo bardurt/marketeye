@@ -6,7 +6,6 @@ import com.zygne.chart.chart.model.chart.TextObject;
 
 public class TopBar extends BoxContainer {
 
-    private int statusBarHeight = 25;
     private TextObject statusText;
     private TextObject labelText;
 
@@ -28,6 +27,7 @@ public class TopBar extends BoxContainer {
         int canvasWidth = width;
 
         canvas.setColor("#000000");
+        int statusBarHeight = 25;
         canvas.drawRectangle(0, 0, canvasWidth, statusBarHeight, Canvas.Fill.SOLID);
 
         canvas.setColor("#FFFFFF");

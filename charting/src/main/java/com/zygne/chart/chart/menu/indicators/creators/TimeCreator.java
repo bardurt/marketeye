@@ -2,6 +2,7 @@ package com.zygne.chart.chart.menu.indicators.creators;
 
 import com.zygne.chart.chart.menu.indicators.TimeIndicator;
 import com.zygne.chart.chart.model.chart.*;
+import com.zygne.chart.chart.model.data.BarSerie;
 import com.zygne.chart.chart.model.data.TimeBox;
 
 import java.util.ArrayList;
@@ -115,6 +116,65 @@ public class TimeCreator {
 
     }
 
+    public void create(Callback callback, List<Bar> barSeries, int y, int height, int barWidth) {
+
+        Runnable r = () -> {
+
+            TimeBox timeBox = new TimeBox(barSeries.get(0).getTimeStamp());
+            TimeBar timeBar = new TimeBar();
+            timeBar.setX(barSeries.get(0).getX());
+            timeBar.setY(y - height);
+            timeBar.setText(timeBox.getDayString() + "\n" + timeBox.getMonthName(), TextObject.FontSize.SMALL);
+            timeBar.setHeight(height);
+            timeBar.setWidth(barWidth);
+
+            List<TimeBar> timeBarList = new ArrayList<>();
+
+            int count = 1;
+            int whenToAdd = 5;
+
+            System.out.println("Barwidth = " + barWidth);
+            if (barWidth < 7) {
+                whenToAdd = 7;
+            } else if (barWidth < 10) {
+                whenToAdd = 6;
+            } else if (barWidth < 20) {
+                whenToAdd = 3;
+            } else if (barWidth > 25) {
+                whenToAdd = 2;
+            }
+
+            for (int i = 1; i < barSeries.size(); i++) {
+
+                Bar bar = barSeries.get(i);
+                timeBar.setWidth(barWidth);
+
+                count++;
+                if (count >= whenToAdd) {
+                    timeBarList.add(timeBar);
+                    count = 0;
+                }
+
+                timeBox = new TimeBox(bar.getTimeStamp());
+                timeBar = new TimeBar();
+                timeBar.setX(bar.getX());
+                timeBar.setY(y - height);
+                timeBar.setText(timeBox.getDayString() + "/" +timeBox.getMonthString() + "\n" + timeBox.getYear(), TextObject.FontSize.SMALL);
+                timeBar.setHeight(height);
+            }
+
+            TimeIndicator timeIndicator = new TimeIndicator(timeBarList);
+            timeIndicator.setzOrder(3);
+            callback.onTimeIndicatorCreated(timeIndicator);
+
+        };
+
+
+        Thread t = new Thread(r);
+
+        t.start();
+
+    }
 
     public interface Callback {
         void onTimeIndicatorCreated(TimeIndicator timeIndicator);

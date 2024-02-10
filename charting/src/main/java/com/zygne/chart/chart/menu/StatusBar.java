@@ -35,8 +35,6 @@ public class StatusBar extends BoxContainer {
         label.setText("Vol :");
         label.draw(canvas);
 
-        int chartWith = canvasWidth;
-
         double increment = 0.25;
         double scalar = 0.25;
 
@@ -46,7 +44,7 @@ public class StatusBar extends BoxContainer {
         canvas.drawLine(labelWidth, 0, labelWidth, statusBarTop, Canvas.LineStyle.DASHED, Canvas.LineWidth.SMALL);
         while (index < 3){
             TextObject textObject = new TextObject();
-            int x = (int) (labelWidth + ((chartWith- labelWidth) * scalar));
+            int x = (int) (labelWidth + ((canvasWidth - labelWidth) * scalar));
             textObject.setX(x);
             textObject.setY(statusBarMid);
             textObject.setText(String.format("%,d", (long) (highestValue * scalar)));

@@ -1,13 +1,18 @@
-package com.zygne.chart.chart.charts.linechart;
+package com.zygne.chart.chart.charts.bar;
 
 import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.Chart;
 import com.zygne.chart.chart.RendererImpl;
-import com.zygne.chart.chart.menu.*;
-import com.zygne.chart.chart.menu.indicators.*;
-import com.zygne.chart.chart.menu.indicators.creators.*;
+import com.zygne.chart.chart.menu.ChartControls;
+import com.zygne.chart.chart.menu.PriceScale;
+import com.zygne.chart.chart.menu.StatusBar;
+import com.zygne.chart.chart.menu.Zoom;
+import com.zygne.chart.chart.menu.indicators.BarIndicator;
+import com.zygne.chart.chart.menu.indicators.TimeIndicator;
+import com.zygne.chart.chart.menu.indicators.creators.BarIndicatorCreator;
+import com.zygne.chart.chart.menu.indicators.creators.TimeCreator;
 import com.zygne.chart.chart.model.chart.*;
-import com.zygne.chart.chart.model.data.LineSerie;
+import com.zygne.chart.chart.model.data.BarSerie;
 import com.zygne.chart.chart.model.data.Serie;
 
 import javax.swing.*;
@@ -15,18 +20,18 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LineChart extends JPanel implements Chart,
-        LineCreator.Callback,
+public class BarChart extends JPanel implements Chart,
+        BarIndicatorCreator.Callback,
         TimeCreator.Callback,
         Zoom.Callback,
-        ChartControls.Callback{
+        ChartControls.Callback {
 
     private static final int DEFAULT_HEIGHT = 640;
     private static final int DEFAULT_WIDTH = 720;
     private double scale = 20;
     private int barWidth = 12;
 
-    private final List<List<Serie>> lineData = new ArrayList<>();
+    private final List<Serie> barData = new ArrayList<>();
 
     private int canvasHeight = DEFAULT_HEIGHT;
     private int canvasWidth = DEFAULT_WIDTH;
@@ -37,12 +42,11 @@ public class LineChart extends JPanel implements Chart,
     private final RendererImpl renderer;
     private final Zoom zoom;
 
-    private LineIndicator lineIndicator = null;
+    private BarIndicator barIndicator = null;
     private TimeIndicator timeIndicator = null;
-    private final List<TextObject> seriesNames = new ArrayList<>();
     private final PriceScale priceScale = new PriceScale();
 
-    public LineChart() {
+    public BarChart() {
         this.camera = new Camera(0, 0);
         this.camera.setX(0);
         this.camera.setY(0);
@@ -90,14 +94,14 @@ public class LineChart extends JPanel implements Chart,
         }
 
         for (List<Serie> items : series) {
-            if (!(items.get(0) instanceof LineSerie)) {
-                throw new RuntimeException("Chart only works with " + LineSerie.class.getName());
+            if (!(items.get(0) instanceof BarSerie)) {
+                throw new RuntimeException("Chart only works with " + BarSerie.class.getName());
             }
         }
 
         reset();
-        this.lineData.clear();
-        this.lineData.addAll(series);
+        this.barData.clear();
+        this.barData.addAll(series.get(0));
         createChartData();
 
         zoom.reset();
@@ -128,16 +132,11 @@ public class LineChart extends JPanel implements Chart,
             objects.add(timeIndicator);
         }
 
-        if (lineIndicator != null) {
-            objects.add(lineIndicator);
-        }
-
-        if (!seriesNames.isEmpty()) {
-            objects.addAll(seriesNames);
+        if (barIndicator != null) {
+            objects.add(barIndicator);
         }
 
         objects.add(priceScale);
-
     }
 
     @Override
@@ -145,7 +144,6 @@ public class LineChart extends JPanel implements Chart,
         this.waterMarkText = waterMark;
         this.waterMark.setText(waterMarkText);
         this.waterMark.setColor("#003D7A");
-
     }
 
     @Override
@@ -156,31 +154,20 @@ public class LineChart extends JPanel implements Chart,
         priceScale.setScale(scale);
         timeIndicator = null;
 
-        if (lineIndicator == null) {
+        if (barIndicator == null) {
             return;
         }
 
         new TimeCreator().create(this,
-                lineIndicator.getLines().get(2),
-                canvasHeight - 10,
-                20,
+                barIndicator.getBars(),
+                canvasHeight,
+                30,
                 barWidth);
     }
 
     @Override
-    public void onLineIndicatorCreated(LineIndicator lineIndicator) {
-        this.lineIndicator = lineIndicator;
-        int textX = 5;
-        for (Line l : lineIndicator.getLines()) {
-            TextObject t1 = new TextObject(textX, 10, 20, 20);
-            t1.setText(l.getName());
-            t1.setColorSchema(l.getColorSchema());
-            t1.setFontSize(TextObject.FontSize.MEDIUM);
-            t1.setzOrder(-1);
-
-            seriesNames.add(t1);
-            textX += 120;
-        }
+    public void onBarIndicatorCreated(BarIndicator barIndicator, int x, int y) {
+        this.barIndicator = barIndicator;
         SwingUtilities.invokeLater(() -> {
             refresh();
             centerCamera();
@@ -194,26 +181,21 @@ public class LineChart extends JPanel implements Chart,
         SwingUtilities.invokeLater(this::refresh);
     }
 
-
     private void createChartData() {
-        lineIndicator = null;
-        new LineCreator().create(
+        barIndicator = null;
+        new BarIndicatorCreator().create(
                 this,
-                lineData,
+                barData,
                 scale,
                 barWidth
         );
     }
 
     private void reset() {
-        lineData.clear();
+        barData.clear();
     }
 
-    private void centerCamera() {
-        camera.setViewPortY(canvasHeight / 2);
-        camera.setViewPortX(0);
-    }
-
+    private void centerCamera() {}
 
     @Override
     public void onZoomChanged(Zoom.ZoomDetails zoomDetails) {
@@ -262,6 +244,7 @@ public class LineChart extends JPanel implements Chart,
 
         @Override
         public void run() {
+            System.out.println("Barchart Running");
             while (true) {
                 EventQueue.invokeLater(component::repaint);
                 try {
@@ -271,5 +254,4 @@ public class LineChart extends JPanel implements Chart,
             }
         }
     }
-
 }

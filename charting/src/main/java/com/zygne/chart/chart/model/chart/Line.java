@@ -7,7 +7,6 @@ import java.util.List;
 
 public class Line extends Object2d {
 
-
     private List<Point2d> point2dList = new ArrayList<>();
     private String color;
     private String name;

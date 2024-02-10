@@ -68,16 +68,9 @@ public class AwtCanvas implements Canvas {
         int lineSize = 1;
 
         switch (lineWidth) {
-
-            case SMALL -> {
-                lineSize = 1;
-            }
-            case MEDIUM -> {
-                lineSize = 3;
-            }
-            case LARGE -> {
-                lineSize = 6;
-            }
+            case SMALL -> lineSize = 1;
+            case MEDIUM -> lineSize = 3;
+            case LARGE -> lineSize = 6;
         }
 
 

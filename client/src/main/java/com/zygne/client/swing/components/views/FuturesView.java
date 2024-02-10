@@ -6,8 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +13,7 @@ public class FuturesView extends JPanel {
 
     private Callback callback;
 
-    private JComboBox comboAsset;
-    private JCheckBox dualChart;
-    private JRadioButton leftChart;
-    private JRadioButton rightChart;
+    private final JComboBox comboAsset;
 
     private java.util.List<Asset> assetList = new ArrayList<>();
 
@@ -41,67 +36,6 @@ public class FuturesView extends JPanel {
         constraints.gridy = 1;
         optionsPanel.add(comboAsset, constraints);
 
-
-        JLabel labelDual = new JLabel("Dual Chart");
-
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-        optionsPanel.add(labelDual, constraints);
-
-        dualChart = new JCheckBox();
-        constraints.gridx = 1;
-        constraints.gridy = 1;
-        optionsPanel.add(dualChart, constraints);
-        dualChart.addItemListener(e -> {
-            if (e.getStateChange() == 2) {
-                callback.toggleDualChart(false);
-            } else {
-                callback.toggleDualChart(true);
-            }
-        });
-
-        JLabel labelLeft = new JLabel("Left Chart");
-
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-        optionsPanel.add(labelLeft, constraints);
-
-        leftChart = new JRadioButton();
-        constraints.gridx = 0;
-        constraints.gridy = 3;
-        optionsPanel.add(leftChart, constraints);
-
-        leftChart.setSelected(true);
-        JLabel rightLabel = new JLabel("Right Chart");
-
-        constraints.gridx = 1;
-        constraints.gridy = 2;
-        optionsPanel.add(rightLabel, constraints);
-
-        rightChart = new JRadioButton();
-        constraints.gridx = 1;
-        constraints.gridy = 3;
-        optionsPanel.add(rightChart, constraints);
-
-        leftChart.addActionListener(e -> {
-            boolean selected = ((JRadioButton) e.getSource()).isSelected();
-            if (selected) {
-                callback.onChartSelected(0);
-            }
-        });
-
-        rightChart.addActionListener(e -> {
-            boolean selected = ((JRadioButton) e.getSource()).isSelected();
-            if (selected) {
-                callback.onChartSelected(1);
-            }
-        });
-
-        ButtonGroup group = new ButtonGroup();
-        group.add(leftChart);
-        group.add(rightChart);
-
-
         mainPanel.add(optionsPanel, BorderLayout.NORTH);
 
         JPanel buttonPanel = new JPanel(new BorderLayout());
@@ -122,8 +56,8 @@ public class FuturesView extends JPanel {
 
     private void createReport() {
         if (callback != null) {
-            String name = assetList.get(comboAsset.getSelectedIndex()).getDisplayName();
-            String symbolText = assetList.get(comboAsset.getSelectedIndex()).getBrokerName();
+            String name = assetList.get(comboAsset.getSelectedIndex()).displayName();
+            String symbolText = assetList.get(comboAsset.getSelectedIndex()).brokerName();
             callback.reportButtonClicked(name, symbolText);
         }
     }
@@ -133,10 +67,8 @@ public class FuturesView extends JPanel {
         assetList.clear();
         assetList.addAll(data);
         comboAsset.removeAllItems();
-        if (comboAsset != null) {
-            for (Asset e : assetList) {
-                comboAsset.addItem(e.getDisplayName());
-            }
+        for (Asset e : assetList) {
+            comboAsset.addItem(e.displayName());
         }
     }
 
@@ -146,9 +78,5 @@ public class FuturesView extends JPanel {
 
     public interface Callback {
         void reportButtonClicked(String name, String symbol);
-
-        void toggleDualChart(boolean active);
-
-        void onChartSelected(int chart);
     }
 }

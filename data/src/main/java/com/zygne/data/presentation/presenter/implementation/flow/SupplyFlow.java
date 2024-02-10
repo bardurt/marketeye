@@ -10,15 +10,11 @@ import java.util.List;
 
 public class SupplyFlow implements VolumePriceInteractor.Callback,
         VolumePriceSumInteractor.Callback,
-        LiquidityLevelInteractor.Callback,
-        LiquidityLevelFilterInteractor.Callback {
+        LiquidityLevelInteractor.Callback {
 
     private final Executor executor;
     private final MainThread mainThread;
     private final Callback callback;
-    private List<Histogram> histogramList;
-    private double percentile;
-    private List<LiquidityLevel> rawLevels;
 
     public SupplyFlow(Executor executor, MainThread mainThread, Callback callback) {
         this.executor = executor;
@@ -26,21 +22,13 @@ public class SupplyFlow implements VolumePriceInteractor.Callback,
         this.callback = callback;
     }
 
-    public void start(List<Histogram> histogramList, double percentile, VolumePriceInteractor.PriceStructure priceStructure) {
-        this.histogramList = histogramList;
-        this.percentile = percentile;
+    public void start(List<Histogram> histogramList, VolumePriceInteractor.PriceStructure priceStructure) {
         new VolumePriceInteractorImpl(executor, mainThread, this, histogramList, priceStructure).execute();
     }
 
     @Override
-    public void onLiquidityLevelsFiltered(List<LiquidityLevel> data) {
-        callback.onSupplyCompleted(data, rawLevels);
-    }
-
-    @Override
     public void onLiquidityLevelsCreated(List<LiquidityLevel> data) {
-        rawLevels = data;
-        new LiquidityLevelFilterInteractorImpl(executor, mainThread, this, data, percentile).execute();
+        callback.onSupplyCompleted(data);
     }
 
     @Override
@@ -54,6 +42,6 @@ public class SupplyFlow implements VolumePriceInteractor.Callback,
     }
 
     public interface Callback {
-        void onSupplyCompleted(List<LiquidityLevel> filtered, List<LiquidityLevel> raw);
+        void onSupplyCompleted(List<LiquidityLevel> filtered);
     }
 }

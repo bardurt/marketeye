@@ -11,7 +11,7 @@ public interface VolumePriceInteractor extends Interactor {
         void onVolumePriceCreated(List<VolumePrice> data);
     }
 
-    public enum PriceStructure{
+    enum PriceStructure{
         H,
         HL,
         OHLC,

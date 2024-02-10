@@ -6,8 +6,6 @@ public class Camera extends Object2d {
 
     private int viewPortX;
     private int viewPortY;
-    private int paddingWidth = 0;
-    private int paddingHeight = 0;
     private double zoom = 1;
 
     public Camera(int viewPortX, int viewPortY) {

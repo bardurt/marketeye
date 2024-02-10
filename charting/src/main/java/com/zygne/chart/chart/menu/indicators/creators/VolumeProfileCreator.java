@@ -11,7 +11,7 @@ import java.util.List;
 public class VolumeProfileCreator {
 
     private double scale = 1;
-    private int barHeight = 2;
+    private final int barHeight = 2;
     private double grouping = 0.1;
     private long highestValue;
     private int y = 0;

@@ -12,7 +12,6 @@ public class LiquidityLevel {
     private int rank = 0;
     private double percentile = 0.0d;
     private double breakPoint;
-    private int hits = 0;
 
     public double getPrice() {
         return price;
@@ -77,14 +76,6 @@ public class LiquidityLevel {
     public LiquidityLevel(double price, long volume) {
         this.price = price;
         this.volume = volume;
-    }
-
-    public int getHits() {
-        return hits;
-    }
-
-    public void setHits(int hits) {
-        this.hits = hits;
     }
 
     public static final class VolumeComparator implements Comparator<LiquidityLevel> {

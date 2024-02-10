@@ -29,7 +29,6 @@ public class LiquidityLevelInteractorImpl extends BaseInteractor implements Liqu
 
         for (VolumePriceSum e : data) {
             LiquidityLevel s = new LiquidityLevel(e.price, e.totalSize);
-            s.setHits(e.hits);
             formatted.add(s);
         }
 
