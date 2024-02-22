@@ -6,13 +6,13 @@ import com.zygne.client.swing.components.views.StocksView;
 import javax.swing.*;
 import java.awt.*;
 
-public class SettingsTab extends JPanel implements StocksView.Callback {
+public class ChartTab extends JPanel implements StocksView.Callback {
 
     private final Callback callback;
     private final StocksView reportView;
     public final PriceChartView priceChartView;
 
-    public SettingsTab(Callback callback) {
+    public ChartTab(Callback callback) {
         super();
         this.callback = callback;
         setLayout(new BorderLayout());

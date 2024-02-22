@@ -17,6 +17,10 @@ public class PriceBox {
         return end;
     }
 
+    public double getMid(){
+        return (end + start)/2;
+    }
+
     public void setEnd(double end) {
         this.end = end;
     }

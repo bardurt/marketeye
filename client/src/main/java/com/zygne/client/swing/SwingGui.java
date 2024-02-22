@@ -2,7 +2,7 @@ package com.zygne.client.swing;
 
 import com.zygne.client.ProjectProps;
 import com.zygne.client.swing.components.tabs.CotTab;
-import com.zygne.client.swing.components.tabs.SettingsTab;
+import com.zygne.client.swing.components.tabs.ChartTab;
 import com.zygne.client.swing.components.views.LoadingView;
 import com.zygne.client.swing.components.UiLogger;
 import com.zygne.client.swing.components.tabs.TendencyTab;
@@ -19,7 +19,7 @@ import java.awt.*;
 import java.util.List;
 
 public class SwingGui extends JPanel implements MainPresenter.View,
-        SettingsTab.Callback,
+        ChartTab.Callback,
         TendencyTab.Callback,
         TendencyPresenter.View,
         CotPresenter.View {
@@ -32,7 +32,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     private final TendencyPresenter tendencyPresenter;
     private final CotPresenter cotPresenter;
 
-    private final SettingsTab settingsTab;
+    private final ChartTab settingsTab;
     private final TendencyTab tendencyTab;
     private final CotTab cotTab;
 
@@ -43,7 +43,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         setSize(880, 880);
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        settingsTab = new SettingsTab(this);
+        settingsTab = new ChartTab(this);
         tendencyTab = new TendencyTab(this);
         cotTab = new CotTab();
 
@@ -88,10 +88,10 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     }
 
     @Override
-    public void onComplete(List<Histogram> histograms, List<LiquidityLevel> liquidityLevels, String symbol, String dateRange) {
+    public void onComplete(List<Histogram> histograms, String symbol, String dateRange) {
         labelStatus.setText("");
         labelLoading.setText("");
-        settingsTab.priceChartView.addData(histograms, liquidityLevels, symbol.toUpperCase());
+        settingsTab.priceChartView.addData(histograms, symbol.toUpperCase());
     }
 
     @Override

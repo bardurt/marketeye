@@ -42,9 +42,7 @@ public class DataFetchInteractorImpl extends BaseInteractor implements DataFetch
             return;
         }
 
-        for (FinanceData d : data) {
-            this.data.add((BarData) d);
-        }
+        this.data.addAll(data);
 
         mainThread.post(() -> callback.onDataFetched(this.data));
     }

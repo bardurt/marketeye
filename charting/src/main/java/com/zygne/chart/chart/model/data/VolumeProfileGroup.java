@@ -19,6 +19,10 @@ public class VolumeProfileGroup {
         this.volume = volume;
     }
 
+    public void incrementVolume(long volume){
+        this.volume += volume;
+    }
+
     public PriceBox getPriceBox() {
         return priceBox;
     }

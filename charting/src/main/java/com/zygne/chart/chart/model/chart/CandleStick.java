@@ -15,13 +15,13 @@ public class CandleStick extends Object2d {
     private int bodyTop;
     private int bodyHeight;
     private String color;
+    public boolean visible;
 
     public void ohlc(double open, double high, double low, double close, long volume, double scalar) {
         this.priceBox = new PriceBox();
-        this.priceBox.setEnd(high*scalar);
-        this.priceBox.setStart(low*scalar);
+        this.priceBox.setEnd(high);
+        this.priceBox.setStart(low);
         this.volume = volume;
-
 
         int height = (int) ((high - low) * scalar);
         this.setHeight(height);
@@ -30,13 +30,11 @@ public class CandleStick extends Object2d {
         if (open < close) {
             bodyTop = (int) (-close * scalar);
             bodyHeight = (int) ((close - open) * scalar);
-
-            color = "#0093FF";
+            color = Colors.BLUE;
         } else {
             bodyTop = (int) (-open * scalar);
             bodyHeight = (int) ((open - close) * scalar);
-
-            color = "#FF7800";
+            color = Colors.ORANGE_BRIGHT;
         }
 
         if (bodyHeight < 1) {

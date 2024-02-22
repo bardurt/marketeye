@@ -5,7 +5,6 @@ import com.zygne.chart.chart.Chart;
 import com.zygne.chart.chart.RendererImpl;
 import com.zygne.chart.chart.menu.*;
 import com.zygne.chart.chart.menu.indicators.*;
-import com.zygne.chart.chart.menu.indicators.creators.*;
 import com.zygne.chart.chart.model.chart.*;
 import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;
@@ -16,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LineChart extends JPanel implements Chart,
-        LineCreator.Callback,
-        TimeCreator.Callback,
+        LineIndicator.Creator.Callback,
+        TimeIndicator.Creator.Callback,
         Zoom.Callback,
         ChartControls.Callback{
 
@@ -116,8 +115,8 @@ public class LineChart extends JPanel implements Chart,
             updateIndicators();
         }
 
+        g.setColor(Colors.BLUE_DARK);
         renderer.Render(objects);
-        g.setColor("#ffffff");
     }
 
     private void refresh() {
@@ -160,7 +159,7 @@ public class LineChart extends JPanel implements Chart,
             return;
         }
 
-        new TimeCreator().create(this,
+        new TimeIndicator.Creator().create(this,
                 lineIndicator.getLines().get(2),
                 canvasHeight - 10,
                 20,
@@ -197,7 +196,7 @@ public class LineChart extends JPanel implements Chart,
 
     private void createChartData() {
         lineIndicator = null;
-        new LineCreator().create(
+        new LineIndicator.Creator().create(
                 this,
                 lineData,
                 scale,
