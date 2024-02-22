@@ -61,10 +61,16 @@ public class CotTab extends JPanel {
 
         double mid = (max + min) / 2;
 
-        for (CotData c : cotData) {
+        for (int i = 0; i < cotData.size(); i++) {
+            CotData c = cotData.get(i);
             BarSerie serie =new BarSerie((c.getNet() -mid)/ 1000);
+            if(i >= start){
+                serie.setIncluded(true);
+            }
+
             serie.setTimeStamp(c.getTimeStamp());
             serieList.add(serie);
+
         }
 
         series.add(serieList);

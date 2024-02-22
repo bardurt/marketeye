@@ -1,6 +1,7 @@
 package com.zygne.chart.chart;
 
 import com.zygne.chart.chart.model.chart.Camera;
+import com.zygne.chart.chart.model.chart.Colors;
 import com.zygne.chart.chart.model.chart.Object2d;
 
 import java.util.List;
@@ -24,7 +25,6 @@ public class RendererImpl implements Renderer {
     }
 
     private void drawCanvas(List<Object2d> object2dList) {
-        canvas.setColor("#02123B");
         canvas.drawRectangle(0, 0, camera.getWidth(), camera.getHeight(), Canvas.Fill.SOLID);
 
         for (int i = 0; i < object2dList.size(); i++) {
@@ -47,7 +47,6 @@ public class RendererImpl implements Renderer {
                 object2dList.get(i).draw(canvas);
             }
         }
-
         canvas.translate(-camera.getViewPortX(), -camera.getViewPortY());
 
         for (int i = 0; i < object2dList.size(); i++) {
@@ -71,11 +70,10 @@ public class RendererImpl implements Renderer {
             }
         }
 
-        canvas.setColor("#000000");
+        canvas.setColor(Colors.BLACK);
         canvas.drawRectangle(0, 0, camera.getWidth(), camera.getHeight(), Canvas.Fill.OUTLINE);
         canvas.drawRectangle(0, 0, 2, camera.getHeight(), Canvas.Fill.SOLID);
         canvas.drawRectangle(camera.getWidth() - 2, 0, camera.getWidth(), camera.getHeight(), Canvas.Fill.SOLID);
-
     }
 
     @Override
@@ -90,4 +88,5 @@ public class RendererImpl implements Renderer {
 
         return camera.getHeight() != height;
     }
+
 }

@@ -124,7 +124,7 @@ public class TextObject extends Object2d {
         if(useColorScheme){
             switch (colorSchema) {
                 case WHITE -> {
-                    color = Colors.WHITE;
+                    color = Colors.SNOW_WHITE;
                 }
                 case RED -> {
                     color = Colors.RED;

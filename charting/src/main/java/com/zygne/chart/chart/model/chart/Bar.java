@@ -19,7 +19,9 @@ public class Bar extends Object2d{
         switch (colorSchema){
 
             case RED -> canvas.setColor(Colors.RED);
-            case ORANGE, HIGHLIGHT, WHITE, BLUE, YELLOW -> {
+            case GRAY -> canvas.setColor(Colors.SILVER);
+            case BLUE -> canvas.setColor(Colors.BLUE);
+            case ORANGE, HIGHLIGHT, WHITE, YELLOW -> {
             }
             case GREEN -> canvas.setColor(Colors.GREEN);
             default -> {}

@@ -75,7 +75,7 @@ public class HistogramInteractorImpl extends BaseInteractor implements Histogram
         Collections.reverse(data);
 
         int size = data.size();
-        double percentile = 100;
+        double percentile;
 
         for (int i = 0; i < data.size(); i++) {
             percentile = ((size-(i)) / (double) size) * 100d;

@@ -6,6 +6,6 @@ import com.zygne.arch.domain.interactor.base.Interactor;
 public interface TendencyInteractor extends Interactor {
 
     interface Callback{
-        void omTendencyReportCreated(TendencyReport tendencyReport);
+        void onTendencyReportCreated(TendencyReport tendencyReport);
     }
 }

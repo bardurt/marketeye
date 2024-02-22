@@ -4,12 +4,10 @@ import com.zygne.chart.chart.Chart;
 import com.zygne.chart.chart.RendererImpl;
 import com.zygne.chart.chart.menu.*;
 import com.zygne.chart.chart.menu.indicators.*;
-import com.zygne.chart.chart.menu.indicators.creators.*;
 import com.zygne.chart.chart.model.chart.*;
 import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.model.data.CandleSerie;
 import com.zygne.chart.chart.model.data.Serie;
-import com.zygne.chart.chart.model.data.VolumeSerie;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,10 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PriceChart extends JPanel implements Chart,
-        CandleSticksCreator.Callback,
-        VolumeProfileCreator.Callback,
-        VolumeIndicatorCreator.Callback,
-        TimeCreator.Callback,
+        CandleSticksIndicator.Creator.Callback,
+        VolumeProfileIndicator.Creator.Callback,
+        VolumeIndicator.Creator.Callback,
+        TimeIndicator.Creator.Callback,
         Zoom.Callback,
         ChartControls.Callback {
 
@@ -33,28 +31,19 @@ public class PriceChart extends JPanel implements Chart,
     private int loadY;
 
     private final List<CandleSerie> bars = new ArrayList<>();
-    private final List<VolumeSerie> volumeProfile = new ArrayList<>();
 
     private int canvasHeight = DEFAULT_HEIGHT;
     private int canvasWidth = DEFAULT_WIDTH;
     private final Camera camera;
     private String waterMarkText = "";
-    private String titleText = "";
     private TextObject waterMark;
-    private TextObject copyright;
-    private TopBar topBar;
     private final List<Object2d> objects = new ArrayList<>();
     private final RendererImpl renderer;
-    private final int percentile = 90;
-
     private CandleSticksIndicator candleSticksIndicator = null;
     private VolumeProfileIndicator volumeProfileIndicator = null;
     private VolumeIndicator volumeIndicator = null;
     private TimeIndicator timeIndicator = null;
     private final Zoom zoom;
-
-    private boolean firstLoad = false;
-
     private final PriceScale priceScale = new PriceScale();
 
     public PriceChart() {
@@ -85,12 +74,6 @@ public class PriceChart extends JPanel implements Chart,
         waterMark.setzOrder(-1);
         this.waterMark.setColor("#00306C");
 
-        copyright = new TextObject(0, 0, canvasWidth, 50);
-        copyright.setFontSize(TextObject.FontSize.MEDIUM);
-        copyright.setText("Zygne Chart");
-        copyright.setzOrder(-1);
-        this.copyright.setColor("#00306C");
-
         StatusBar statusBar = new StatusBar();
         statusBar.setWidth(canvasWidth);
         statusBar.setHeight(canvasHeight);
@@ -105,14 +88,6 @@ public class PriceChart extends JPanel implements Chart,
         priceScale.setzOrder(1);
         priceScale.setScale(scale);
 
-        topBar = new TopBar();
-        topBar.setX(0);
-        topBar.setY(0);
-        topBar.setWidth(canvasWidth);
-        topBar.setHeight(canvasHeight);
-        topBar.setzOrder(2);
-        topBar.init();
-        topBar.setLabelText(titleText + " " + percentile + "%");
     }
 
 
@@ -121,8 +96,6 @@ public class PriceChart extends JPanel implements Chart,
         if (series.isEmpty()) {
             return;
         }
-
-        firstLoad = true;
 
         reset();
         List<Serie> bars = series.get(0);
@@ -137,27 +110,11 @@ public class PriceChart extends JPanel implements Chart,
             quotes.add((CandleSerie) s);
         }
 
-
         this.bars.clear();
         this.bars.addAll(quotes);
         this.bars.sort(new CandleSerie.TimeComparator());
 
-        if (series.size() == 2) {
-            List<Serie> volumeProfileItems = series.get(1);
-            if (!(volumeProfileItems.get(0) instanceof VolumeSerie)) {
-                throw new RuntimeException("Series items at [0] should be of type " + VolumeSerie.class.getName());
-            }
-            for (Serie s : volumeProfileItems) {
-                volumeProfile.add((VolumeSerie) s);
-            }
-        }
-
-
         createCandleSticks();
-
-        if (!volumeProfile.isEmpty()) {
-            createVolumeProfile();
-        }
 
         zoom.reset();
     }
@@ -175,14 +132,14 @@ public class PriceChart extends JPanel implements Chart,
             updateIndicators();
         }
 
+        g.setColor(Colors.BLUE_DARK);
         renderer.Render(objects);
-        g.setColor("#ffffff");
     }
 
     private void refresh() {
         objects.clear();
         objects.add(waterMark);
-        objects.add(copyright);
+        objects.add(camera);
 
 
         if (volumeIndicator != null) {
@@ -210,13 +167,10 @@ public class PriceChart extends JPanel implements Chart,
         this.waterMarkText = waterMark;
         this.waterMark.setText(waterMarkText);
         this.waterMark.setColor("#003D7A");
-
     }
 
     @Override
     public void setTitle(String title) {
-        this.titleText = title;
-        topBar.setLabelText(title + " " + percentile + "%");
     }
 
     private void updateIndicators() {
@@ -232,13 +186,13 @@ public class PriceChart extends JPanel implements Chart,
 
         createVolumeProfile();
 
-        new VolumeIndicatorCreator().create(
+        new VolumeIndicator.Creator().create(
                 this,
                 candleSticksIndicator.getCandleSticks(),
                 150,
                 canvasHeight - 20);
 
-        new TimeCreator().create(this,
+        new TimeIndicator.Creator().create(this,
                 candleSticksIndicator.getCandleSticks(),
                 canvasHeight,
                 20);
@@ -280,12 +234,17 @@ public class PriceChart extends JPanel implements Chart,
 
 
     private void createVolumeProfile() {
+        if (candleSticksIndicator == null) {
+            return;
+        }
+
         if (volumeProfileIndicator != null) {
             volumeProfileIndicator = null;
         }
 
-        new VolumeProfileCreator().create(this,
-                this.volumeProfile,
+        new VolumeProfileIndicator.Creator().create(
+                this,
+                candleSticksIndicator.getCandleSticks(),
                 scale,
                 150,
                 camera.getWidth() - 200
@@ -296,7 +255,7 @@ public class PriceChart extends JPanel implements Chart,
         candleSticksIndicator = null;
 
         int barSeparator = 0;
-        new CandleSticksCreator().create(
+        new CandleSticksIndicator.Creator().create(
                 this,
                 bars,
                 scale,
@@ -310,7 +269,6 @@ public class PriceChart extends JPanel implements Chart,
     }
 
     private void centerCamera() {
-        System.out.println("x " + lastBar + " y" + loadY);
         camera.setViewPortY((-loadY - camera.getHeight() / 2) * -1);
         camera.setViewPortX((lastBar - camera.getWidth() / 2) * -1);
     }
@@ -345,17 +303,26 @@ public class PriceChart extends JPanel implements Chart,
     @Override
     public void onDrag(int dx, int dy) {
         int y = camera.getViewPortY() - (dy / 100);
-
         int x = camera.getViewPortX() - (dx / 100);
-
         camera.setViewPortY(y);
         camera.setViewPortX(x);
+        checkVisibility();
+        createVolumeProfile();
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         this.draw(new AwtCanvas(g));
+    }
+
+    private void checkVisibility() {
+        if (candleSticksIndicator == null) {
+            return;
+        }
+        for (CandleStick c : candleSticksIndicator.getCandleSticks()) {
+            c.visible = camera.inVerticalSpace(c);
+        }
     }
 
     private record ChartRunner(Component component) implements Runnable {

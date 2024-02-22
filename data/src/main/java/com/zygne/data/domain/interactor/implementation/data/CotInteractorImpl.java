@@ -52,16 +52,16 @@ public class CotInteractorImpl  extends BaseInteractor implements CotInteractor,
 
     private String getCotUrlForSymbol(String assetName){
 
-        String cotUrl = switch (assetName) {
+        return switch (assetName) {
             case "%5EGSPC" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_sp500.csv";
             case "CL=F" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_crude_oil.csv";
             case "%5EIXIC" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_nasdaq.csv";
             case "GC=F" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_gold.csv";
             case "SI=F" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_silver.csv";
             case "KE=F" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_wheat.csv";
+            case "DX-Y.NYB" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_usd.csv";
+            case "BTC-USD" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_btc.csv";
             default -> "";
         };
-
-        return cotUrl;
     }
 }

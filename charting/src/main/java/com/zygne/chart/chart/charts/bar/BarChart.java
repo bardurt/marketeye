@@ -9,8 +9,6 @@ import com.zygne.chart.chart.menu.StatusBar;
 import com.zygne.chart.chart.menu.Zoom;
 import com.zygne.chart.chart.menu.indicators.BarIndicator;
 import com.zygne.chart.chart.menu.indicators.TimeIndicator;
-import com.zygne.chart.chart.menu.indicators.creators.BarIndicatorCreator;
-import com.zygne.chart.chart.menu.indicators.creators.TimeCreator;
 import com.zygne.chart.chart.model.chart.*;
 import com.zygne.chart.chart.model.data.BarSerie;
 import com.zygne.chart.chart.model.data.Serie;
@@ -21,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BarChart extends JPanel implements Chart,
-        BarIndicatorCreator.Callback,
-        TimeCreator.Callback,
+        BarIndicator.Creator.Callback,
+        TimeIndicator.Creator.Callback,
         Zoom.Callback,
         ChartControls.Callback {
 
@@ -36,8 +34,6 @@ public class BarChart extends JPanel implements Chart,
     private int canvasHeight = DEFAULT_HEIGHT;
     private int canvasWidth = DEFAULT_WIDTH;
     private final Camera camera;
-    private String waterMarkText = "";
-    private TextObject waterMark;
     private final List<Object2d> objects = new ArrayList<>();
     private final RendererImpl renderer;
     private final Zoom zoom;
@@ -66,11 +62,6 @@ public class BarChart extends JPanel implements Chart,
     }
 
     private void setUp() {
-        waterMark = new TextObject(0, 0, canvasWidth, canvasHeight);
-        waterMark.setFontSize(TextObject.FontSize.LARGE);
-        waterMark.setText(waterMarkText);
-        waterMark.setzOrder(-1);
-        this.waterMark.setColor("#00306C");
 
         StatusBar statusBar = new StatusBar();
         statusBar.setWidth(canvasWidth);
@@ -120,13 +111,12 @@ public class BarChart extends JPanel implements Chart,
             updateIndicators();
         }
 
+        g.setColor(Colors.BLUE_DARK);
         renderer.Render(objects);
-        g.setColor("#ffffff");
     }
 
     private void refresh() {
         objects.clear();
-        objects.add(waterMark);
 
         if (timeIndicator != null) {
             objects.add(timeIndicator);
@@ -141,9 +131,6 @@ public class BarChart extends JPanel implements Chart,
 
     @Override
     public void setWaterMark(String waterMark) {
-        this.waterMarkText = waterMark;
-        this.waterMark.setText(waterMarkText);
-        this.waterMark.setColor("#003D7A");
     }
 
     @Override
@@ -158,7 +145,7 @@ public class BarChart extends JPanel implements Chart,
             return;
         }
 
-        new TimeCreator().create(this,
+        new TimeIndicator.Creator().create(this,
                 barIndicator.getBars(),
                 canvasHeight,
                 30,
@@ -183,7 +170,7 @@ public class BarChart extends JPanel implements Chart,
 
     private void createChartData() {
         barIndicator = null;
-        new BarIndicatorCreator().create(
+        new BarIndicator.Creator().create(
                 this,
                 barData,
                 scale,

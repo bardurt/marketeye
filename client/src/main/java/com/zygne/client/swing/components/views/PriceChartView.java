@@ -3,9 +3,7 @@ package com.zygne.client.swing.components.views;
 import com.zygne.chart.chart.charts.pricechart.PriceChart;
 import com.zygne.chart.chart.model.data.CandleSerie;
 import com.zygne.chart.chart.model.data.Serie;
-import com.zygne.chart.chart.model.data.VolumeSerie;
 import com.zygne.data.domain.model.Histogram;
-import com.zygne.data.domain.model.LiquidityLevel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +19,7 @@ public class PriceChartView extends JPanel {
         add(pricePanel, BorderLayout.CENTER);
     }
 
-    public void addData(List<Histogram> data, List<LiquidityLevel> levels, String symbol) {
+    public void addData(List<Histogram> data, String symbol) {
 
         List<Serie> quoteList = new ArrayList<>();
 
@@ -41,18 +39,6 @@ public class PriceChartView extends JPanel {
 
         List<List<Serie>> series = new ArrayList<>();
         series.add(quoteList);
-
-        List<Serie> volumeProfileList = new ArrayList<>();
-
-        for (LiquidityLevel e : levels) {
-
-            VolumeSerie quote = new VolumeSerie();
-            quote.setPrice(e.price);
-            quote.setVolume(e.getVolume());
-            volumeProfileList.add(quote);
-        }
-
-        series.add(volumeProfileList);
 
         pricePanel.setSeries(series);
         pricePanel.setWaterMark(symbol);

@@ -10,7 +10,7 @@ public interface MainPresenter {
     void createReport(String ticker);
 
     interface View extends BaseView {
-        void onComplete(List<Histogram> histograms, List<LiquidityLevel> liquidityLevels, String symbol, String dateRange);
+        void onComplete(List<Histogram> histograms, String symbol, String dateRange);
         void prepareView();
     }
 }

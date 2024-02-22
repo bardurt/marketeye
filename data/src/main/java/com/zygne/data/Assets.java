@@ -16,6 +16,7 @@ public class Assets {
             add(new Asset("Crude Oil", "CL=F"));
             add(new Asset("Wheat", "KE=F"));
             add(new Asset("USD", "DX-Y.NYB"));
+            add(new Asset("Bitcoin", "BTC-USD"));
         }
     };
 

@@ -65,13 +65,11 @@ public class AwtCanvas implements Canvas {
     @Override
     public void drawLine(int x1, int y1, int x2, int y2, LineStyle lineStyle, LineWidth lineWidth) {
 
-        int lineSize = 1;
-
-        switch (lineWidth) {
-            case SMALL -> lineSize = 1;
-            case MEDIUM -> lineSize = 3;
-            case LARGE -> lineSize = 6;
-        }
+        int lineSize = switch (lineWidth) {
+            case SMALL -> 1;
+            case MEDIUM -> 3;
+            case LARGE -> 6;
+        };
 
 
         if (lineStyle == LineStyle.SOLID) {

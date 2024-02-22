@@ -40,7 +40,7 @@ public class Line extends Object2d {
         }
         switch (colorSchema) {
             case WHITE -> {
-                color = Colors.WHITE;
+                color = Colors.SNOW_WHITE;
             }
             case RED -> {
                 color = Colors.RED;

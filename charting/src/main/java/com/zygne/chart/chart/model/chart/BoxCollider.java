@@ -75,13 +75,10 @@ public class BoxCollider {
                 }
             }
         }
-
         return false;
     }
 
     public boolean intersects(BoxCollider boxCollider) {
-
-
         if (boxCollider.getLeft() <= this.getRight()) {
             if (boxCollider.getRight() >= this.getLeft()) {
                 if (boxCollider.getTop() <= this.getBottom()) {
@@ -91,7 +88,15 @@ public class BoxCollider {
                 }
             }
         }
+        return false;
+    }
 
+    public boolean inVerticalSpace(BoxCollider boxCollider) {
+        if (boxCollider.getLeft() <= this.getRight()) {
+            if (boxCollider.getRight() >= this.getLeft()) {
+                    return true;
+            }
+        }
         return false;
     }
 

@@ -57,7 +57,7 @@ public class TendencyPresenterImpl extends BasePresenter implements
     }
 
     @Override
-    public void omTendencyReportCreated(TendencyReport tendencyReport) {
+    public void onTendencyReportCreated(TendencyReport tendencyReport) {
         logger.log(Logger.LOG_LEVEL.INFO, "Tendency Created");
         view.onTendencyReportCreated(tendencyReport);
     }

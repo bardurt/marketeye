@@ -45,11 +45,6 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
                 histogramYear.add(histogram);
             } else {
                 yearToFetch++;
-                if (year != endYear) {
-                    if (minLength > histogramYear.size()) {
-                        minLength = histogramYear.size();
-                    }
-                }
                 histogramsByYear.add(histogramYear);
                 histogramYear = new ArrayList<>();
             }
@@ -59,10 +54,14 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
 
         List<List<Histogram>> normalList = new ArrayList<>();
 
+        histogramsByYear.remove(0);
         List<Histogram> currentYear = new ArrayList<>(histogramsByYear.remove(histogramsByYear.size() - 1));
 
-        // remove first year, to ensure complete data
-        histogramsByYear.remove(0);
+        for (List<Histogram> current : histogramsByYear) {
+            if (current.size() < minLength) {
+                minLength = current.size();
+            }
+        }
 
         // normalize the list to make sure all have same size
         for (List<Histogram> current : histogramsByYear) {
@@ -104,7 +103,7 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
             report.tendencies().add(new Tendency("7 Year", getAverageFor(avgList, minLength, 7)));
         }
 
-        mainThread.post(() -> callback.omTendencyReportCreated(report));
+        mainThread.post(() -> callback.onTendencyReportCreated(report));
     }
 
     private List<TendencyEntry> getAverageFor(List<List<TendencyEntry>> data, int minLength, int years) {
@@ -134,7 +133,6 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
 
         return yearAvg;
     }
-
 
     private List<TendencyEntry> getChange(List<Histogram> data) {
         List<TendencyEntry> avgByYearList = new ArrayList<>();
