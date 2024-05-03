@@ -30,7 +30,6 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
     public void run() {
         histogramList.sort(new Histogram.TimeComparator());
 
-        int endYear = TimeHelper.getYearFromTimeStamp(System.currentTimeMillis());
         int yearToFetch = TimeHelper.getYearFromTimeStamp(histogramList.get(0).timeStamp);
 
         List<List<Histogram>> histogramsByYear = new ArrayList<>();
@@ -141,13 +140,13 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
         start.timeStamp = data.get(0).timeStamp;
         avgByYearList.add(start);
         double startValue = data.get(0).open;
-        for (int j = 1; j < data.size(); j++) {
-            double endValue = data.get(j).open;
+        for (int i = 1; i < data.size(); i++) {
+            double endValue = data.get(i).close;
             double change = ((endValue - startValue) / startValue) * 100;
 
             TendencyEntry currentAvg = new TendencyEntry();
             currentAvg.value = change;
-            currentAvg.timeStamp = data.get(j).timeStamp;
+            currentAvg.timeStamp = data.get(i).timeStamp;
             avgByYearList.add(currentAvg);
 
         }
