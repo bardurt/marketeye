@@ -1,5 +1,6 @@
 package com.zygne.data.domain.interactor.implementation.data;
 
+import com.zygne.data.FileWriter;
 import com.zygne.data.domain.interactor.implementation.data.base.TendencyInteractor;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.Tendency;
@@ -30,7 +31,6 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
     public void run() {
         histogramList.sort(new Histogram.TimeComparator());
 
-        int endYear = TimeHelper.getYearFromTimeStamp(System.currentTimeMillis());
         int yearToFetch = TimeHelper.getYearFromTimeStamp(histogramList.get(0).timeStamp);
 
         List<List<Histogram>> histogramsByYear = new ArrayList<>();
@@ -40,14 +40,14 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
 
         for (Histogram histogram : histogramList) {
             int year = TimeHelper.getYearFromTimeStamp(histogram.timeStamp);
-
-            if (year == yearToFetch) {
-                histogramYear.add(histogram);
-            } else {
-                yearToFetch++;
-                histogramsByYear.add(histogramYear);
-                histogramYear = new ArrayList<>();
-            }
+                if (year == yearToFetch) {
+                    histogramYear.add(histogram);
+                } else {
+                    yearToFetch++;
+                    histogramsByYear.add(histogramYear);
+                    histogramYear = new ArrayList<>();
+                    histogramYear.add(histogram);
+                }
         }
 
         histogramsByYear.add(histogramYear);
@@ -80,6 +80,14 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
             avgList.add(getChange(histograms));
         }
 
+        for (List<TendencyEntry> tendencyEntries : avgList) {
+            for(TendencyEntry t : tendencyEntries){
+                if(Math.abs(t.value) > 100){
+                    t.value = t.value * 0.50;
+                }
+            }
+        }
+
         List<TendencyEntry> currentYearAvg = getChange(currentYear);
 
         for (int i = 0; i < currentYearAvg.size(); i++) {
@@ -102,6 +110,31 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
             report.tendencies().add(new Tendency("5 Year", getAverageFor(avgList, minLength, 5)));
             report.tendencies().add(new Tendency("7 Year", getAverageFor(avgList, minLength, 7)));
         }
+
+        FileWriter fileWriter = new FileWriter("tendency");
+
+        String dates = "timestamp:";
+        Tendency t = report.tendencies().get(1);
+
+        for (TendencyEntry tendencyEntry : t.data) {
+            dates += tendencyEntry.timeStamp + ",";
+
+        }
+
+        fileWriter.writeLine(dates);
+
+        for (Tendency tendency : report.tendencies()) {
+
+            String line = "" + tendency.name + ":";
+            for (TendencyEntry tendencyEntry : tendency.data) {
+                line += tendencyEntry.value + ",";
+
+            }
+
+            fileWriter.writeLine(line);
+        }
+
+        fileWriter.close();
 
         mainThread.post(() -> callback.onTendencyReportCreated(report));
     }
@@ -141,13 +174,13 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
         start.timeStamp = data.get(0).timeStamp;
         avgByYearList.add(start);
         double startValue = data.get(0).open;
-        for (int j = 1; j < data.size(); j++) {
-            double endValue = data.get(j).open;
+        for (int i = 1; i < data.size(); i++) {
+            double endValue = data.get(i).close;
             double change = ((endValue - startValue) / startValue) * 100;
 
             TendencyEntry currentAvg = new TendencyEntry();
             currentAvg.value = change;
-            currentAvg.timeStamp = data.get(j).timeStamp;
+            currentAvg.timeStamp = data.get(i).timeStamp;
             avgByYearList.add(currentAvg);
 
         }

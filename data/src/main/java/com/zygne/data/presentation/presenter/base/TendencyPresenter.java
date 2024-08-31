@@ -1,6 +1,7 @@
 package com.zygne.data.presentation.presenter.base;
 
 import com.zygne.data.domain.model.Asset;
+import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.TendencyReport;
 import com.zygne.arch.presentation.view.BaseView;
 
@@ -12,6 +13,6 @@ public interface TendencyPresenter {
 
     interface View extends BaseView {
         void onTendencyAssetsPrepared(List<Asset> assets, int defaultSelection);
-        void onTendencyReportCreated(TendencyReport tendencyReport);
+        void onTendencyReportCreated(List<Histogram> raw, TendencyReport tendencyReport);
     }
 }

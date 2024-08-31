@@ -22,7 +22,7 @@ public class TimeIndicator extends Object2d {
         }
     }
 
-    public static final class Creator{
+    public static final class Creator {
 
         public void create(Callback callback, List<CandleStick> candleSticks, int y, int height) {
 
@@ -96,6 +96,8 @@ public class TimeIndicator extends Object2d {
                     whenToAdd = 3;
                 } else if (barWidth < 20) {
                     whenToAdd = 2;
+                } else {
+                    whenToAdd = 1;
                 }
 
                 for (int i = 1; i < line.getPoints().size(); i++) {
@@ -103,11 +105,11 @@ public class TimeIndicator extends Object2d {
                     Point2d point2d = line.getPoint(i);
                     timeBar.setWidth(barWidth);
 
-                    count++;
                     if (count == whenToAdd) {
                         timeBarList.add(timeBar);
                         count = 0;
                     }
+
 
                     timeBox = new TimeBox(point2d.getTimeStamp());
                     timeBar = new TimeBar();
@@ -115,6 +117,8 @@ public class TimeIndicator extends Object2d {
                     timeBar.setY(y - height);
                     timeBar.setText(timeBox.getDayString() + "\n" + timeBox.getMonthName(), TextObject.FontSize.SMALL);
                     timeBar.setHeight(height);
+
+                    count++;
                 }
 
                 TimeIndicator timeIndicator = new TimeIndicator(timeBarList);
@@ -138,12 +142,17 @@ public class TimeIndicator extends Object2d {
                 TimeBar timeBar = new TimeBar();
                 timeBar.setX(barSeries.get(0).getX());
                 timeBar.setY(y - height);
-                timeBar.setText(timeBox.getDayString() + "\n" + timeBox.getMonthName(), TextObject.FontSize.SMALL);
+                if (barSeries.get(0).getShowMonthOnly()) {
+                    timeBar.setText(timeBox.getMonthName(), TextObject.FontSize.SMALL);
+                } else {
+                    timeBar.setText(timeBox.getDayString() + "/" + timeBox.getMonthString() + "\n" + timeBox.getYear(), TextObject.FontSize.SMALL);
+                }
+
                 timeBar.setHeight(height);
                 timeBar.setWidth(barWidth);
 
                 List<TimeBar> timeBarList = new ArrayList<>();
-
+                timeBarList.add(timeBar);
                 int count = 1;
                 int whenToAdd = 5;
 
@@ -154,8 +163,10 @@ public class TimeIndicator extends Object2d {
                     whenToAdd = 6;
                 } else if (barWidth < 20) {
                     whenToAdd = 3;
-                } else if (barWidth > 25) {
+                } else if (barWidth < 40) {
                     whenToAdd = 2;
+                } else {
+                    whenToAdd = 1;
                 }
 
                 for (int i = 1; i < barSeries.size(); i++) {
@@ -163,18 +174,24 @@ public class TimeIndicator extends Object2d {
                     Bar bar = barSeries.get(i);
                     timeBar.setWidth(barWidth);
 
-                    count++;
+                    timeBox = new TimeBox(bar.getTimeStamp());
+                    timeBar = new TimeBar();
+                    timeBar.setX(bar.getX());
+                    timeBar.setY(y - height);
+                    if (barSeries.get(0).getShowMonthOnly()) {
+                        timeBar.setText(timeBox.getMonthName(), TextObject.FontSize.SMALL);
+                    } else {
+                        timeBar.setText(timeBox.getDayString() + "/" + timeBox.getMonthString() + "\n" + timeBox.getYear(), TextObject.FontSize.SMALL);
+                    }
+
+                    timeBar.setHeight(height);
+
                     if (count >= whenToAdd) {
                         timeBarList.add(timeBar);
                         count = 0;
                     }
 
-                    timeBox = new TimeBox(bar.getTimeStamp());
-                    timeBar = new TimeBar();
-                    timeBar.setX(bar.getX());
-                    timeBar.setY(y - height);
-                    timeBar.setText(timeBox.getDayString() + "/" +timeBox.getMonthString() + "\n" + timeBox.getYear(), TextObject.FontSize.SMALL);
-                    timeBar.setHeight(height);
+                    count++;
                 }
 
                 TimeIndicator timeIndicator = new TimeIndicator(timeBarList);

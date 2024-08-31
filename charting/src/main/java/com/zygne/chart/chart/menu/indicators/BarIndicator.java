@@ -48,6 +48,9 @@ public class BarIndicator extends Object2d {
                     b.setzOrder(0);
                     b.setHeight((int) (-barSerie.getValue() * scalar));
                     b.setTimeStamp(barSerie.getTimeStamp());
+                    if(barSerie.getDateFormat() == Serie.DateFormat.MONTH){
+                        b.setShowMonthOnly(true);
+                    }
 
                     if(barSerie.isIncluded()) {
                         if (barSerie.getValue() > 0) {

@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface DataBroker  {
 
-    void downloadData(String symbol, int yearsBack);
+    void downloadData(String symbol, String interval, int yearsBack);
     void setCallback(Callback callback);
     void removeCallback();
 

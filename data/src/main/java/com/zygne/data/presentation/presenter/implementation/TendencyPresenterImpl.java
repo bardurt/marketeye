@@ -3,6 +3,7 @@ package com.zygne.data.presentation.presenter.implementation;
 import com.zygne.data.Assets;
 import com.zygne.data.YahooDataBroker;
 import com.zygne.data.domain.DataBroker;
+import com.zygne.data.domain.interactor.implementation.data.RatioInteractorImpl;
 import com.zygne.data.domain.interactor.implementation.data.TendencyInteractorImpl;
 import com.zygne.data.domain.interactor.implementation.data.base.TendencyInteractor;
 import com.zygne.data.domain.model.*;
@@ -25,6 +26,7 @@ public class TendencyPresenterImpl extends BasePresenter implements
     private final DataFlow dataFlow;
     private final Logger logger;
     private final DataBroker dataBroker;
+    private List<Histogram> histograms;
 
     public TendencyPresenterImpl(Executor executor, MainThread mainThread, View view, Logger logger) {
         super(executor, mainThread);
@@ -42,12 +44,13 @@ public class TendencyPresenterImpl extends BasePresenter implements
 
     @Override
     public void createTendency(String symbol) {
-        dataFlow.fetchData(dataBroker, symbol, 22);
+        dataFlow.fetchData(dataBroker, symbol, 25, "");
     }
 
     @Override
     public void onDataFetched(List<Histogram> data, String time) {
         logger.log(Logger.LOG_LEVEL.INFO, "Creating Tendency");
+        this.histograms = data;
         new TendencyInteractorImpl(executor, mainThread, this, data).execute();
     }
 
@@ -59,6 +62,6 @@ public class TendencyPresenterImpl extends BasePresenter implements
     @Override
     public void onTendencyReportCreated(TendencyReport tendencyReport) {
         logger.log(Logger.LOG_LEVEL.INFO, "Tendency Created");
-        view.onTendencyReportCreated(tendencyReport);
+        view.onTendencyReportCreated(histograms, tendencyReport);
     }
 }

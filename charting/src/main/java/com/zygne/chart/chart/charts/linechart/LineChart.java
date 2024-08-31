@@ -151,6 +151,11 @@ public class LineChart extends JPanel implements Chart,
     public void setTitle(String title) {
     }
 
+    @Override
+    public void stretch(double level) {
+        zoom.stretch(level);
+    }
+
     private void updateIndicators() {
         priceScale.setScale(scale);
         timeIndicator = null;
@@ -271,4 +276,8 @@ public class LineChart extends JPanel implements Chart,
         }
     }
 
+    @Override
+    public void zoom(double level) {
+
+    }
 }

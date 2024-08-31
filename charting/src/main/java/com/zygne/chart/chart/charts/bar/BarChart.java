@@ -94,8 +94,6 @@ public class BarChart extends JPanel implements Chart,
         this.barData.clear();
         this.barData.addAll(series.get(0));
         createChartData();
-
-        zoom.reset();
     }
 
     @Override
@@ -135,6 +133,16 @@ public class BarChart extends JPanel implements Chart,
 
     @Override
     public void setTitle(String title) {
+    }
+
+    @Override
+    public void zoom(double level) {
+        zoom.zoom(level);
+    }
+
+    @Override
+    public void stretch(double level) {
+        zoom.stretch(level);
     }
 
     private void updateIndicators() {
@@ -235,7 +243,7 @@ public class BarChart extends JPanel implements Chart,
             while (true) {
                 EventQueue.invokeLater(component::repaint);
                 try {
-                    Thread.sleep(35);
+                    Thread.sleep(25);
                 } catch (InterruptedException e) {
                 }
             }

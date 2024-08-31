@@ -23,7 +23,7 @@ public class CotDataBroker implements DataBroker {
     }
 
     @Override
-    public void downloadData(String symbol, int yearsBack) {
+    public void downloadData(String symbol, String interval, int yearsBack) {
 
         logger.log(Logger.LOG_LEVEL.INFO, symbol + " " + yearsBack + " years");
 
@@ -120,7 +120,7 @@ public class CotDataBroker implements DataBroker {
             }
         });
 
-        cotDataBroker.downloadData("", 1);
+        cotDataBroker.downloadData("","", 1);
     }
 
 }

@@ -53,7 +53,7 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter,
 
         view.showLoading("Fetching data for " + ticker.toUpperCase() + "");
 
-        dataFlow.fetchData(dataBroker, ticker, 5);
+        dataFlow.fetchData(dataBroker, ticker, 5, "");
     }
 
     @Override
