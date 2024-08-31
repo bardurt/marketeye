@@ -128,7 +128,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         tabbedPane.removeAll();
         tabbedPane.addTab("Price Chart", settingsTab);
         tabbedPane.addTab("Seasonality Chart", tendencyTab);
-        tabbedPane.addTab("Season", cotTab);
+        tabbedPane.addTab("COT", cotTab);
     }
 
     @Override
@@ -156,7 +156,6 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onBiasCreated(List<Bias> biasList) {
-        cotTab.setBiasData(biasList);
     }
 
     @Override

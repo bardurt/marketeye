@@ -15,17 +15,15 @@ import java.util.List;
 public class CotTab extends JPanel {
 
     private final BarChart barChartRaw;
-    private final BarChart monthlySeason;
 
     public CotTab() {
         setLayout(new BorderLayout());
-        JPanel barLayout = new JPanel(new GridLayout(2, 0));
+        JPanel barLayout = new JPanel(new GridLayout(1, 0));
 
         barChartRaw = new BarChart();
-        monthlySeason = new BarChart();
+
 
         barLayout.add(barChartRaw);
-        barLayout.add(monthlySeason);
 
         add(barLayout, BorderLayout.CENTER);
     }
@@ -34,20 +32,6 @@ public class CotTab extends JPanel {
         barChartRaw.setSeries(adjustedToMonths(18, cotData));
     }
 
-    public void setBiasData(List<Bias> biasList) {
-        List<List<Serie>> series = new ArrayList<>();
-        List<Serie> serieList = new ArrayList<>();
-        for (Bias b : biasList) {
-            BarSerie serie = new BarSerie(b.change);
-            serie.setDate(1, b.index, Calendar.getInstance().get(Calendar.YEAR));
-            serie.setDateFormat(Serie.DateFormat.MONTH);
-            serie.setIncluded(true);
-            serieList.add(serie);
-        }
-        series.add(serieList);
-        monthlySeason.setSeries(series);
-
-    }
 
     private List<List<Serie>> adjustedToMonths(int months, List<CotData> cotData) {
 
