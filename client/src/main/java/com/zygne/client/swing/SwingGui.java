@@ -22,7 +22,9 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         ChartTab.Callback,
         TendencyTab.Callback,
         TendencyPresenter.View,
-        CotPresenter.View {
+        CotPresenter.View,
+        BiasPresenter.View,
+        RatioPresenter.View {
 
     private final JLabel labelStatus;
     private final JLabel labelLoading;
@@ -31,6 +33,8 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     private final MainPresenter mainPresenter;
     private final TendencyPresenter tendencyPresenter;
     private final CotPresenter cotPresenter;
+    private final BiasPresenter biasPresenter;
+    private final RatioPresenter ratioPresenter;
 
     private final ChartTab settingsTab;
     private final TendencyTab tendencyTab;
@@ -85,6 +89,8 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         tendencyPresenter = new TendencyPresenterImpl(executor, mainThread, this, logger);
         mainPresenter = new MainPresenterImpl(executor, mainThread, this, logger);
         cotPresenter = new CotPresenterImpl(executor, mainThread, this, logger);
+        biasPresenter = new BiasPresenterImpl(executor, mainThread, this, logger);
+        ratioPresenter = new RatioPresenterImpl(executor, mainThread, this);
     }
 
     @Override
@@ -92,6 +98,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         labelStatus.setText("");
         labelLoading.setText("");
         settingsTab.priceChartView.addData(histograms, symbol.toUpperCase());
+        ratioPresenter.createRatio(histograms);
     }
 
     @Override
@@ -120,8 +127,8 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     public void prepareView() {
         tabbedPane.removeAll();
         tabbedPane.addTab("Price Chart", settingsTab);
-        tabbedPane.addTab("Seasonality", tendencyTab);
-        tabbedPane.addTab("CFTC COT", cotTab);
+        tabbedPane.addTab("Seasonality Chart", tendencyTab);
+        tabbedPane.addTab("Season", cotTab);
     }
 
     @Override
@@ -133,17 +140,27 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     public void generateTendency(String symbol) {
         tendencyPresenter.createTendency(symbol);
         cotPresenter.createReport(symbol);
+        biasPresenter.createBias(symbol);
     }
 
     @Override
-    public void onTendencyReportCreated(TendencyReport tendencyReport) {
+    public void onTendencyReportCreated(List<Histogram> raw, TendencyReport tendencyReport) {
         tendencyTab.addTendency(tendencyReport);
+        ratioPresenter.createRatio(raw);
     }
-
 
     @Override
     public void onCotDataReady(List<CotData> cotData) {
         cotTab.setCotData(cotData);
+    }
+
+    @Override
+    public void onBiasCreated(List<Bias> biasList) {
+        cotTab.setBiasData(biasList);
+    }
+
+    @Override
+    public void onRatioCreated(Ratio ratio) {
     }
 
     public void launch() {

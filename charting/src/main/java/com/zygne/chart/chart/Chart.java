@@ -12,4 +12,8 @@ public interface Chart {
     public void setTitle(String title);
 
     public void setSeries(List<List<Serie>> series);
+
+    public void zoom(double level);
+
+    public void stretch(double level);
 }

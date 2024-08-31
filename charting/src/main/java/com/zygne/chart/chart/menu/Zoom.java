@@ -21,7 +21,8 @@ public class Zoom {
             250,
             500,
             1000,
-            5000};
+            5000,
+            10000};
 
     private static final double[] stretchScale = {
             1,
@@ -41,7 +42,12 @@ public class Zoom {
             20,
             22,
             24,
-            26};
+            26,
+            30,
+            40,
+            50,
+            75,
+            100};
 
 
     private final Callback callback;
@@ -52,7 +58,7 @@ public class Zoom {
         this.callback = callback;
     }
 
-    public void reset(){
+    public void reset() {
         currentZoom = 10;
         currentStretch = 10;
         update();
@@ -76,6 +82,52 @@ public class Zoom {
             return;
         }
         currentZoom--;
+
+        update();
+    }
+
+    public void zoom(double level) {
+        if (level > 1) {
+            return;
+        }
+
+        if (level < 0) {
+            return;
+        }
+
+        currentZoom = (int) (zoomScales.length * level);
+
+        if(currentZoom < 0){
+            currentZoom = 0;
+        }
+
+        if (currentZoom >= zoomScales.length - 1) {
+            currentZoom = zoomScales.length - 1;
+            return;
+        }
+
+        update();
+    }
+
+    public void stretch(double level) {
+        if (level > 1) {
+            return;
+        }
+
+        if (level < 0) {
+            return;
+        }
+
+        currentStretch = (int) (stretchScale.length * level);
+
+        if(currentStretch < 0){
+            currentStretch = 0;
+        }
+
+        if (currentStretch >= stretchScale.length - 1) {
+            currentStretch = stretchScale.length - 1;
+            return;
+        }
 
         update();
     }
@@ -113,6 +165,7 @@ public class Zoom {
         void onZoomChanged(ZoomDetails zoomDetails);
     }
 
-    public record ZoomDetails(double zoomLevel, double stretchLevel){}
+    public record ZoomDetails(double zoomLevel, double stretchLevel) {
+    }
 
 }

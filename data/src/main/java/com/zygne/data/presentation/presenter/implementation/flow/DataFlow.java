@@ -29,10 +29,10 @@ public class DataFlow implements DataFetchInteractor.Callback,
         this.logger = logger;
     }
 
-    public void fetchData(DataBroker dataBroker, String ticker, int years) {
+    public void fetchData(DataBroker dataBroker, String ticker, int years, String timeFrame) {
         this.downloadedData.clear();
         logger.log(Logger.LOG_LEVEL.INFO, "Download data for " + ticker.toUpperCase());
-        new DataFetchInteractorImpl(executor, mainThread, this, ticker, years, dataBroker).execute();
+        new DataFetchInteractorImpl(executor, mainThread, this, ticker, years, timeFrame, dataBroker).execute();
     }
 
     @Override
@@ -58,6 +58,7 @@ public class DataFlow implements DataFetchInteractor.Callback,
 
     public interface Callback {
         void onDataFetched(List<Histogram> data, String time);
+
         void onDataError();
     }
 }

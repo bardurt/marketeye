@@ -5,6 +5,7 @@ import com.zygne.chart.chart.Canvas;
 public class Bar extends Object2d{
 
     private long timeStamp;
+    private boolean showMonthOnly = false;
 
     public long getTimeStamp() {
         return timeStamp;
@@ -12,6 +13,14 @@ public class Bar extends Object2d{
 
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public boolean getShowMonthOnly() {
+        return showMonthOnly;
+    }
+
+    public void setShowMonthOnly(boolean showMonthOnly) {
+        this.showMonthOnly = showMonthOnly;
     }
 
     @Override

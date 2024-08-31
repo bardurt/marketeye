@@ -33,7 +33,7 @@ public class CotInteractorImpl  extends BaseInteractor implements CotInteractor,
         String url = getCotUrlForSymbol(symbol);
 
         if(!url.isEmpty()){
-            dataBroker.downloadData(url, 0);
+            dataBroker.downloadData(url,"", 0);
         } else {
             mainThread.post(callback::onError);
         }
@@ -53,14 +53,14 @@ public class CotInteractorImpl  extends BaseInteractor implements CotInteractor,
     private String getCotUrlForSymbol(String assetName){
 
         return switch (assetName) {
-            case "%5EGSPC" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_sp500.csv";
-            case "CL=F" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_crude_oil.csv";
-            case "%5EIXIC" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_nasdaq.csv";
-            case "GC=F" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_gold.csv";
-            case "SI=F" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_silver.csv";
-            case "KE=F" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_wheat.csv";
-            case "DX-Y.NYB" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_usd.csv";
-            case "BTC-USD" -> "https://raw.githubusercontent.com/bardurt/cftccot/main/data/cot_btc.csv";
+            case "%5EGSPC" -> "https://raw.githubusercontent.com/bardurt/market_data/main/cot/cot_sp500.csv";
+            case "CL=F" -> "https://raw.githubusercontent.com/bardurt/market_data/main/cot/cot_crude_oil.csv";
+            case "%5EIXIC" -> "https://raw.githubusercontent.com/bardurt/market_data/main/cot/cot_nasdaq.csv";
+            case "GC=F" -> "https://raw.githubusercontent.com/bardurt/market_data/main/cot/cot_gold.csv";
+            case "SI=F" -> "https://raw.githubusercontent.com/bardurt/market_data/main/cot/ot_silver.csv";
+            case "KE=F" -> "https://raw.githubusercontent.com/bardurt/market_data/main/cot/cot_wheat.csv";
+            case "DX-Y.NYB" -> "https://raw.githubusercontent.com/bardurt/market_data/main/cot/cot_usd.csv";
+            case "BTC-USD" -> "https://raw.githubusercontent.com/bardurt/market_data/main/cot/cot_btc.csv";
             default -> "";
         };
     }

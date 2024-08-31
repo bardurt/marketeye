@@ -173,6 +173,16 @@ public class PriceChart extends JPanel implements Chart,
     public void setTitle(String title) {
     }
 
+    @Override
+    public void zoom(double level) {
+
+    }
+
+    @Override
+    public void stretch(double level) {
+        zoom.stretch(level);
+    }
+
     private void updateIndicators() {
         priceScale.setScale(scale);
 

@@ -3,38 +3,50 @@ package com.zygne.client.swing.components.tabs;
 import com.zygne.chart.chart.charts.bar.BarChart;
 import com.zygne.chart.chart.model.data.BarSerie;
 import com.zygne.chart.chart.model.data.Serie;
+import com.zygne.data.domain.model.Bias;
 import com.zygne.data.domain.model.CotData;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class CotTab extends JPanel {
 
     private final BarChart barChartRaw;
-    private final BarChart barChartAdjusted;
-    private final BarChart barChartAdjusted3Months;
+    private final BarChart monthlySeason;
 
     public CotTab() {
         setLayout(new BorderLayout());
-        JPanel barLayout = new JPanel(new GridLayout(3, 0));
+        JPanel barLayout = new JPanel(new GridLayout(2, 0));
 
         barChartRaw = new BarChart();
-        barChartAdjusted = new BarChart();
-        barChartAdjusted3Months = new BarChart();
+        monthlySeason = new BarChart();
 
         barLayout.add(barChartRaw);
-        barLayout.add(barChartAdjusted);
-        barLayout.add(barChartAdjusted3Months);
+        barLayout.add(monthlySeason);
 
         add(barLayout, BorderLayout.CENTER);
     }
 
     public void setCotData(List<CotData> cotData) {
-        barChartRaw.setSeries(adjustedToMonths(12, cotData));
-        barChartAdjusted.setSeries(adjustedToMonths(6, cotData));
-        barChartAdjusted3Months.setSeries(adjustedToMonths(3, cotData));
+        barChartRaw.setSeries(adjustedToMonths(18, cotData));
+    }
+
+    public void setBiasData(List<Bias> biasList) {
+        List<List<Serie>> series = new ArrayList<>();
+        List<Serie> serieList = new ArrayList<>();
+        for (Bias b : biasList) {
+            BarSerie serie = new BarSerie(b.change);
+            serie.setDate(1, b.index, Calendar.getInstance().get(Calendar.YEAR));
+            serie.setDateFormat(Serie.DateFormat.MONTH);
+            serie.setIncluded(true);
+            serieList.add(serie);
+        }
+        series.add(serieList);
+        monthlySeason.setSeries(series);
+
     }
 
     private List<List<Serie>> adjustedToMonths(int months, List<CotData> cotData) {
@@ -63,14 +75,12 @@ public class CotTab extends JPanel {
 
         for (int i = 0; i < cotData.size(); i++) {
             CotData c = cotData.get(i);
-            BarSerie serie =new BarSerie((c.getNet() -mid)/ 1000);
-            if(i >= start){
+            BarSerie serie = new BarSerie((c.getNet() - mid) / 1000);
+            if (i >= start) {
                 serie.setIncluded(true);
+                serie.setTimeStamp(c.getTimeStamp());
+                serieList.add(serie);
             }
-
-            serie.setTimeStamp(c.getTimeStamp());
-            serieList.add(serie);
-
         }
 
         series.add(serieList);

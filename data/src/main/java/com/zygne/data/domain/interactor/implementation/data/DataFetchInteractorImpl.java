@@ -18,20 +18,22 @@ public class DataFetchInteractorImpl extends BaseInteractor implements DataFetch
     private final int years;
     private final DataBroker dataBroker;
     private final List<FinanceData> data;
+    private final String timeFrame;
 
-    public DataFetchInteractorImpl(Executor executor, MainThread mainThread, Callback callback, String symbol, int yearsToFetch, DataBroker dataBroker) {
+    public DataFetchInteractorImpl(Executor executor, MainThread mainThread, Callback callback, String symbol, int yearsToFetch, String timeFrame, DataBroker dataBroker) {
         super(executor, mainThread);
         this.callback = callback;
         this.symbol = symbol;
         this.years = yearsToFetch;
         this.dataBroker = dataBroker;
+        this.timeFrame = timeFrame;
         data = new ArrayList<>();
     }
 
     @Override
     public void run() {
         dataBroker.setCallback(this);
-        dataBroker.downloadData(symbol, years);
+        dataBroker.downloadData(symbol, timeFrame, years);
     }
 
     @Override
