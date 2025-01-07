@@ -126,7 +126,8 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     }
 
     public static void launch(String api) {
-        JFrame frame = new JFrame(ProjectProps.readProperty("name"));
+        String title = ProjectProps.readProperty("name") + " by " + ProjectProps.readProperty("author");
+        JFrame frame = new JFrame(title);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(new SwingGui(api));
         frame.getContentPane().setPreferredSize(new Dimension(1024, 512));
