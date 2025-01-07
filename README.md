@@ -1,3 +1,8 @@
+![GitHub Created At](https://img.shields.io/github/created-at/bardurt/marketeye?style=plastic)
+![GitHub Stars](https://img.shields.io/github/stars/bardurt/marketeye?style=plastic)
+![GitHub Forks](https://img.shields.io/github/forks/bardurt/marketeye?style=plastic)
+![GitHub License](https://img.shields.io/github/license/bardurt/marketeye?style=plastic)
+
 # MarketEye
 
 ![logo](images/icon.png)
