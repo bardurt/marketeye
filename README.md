@@ -13,4 +13,4 @@ A small application that fetches data from Alpha Vantage and allows the user to 
 
 
 ### How to use
-Locate the file ```gradle.properties``` and change the value for `api` to the API key that you can get from AlphaVantage.co for free
+Locate the file ```gradle.properties``` and change the value for `api` to the API key that you can get from https://www.alphavantage.co/ for free
