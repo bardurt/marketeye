@@ -58,11 +58,7 @@ public class HistogramInteractorImpl extends BaseInteractor implements Histogram
 
                 sma.addData(volume);
 
-                if(count > periods){
-                    histogram.volumeSma = sma.getMean();
-                } else {
-                    histogram.volumeSma = 0;
-                }
+                histogram.volumeSma = sma.getMean();
 
                 data.add(histogram);
 

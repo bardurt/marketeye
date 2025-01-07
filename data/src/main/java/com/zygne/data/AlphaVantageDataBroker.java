@@ -1,9 +1,9 @@
 package com.zygne.data;
 
+import com.zygne.arch.domain.Logger;
 import com.zygne.data.domain.DataBroker;
 import com.zygne.data.domain.FinanceData;
 import com.zygne.data.domain.model.BarData;
-import com.zygne.arch.domain.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,17 +11,19 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
-public class YahooDataBroker implements DataBroker {
 
+public class AlphaVantageDataBroker implements DataBroker {
+
+    private final String apiKey;
     private Callback callback;
     private final Logger logger;
 
-    public YahooDataBroker(Logger logger) {
+    public AlphaVantageDataBroker(Logger logger, String api) {
         this.logger = logger;
+        this.apiKey = api;
     }
 
     @Override
@@ -29,33 +31,77 @@ public class YahooDataBroker implements DataBroker {
 
         logger.log(Logger.LOG_LEVEL.INFO, symbol + " " + yearsBack + " years");
 
-        Calendar calendar = Calendar.getInstance();
-        String timeEnd = "" + (calendar.getTime().getTime() / 1000);
 
-        calendar.add(Calendar.YEAR, yearsBack * -1);
-        calendar.set(Calendar.MONTH, 0);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        String url = "";
 
-        String timeStart = "" + (calendar.getTime().getTime() / 1000);
-
-        String time = "1d";
-        if (Objects.equals(interval, "1mo")) {
-            time = "1mo";
+        if(Objects.equals(symbol, "wti")){
+            url = "https://www.alphavantage.co/query?function=WTI&interval=daily&apikey=" + apiKey + "&datatype=csv";
+        } else {
+            url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + symbol + "&apikey=" + apiKey + "&outputsize=full&datatype=csv";
         }
 
-
-        String url = "https://query1.finance.yahoo.com/v7/finance/download/" + symbol + "?period1=" + timeStart + "&period2=" + timeEnd + "&interval=" + time + "&events=history&includeAdjustedClose=true";
         System.out.println(url);
         logger.log(Logger.LOG_LEVEL.INFO, "Downloading data for " + symbol);
 
+        String finalUrl = url;
         Thread t = new Thread(() -> {
-            List<FinanceData> data = downLoadTimeSeries(url);
+            List<FinanceData> data = downLoadTimeSeries(finalUrl);
             if (callback != null) {
                 callback.onDataFinished(data);
             }
         });
 
         t.start();
+    }
+
+
+    public void testData() {
+
+
+        String url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + "spx" + "&apikey=" + apiKey + "&outputsize=full&datatype=csv";
+
+
+        InputStreamReader inputStreamReader = null;
+        BufferedReader bufferedReader = null;
+        URLConnection urlConnection;
+        try {
+            URL content = new URL(url);
+
+            // establish connection to file in URL
+            urlConnection = content.openConnection();
+
+            inputStreamReader = new InputStreamReader(urlConnection.getInputStream());
+
+            bufferedReader = new BufferedReader(inputStreamReader);
+
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null) {
+
+                System.out.println(line);
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (inputStreamReader != null) {
+                try {
+                    inputStreamReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
     }
 
     private List<FinanceData> downLoadTimeSeries(String url) {
@@ -77,11 +123,14 @@ public class YahooDataBroker implements DataBroker {
 
             String line;
 
+            int count = 0;
             while ((line = bufferedReader.readLine()) != null) {
-
-                BarData barData = BarData.fromStream(line);
-                if (barData != null) {
-                    lines.add(barData);
+                count++;
+                if(count > 1) {
+                    BarData barData = BarData.fromStreamAlphaVantage(line);
+                    if (barData != null) {
+                        lines.add(barData);
+                    }
                 }
 
             }
@@ -118,5 +167,6 @@ public class YahooDataBroker implements DataBroker {
     public void removeCallback() {
         this.callback = null;
     }
+
 
 }

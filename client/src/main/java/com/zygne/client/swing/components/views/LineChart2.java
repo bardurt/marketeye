@@ -38,6 +38,7 @@ public class LineChart2 extends JPanel {
         LineChart linePanel = new LineChart();
         linePanel.setTitle(symbol);
         linePanel.setSeries(dataset);
+        linePanel.setWaterMark(symbol);
 
         add(linePanel);
         invalidate();

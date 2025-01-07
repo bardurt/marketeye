@@ -76,6 +76,22 @@ public class Histogram {
         return NumberHelper.getPercentChange(low, high);
     }
 
+    public boolean isSameWeek(long timeStamp) {
+        Calendar c1 = Calendar.getInstance();
+        c1.setTimeInMillis(this.timeStamp);
+
+        Calendar c2 = Calendar.getInstance();
+        c2.setTimeInMillis(timeStamp);
+
+        if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR)) {
+            if (c1.get(Calendar.WEEK_OF_YEAR) == c2.get(Calendar.WEEK_OF_YEAR)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public boolean equals(Object obj) {
         long timeStamp1 = ((Histogram) obj).timeStamp;

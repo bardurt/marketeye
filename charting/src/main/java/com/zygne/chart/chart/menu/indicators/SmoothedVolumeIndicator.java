@@ -8,11 +8,11 @@ import com.zygne.chart.chart.model.chart.VolumeBar;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VolumeIndicator extends Object2d {
+public class SmoothedVolumeIndicator extends Object2d {
 
     private final List<VolumeBar> volumeBarList;
 
-    public VolumeIndicator(List<VolumeBar> volumeBarList) {
+    public SmoothedVolumeIndicator(List<VolumeBar> volumeBarList) {
         this.volumeBarList = volumeBarList;
     }
 
@@ -33,13 +33,13 @@ public class VolumeIndicator extends Object2d {
 
                 long highestVolume = 0;
                 for (CandleStick e : candleSticks) {
-                    if (e.getVolume() > highestVolume) {
-                        highestVolume = e.getVolume();
+                    if (e.getVolumeSma() > highestVolume) {
+                        highestVolume = e.getVolumeSma();
                     }
                 }
 
                 for (CandleStick e : candleSticks) {
-                    double percent = e.getVolume() / (double) highestVolume;
+                    double percent = e.getVolumeSma() / (double) highestVolume;
                     int barHeight = (int) (height * percent);
                     if (barHeight < 2) {
                         barHeight = 2;
@@ -50,11 +50,12 @@ public class VolumeIndicator extends Object2d {
                     volumeBar.setY(y);
                     volumeBar.setWidth(e.getWidth());
                     volumeBar.setHeight(barHeight);
-                    volumeBar.setColorSchema(ColorSchema.BLUE);
+                    volumeBar.setColorSchema(ColorSchema.YELLOW);
+
                     volumeBars.add(volumeBar);
                 }
 
-                VolumeIndicator indicator = new VolumeIndicator(volumeBars);
+                SmoothedVolumeIndicator indicator = new SmoothedVolumeIndicator(volumeBars);
                 indicator.setzOrder(3);
 
                 callback.onVolumeIndicatorCreated(indicator);
@@ -66,8 +67,7 @@ public class VolumeIndicator extends Object2d {
         }
 
         public interface Callback {
-            void onVolumeIndicatorCreated(VolumeIndicator volumeIndicator);
+            void onVolumeIndicatorCreated(SmoothedVolumeIndicator volumeIndicator);
         }
-
     }
 }

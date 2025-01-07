@@ -1,54 +1,46 @@
 package com.zygne.client.swing.components.tabs;
 
-import com.zygne.client.swing.components.views.FuturesView;
-import com.zygne.client.swing.components.views.SingleChartView;
+import com.zygne.chart.chart.charts.linechart.LineChart;
+import com.zygne.chart.chart.model.data.LineSerie;
+import com.zygne.chart.chart.model.data.Serie;
+import com.zygne.client.swing.components.views.LineChart2;
 import com.zygne.data.domain.model.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
-public class TendencyTab extends JPanel implements FuturesView.Callback {
+public class TendencyTab extends JPanel  {
 
-    private final Callback callback;
-    private final FuturesView reportView;
-    private final SingleChartView singleChartView;
-    private String symbol;
 
-    public TendencyTab(Callback callback) {
+    private final LineChart linePanel;
+
+    public TendencyTab() {
         super();
-        this.callback = callback;
         setLayout(new BorderLayout());
-
-        singleChartView = new SingleChartView();
-
-        reportView = new FuturesView();
-        reportView.setCallback(this);
-
-        JPanel chartPanel = new JPanel(new GridLayout(0, 1));
-        chartPanel.add(singleChartView);
-
-        add(reportView, BorderLayout.NORTH);
-        add(chartPanel, BorderLayout.CENTER);
+        linePanel = new LineChart();
+        add(linePanel);
     }
 
-    public void setAssets(List<Asset> data) {
-        reportView.setAssets(data);
-    }
+    public void addTendency(TendencyReport tendencyReport, String title) {
+        java.util.List<java.util.List<Serie>> dataset = new ArrayList<>();
+        for (Tendency t : tendencyReport.tendencies()) {
+            String name = t.name;
+            List<Serie> quoteList = new ArrayList<>();
+            for (int i = 0; i < t.data.size(); i++) {
 
-    @Override
-    public void reportButtonClicked(String name, String symbol) {
-        if (callback != null) {
-            this.symbol = name;
-            callback.generateTendency(symbol);
+                LineSerie item = new LineSerie();
+                item.setY(t.data.get(i).value);
+                item.setTimeStamp(t.data.get(i).timeStamp);
+                item.setName(name);
+                quoteList.add(item);
+            }
+            dataset.add(quoteList);
         }
+
+        linePanel.setWaterMark(title);
+        linePanel.setSeries(dataset);
     }
 
-    public void addTendency(TendencyReport tendencyReport) {
-        singleChartView.addTendency(symbol, tendencyReport);
-    }
-
-    public interface Callback {
-        void generateTendency(String symbol);
-    }
 }

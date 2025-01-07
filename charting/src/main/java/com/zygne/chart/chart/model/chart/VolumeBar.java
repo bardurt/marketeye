@@ -6,7 +6,13 @@ public class VolumeBar extends Object2d {
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.setColor(15, 151, 255,  128);
+
+        if(colorSchema == ColorSchema.BLUE) {
+            canvas.setColor(15, 151, 255, 128);
+        } else {
+            canvas.setColor(231, 238, 28, 96);
+        }
+
         canvas.drawRectangle(x, y-height, width, height, Canvas.Fill.SOLID);
     }
 }
