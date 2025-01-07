@@ -54,56 +54,6 @@ public class AlphaVantageDataBroker implements DataBroker {
         t.start();
     }
 
-
-    public void testData() {
-
-
-        String url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + "spx" + "&apikey=" + apiKey + "&outputsize=full&datatype=csv";
-
-
-        InputStreamReader inputStreamReader = null;
-        BufferedReader bufferedReader = null;
-        URLConnection urlConnection;
-        try {
-            URL content = new URL(url);
-
-            // establish connection to file in URL
-            urlConnection = content.openConnection();
-
-            inputStreamReader = new InputStreamReader(urlConnection.getInputStream());
-
-            bufferedReader = new BufferedReader(inputStreamReader);
-
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null) {
-
-                System.out.println(line);
-
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (inputStreamReader != null) {
-                try {
-                    inputStreamReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-    }
-
     private List<FinanceData> downLoadTimeSeries(String url) {
 
         List<FinanceData> lines = new ArrayList<>();
