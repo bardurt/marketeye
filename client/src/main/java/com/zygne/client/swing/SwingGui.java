@@ -38,7 +38,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
     private String symbol = "";
 
-    public SwingGui() {
+    public SwingGui(String api) {
         super(new BorderLayout());
         setSize(880, 880);
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -87,7 +87,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
         MainThread mainThread = new JavaSwingThread();
         Executor executor = ThreadExecutor.getInstance();
-        String api = ProjectProps.readProperty("api");
+
         mainPresenter = new MainPresenterImpl(executor, mainThread, this, logger, api);
     }
 
@@ -125,10 +125,10 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         tabbedPane.addTab("Seasonality", tendencyTab);
     }
 
-    public void launch() {
+    public static void launch(String api) {
         JFrame frame = new JFrame(ProjectProps.readProperty("name"));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new SwingGui());
+        frame.add(new SwingGui(api));
         frame.getContentPane().setPreferredSize(new Dimension(1024, 512));
         frame.pack();
         frame.setVisible(true);
