@@ -1,16 +1,15 @@
 package com.zygne.client.swing.components.tabs;
 
 import com.zygne.client.swing.components.views.PriceChartView;
-import com.zygne.client.swing.components.views.StocksView;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
 
-public class ChartTab extends JPanel {
+public class WeeklyChartTab extends JPanel {
 
     public final PriceChartView priceChartView;
 
-    public ChartTab() {
+    public WeeklyChartTab() {
         super();
         setLayout(new BorderLayout());
 

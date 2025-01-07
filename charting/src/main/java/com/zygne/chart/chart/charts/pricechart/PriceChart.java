@@ -18,6 +18,7 @@ public class PriceChart extends JPanel implements Chart,
         CandleSticksIndicator.Creator.Callback,
         VolumeProfileIndicator.Creator.Callback,
         VolumeIndicator.Creator.Callback,
+        SmoothedVolumeIndicator.Creator.Callback,
         TimeIndicator.Creator.Callback,
         Zoom.Callback,
         ChartControls.Callback {
@@ -43,8 +44,11 @@ public class PriceChart extends JPanel implements Chart,
     private VolumeProfileIndicator volumeProfileIndicator = null;
     private VolumeIndicator volumeIndicator = null;
     private TimeIndicator timeIndicator = null;
+    private SmoothedVolumeIndicator smoothedVolumeIndicator = null;
     private final Zoom zoom;
     private final PriceScale priceScale = new PriceScale();
+    private boolean shouldCenterCamera = true;
+    private boolean dataLoad = false;
 
     public PriceChart() {
         this.camera = new Camera(0, 0);
@@ -113,10 +117,12 @@ public class PriceChart extends JPanel implements Chart,
         this.bars.clear();
         this.bars.addAll(quotes);
         this.bars.sort(new CandleSerie.TimeComparator());
-
+        dataLoad = true;
+        shouldCenterCamera = true;
         createCandleSticks();
 
         zoom.reset();
+        dataLoad = false;
     }
 
     @Override
@@ -141,6 +147,10 @@ public class PriceChart extends JPanel implements Chart,
         objects.add(waterMark);
         objects.add(camera);
 
+
+        if (smoothedVolumeIndicator != null) {
+            objects.add(smoothedVolumeIndicator);
+        }
 
         if (volumeIndicator != null) {
             objects.add(volumeIndicator);
@@ -186,6 +196,7 @@ public class PriceChart extends JPanel implements Chart,
     private void updateIndicators() {
         priceScale.setScale(scale);
 
+        smoothedVolumeIndicator = null;
         volumeIndicator = null;
         volumeProfileIndicator = null;
         timeIndicator = null;
@@ -197,6 +208,12 @@ public class PriceChart extends JPanel implements Chart,
         createVolumeProfile();
 
         new VolumeIndicator.Creator().create(
+                this,
+                candleSticksIndicator.getCandleSticks(),
+                150,
+                canvasHeight - 20);
+
+        new SmoothedVolumeIndicator.Creator().create(
                 this,
                 candleSticksIndicator.getCandleSticks(),
                 150,
@@ -226,6 +243,12 @@ public class PriceChart extends JPanel implements Chart,
     @Override
     public void onVolumeIndicatorCreated(VolumeIndicator volumeIndicator) {
         this.volumeIndicator = volumeIndicator;
+        refresh();
+    }
+
+    @Override
+    public void onVolumeIndicatorCreated(SmoothedVolumeIndicator volumeIndicator) {
+        this.smoothedVolumeIndicator = volumeIndicator;
         refresh();
     }
 
@@ -287,6 +310,9 @@ public class PriceChart extends JPanel implements Chart,
     public void onZoomChanged(Zoom.ZoomDetails zoomDetails) {
         scale = zoomDetails.zoomLevel();
         barWidth = (int) zoomDetails.stretchLevel();
+        if (!dataLoad) {
+            shouldCenterCamera = false;
+        }
         createCandleSticks();
     }
 
