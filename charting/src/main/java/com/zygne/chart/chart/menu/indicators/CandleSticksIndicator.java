@@ -30,6 +30,18 @@ public class CandleSticksIndicator extends Object2d {
     public static final class Creator {
         public void create(Callback callback, List<CandleSerie> quoteList, double scalar, int barWidth, int separator) {
 
+
+            final int spacing;
+            final int width;
+            if(barWidth == 0){
+                spacing = 0;
+                width = 1;
+            } else {
+                spacing = 1;
+                width = barWidth;
+            }
+
+
             Runnable r = () -> {
 
                 List<CandleStick> candleSticks = new ArrayList<>();
@@ -47,7 +59,7 @@ public class CandleSticksIndicator extends Object2d {
                             scalar);
 
                     b.setX(x);
-                    b.setWidth(barWidth);
+                    b.setWidth(width);
 
                     b.setId(e.getTimeStamp());
                     b.setTimeStamp(e.getTimeStamp());
@@ -58,8 +70,8 @@ public class CandleSticksIndicator extends Object2d {
                     candleSticks.add(b);
                     candleSticks.add(b);
 
-                    x += barWidth;
-                    x += 1;
+                    x += width;
+                    x += spacing;
                 }
 
                 int lastBar = x;

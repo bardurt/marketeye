@@ -25,6 +25,7 @@ public class Zoom {
             10000};
 
     private static final double[] stretchScale = {
+            0,
             1,
             2,
             3,
@@ -45,9 +46,7 @@ public class Zoom {
             26,
             30,
             40,
-            50,
-            75,
-            100};
+            50};
 
 
     private final Callback callback;

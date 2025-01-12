@@ -9,6 +9,10 @@
 ### About
 A small application that fetches data from Alpha Vantage and allows the user to visualize the price chart, and, fetch the seasonal tendency for a given market.
 
+### Features
+- Bar chart with Volume Profile
+- Line chart for seasonal tendencies
+
 ### Preview
 #### Chart
 ![Chart](images/preview_1.png)

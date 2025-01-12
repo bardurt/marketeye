@@ -1,6 +1,5 @@
 package com.zygne.data.domain.model;
 
-import com.zygne.data.domain.utils.NumberHelper;
 
 import java.util.Calendar;
 import java.util.Comparator;
@@ -16,66 +15,6 @@ public class Histogram {
     public long volumeSma;
     public double volumeSmaPercentile;
 
-    public Direction getDirection() {
-        if (open < close) {
-            return Direction.Up;
-        } else {
-            return Direction.Down;
-        }
-    }
-
-    public double getTotalRange() {
-        return ((high - low) / low) * 100;
-    }
-
-    public double getBodyRange() {
-        return ((close - open) / open) * 100;
-    }
-
-    public double getOpenHighRange() {
-        return ((high - open) / open) * 100;
-    }
-
-    public enum Direction {Up, Down}
-
-    public boolean intersects(double value) {
-        if (value < high) {
-            return value > low;
-        }
-
-        return false;
-    }
-
-    public boolean contains(double value) {
-        if (value <= high) {
-            return value >= low;
-        }
-
-        return false;
-    }
-
-    public boolean inBody(double value) {
-        if (getDirection() == Direction.Up) {
-            if (value <= close) {
-                return value >= open;
-            }
-        } else {
-            if (value >= close) {
-                return value <= open;
-            }
-        }
-
-        return false;
-    }
-
-    public double getOpenCloseChange() {
-        return NumberHelper.getPercentChange(open, close);
-    }
-
-    public double getOpenHighChange() {
-        return NumberHelper.getPercentChange(low, high);
-    }
-
     public boolean isSameWeek(long timeStamp) {
         Calendar c1 = Calendar.getInstance();
         c1.setTimeInMillis(this.timeStamp);
@@ -85,6 +24,22 @@ public class Histogram {
 
         if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR)) {
             if (c1.get(Calendar.WEEK_OF_YEAR) == c2.get(Calendar.WEEK_OF_YEAR)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isSameMonth(long timeStamp) {
+        Calendar c1 = Calendar.getInstance();
+        c1.setTimeInMillis(this.timeStamp);
+
+        Calendar c2 = Calendar.getInstance();
+        c2.setTimeInMillis(timeStamp);
+
+        if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR)) {
+            if (c1.get(Calendar.MONTH) == c2.get(Calendar.MONTH)) {
                 return true;
             }
         }

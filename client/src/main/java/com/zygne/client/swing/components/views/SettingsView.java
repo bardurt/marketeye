@@ -6,12 +6,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class StocksView extends JPanel {
+public class SettingsView extends JPanel {
 
     private Callback callback;
     private TextField textFieldSymbol;
 
-    public StocksView() {
+    public SettingsView() {
         JPanel mainPanel = new JPanel(new BorderLayout());
 
         JPanel optionsPanel = new JPanel(new GridBagLayout());
@@ -22,7 +22,7 @@ public class StocksView extends JPanel {
         JLabel labelSymbol = new JLabel("Symbol");
 
         textFieldSymbol = new TextField();
-        textFieldSymbol.setColumns(12);
+        textFieldSymbol.setColumns(18);
 
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -32,28 +32,35 @@ public class StocksView extends JPanel {
         constraints.gridy = 1;
         optionsPanel.add(textFieldSymbol, constraints);
 
-        JButton buttonCreateReport = new JButton("Create Report");
-        buttonCreateReport.setBounds(50, 100, 95, 30);
-        buttonCreateReport.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                createReport();
-            }
+
+        JPanel buttonPanel = new JPanel(new GridLayout(1,2));
+
+        JButton buttonEquities = new JButton("Equity");
+        buttonEquities.setBounds(50, 100, 95, 30);
+        buttonEquities.addActionListener(e -> {
+            String symbolText = textFieldSymbol.getText();
+            callback.reportButtonClicked(symbolText, 0);
         });
 
-        constraints.gridx = 1;
-        constraints.gridy = 1;
-        optionsPanel.add(buttonCreateReport, constraints);
+        buttonPanel.add(buttonEquities);
+
+        JButton buttonCrypto = new JButton("Crypto");
+        buttonCrypto.setBounds(50, 100, 95, 30);
+        buttonCrypto.addActionListener(e -> {
+
+            String symbolText = textFieldSymbol.getText();
+            callback.reportButtonClicked(symbolText, 1);
+
+        });
+
+        buttonPanel.add(buttonCrypto);
+
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        optionsPanel.add(buttonPanel, constraints);
 
         mainPanel.add(optionsPanel, BorderLayout.NORTH);
         add(mainPanel);
-    }
-
-    private void createReport() {
-        if (callback != null) {
-            String symbolText = textFieldSymbol.getText();
-            callback.reportButtonClicked(symbolText);
-
-        }
     }
 
     public void setCallback(Callback callback) {
@@ -61,6 +68,6 @@ public class StocksView extends JPanel {
     }
 
     public interface Callback {
-        void reportButtonClicked(String symbol);
+        void reportButtonClicked(String symbol, int type);
     }
 }

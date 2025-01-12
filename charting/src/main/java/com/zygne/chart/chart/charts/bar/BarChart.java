@@ -5,7 +5,6 @@ import com.zygne.chart.chart.Chart;
 import com.zygne.chart.chart.RendererImpl;
 import com.zygne.chart.chart.menu.ChartControls;
 import com.zygne.chart.chart.menu.PriceScale;
-import com.zygne.chart.chart.menu.StatusBar;
 import com.zygne.chart.chart.menu.Zoom;
 import com.zygne.chart.chart.menu.indicators.BarIndicator;
 import com.zygne.chart.chart.menu.indicators.TimeIndicator;
@@ -62,14 +61,6 @@ public class BarChart extends JPanel implements Chart,
     }
 
     private void setUp() {
-
-        StatusBar statusBar = new StatusBar();
-        statusBar.setWidth(canvasWidth);
-        statusBar.setHeight(canvasHeight);
-        int labelWidth = 60;
-        statusBar.setLabelWidth(labelWidth);
-        statusBar.setzOrder(2);
-
         priceScale.setX(canvasWidth - 50);
         priceScale.setY(1);
         priceScale.setWidth(100);

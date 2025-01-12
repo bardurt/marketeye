@@ -1,9 +1,7 @@
 package com.zygne.data.domain.interactor.implementation.data;
 
-import com.zygne.data.CryptoDataBroker;
 import com.zygne.data.domain.DataBroker;
 import com.zygne.data.domain.FinanceData;
-import com.zygne.data.domain.interactor.implementation.data.base.DataFetchInteractor;
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
 import com.zygne.arch.domain.interactor.base.BaseInteractor;
@@ -19,9 +17,9 @@ public class DataFetchInteractorImpl extends BaseInteractor implements DataFetch
     private final DataBroker dataBroker;
     private final List<FinanceData> data;
     private final String timeFrame;
-    private final CryptoDataBroker cryptoDataBroker;
 
-    public DataFetchInteractorImpl(Executor executor, MainThread mainThread, Callback callback, String symbol, int yearsToFetch, String timeFrame, DataBroker dataBroker) {
+    public DataFetchInteractorImpl(Executor executor, MainThread mainThread, Callback callback, String symbol, int yearsToFetch, String timeFrame,
+                                   DataBroker dataBroker) {
         super(executor, mainThread);
         this.callback = callback;
         this.symbol = symbol;
@@ -29,19 +27,12 @@ public class DataFetchInteractorImpl extends BaseInteractor implements DataFetch
         this.dataBroker = dataBroker;
         this.timeFrame = timeFrame;
         data = new ArrayList<>();
-        cryptoDataBroker = new CryptoDataBroker();
-        cryptoDataBroker.setCallback(this);
     }
 
     @Override
     public void run() {
-
-        if(symbol.equalsIgnoreCase("BTC") || symbol.equalsIgnoreCase("ETH")){
-            cryptoDataBroker.downloadData(symbol, timeFrame, years);
-        } else {
-            dataBroker.setCallback(this);
-            dataBroker.downloadData(symbol, timeFrame, years);
-        }
+        dataBroker.setCallback(this);
+        dataBroker.downloadData(symbol, timeFrame, years);
     }
 
     @Override

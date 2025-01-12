@@ -15,6 +15,7 @@ public class PriceChartView extends JPanel {
     private final PriceChart pricePanel = new PriceChart();
 
     public PriceChartView() {
+        pricePanel.setFocusable(true);
         setLayout(new BorderLayout());
         add(pricePanel, BorderLayout.CENTER);
     }

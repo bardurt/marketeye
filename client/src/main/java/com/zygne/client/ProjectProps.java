@@ -16,11 +16,10 @@ public class ProjectProps {
 
             input = new FileInputStream("gradle.properties");
 
-            // load a properties file
             prop.load(input);
 
             propValue = prop.getProperty(propName);
-            // get the property value and print it out
+
             System.out.println(propValue);
         } catch (IOException ex) {
             ex.printStackTrace();

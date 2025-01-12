@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class ApiProps {
 
-    public static String readApi(){
+    public static String readApi(String key){
 
         String propValue = "";
         try {
@@ -17,11 +17,9 @@ public class ApiProps {
 
             input = new FileInputStream("api.properties");
 
-            // load a properties file
             prop.load(input);
 
-            propValue = prop.getProperty("api");
-            // get the property value and print it out
+            propValue = prop.getProperty(key);
             System.out.println(propValue);
         } catch (IOException ex) {
             ex.printStackTrace();

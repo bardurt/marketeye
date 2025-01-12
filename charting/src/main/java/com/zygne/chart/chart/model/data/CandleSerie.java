@@ -7,6 +7,7 @@ public class CandleSerie extends QuoteSerie {
     private double percentile;
     private long volumeSma;
     private double volumeSmaPercentile;
+    private double priceSma;
 
     public double getPercentile() {
         return percentile;
@@ -30,6 +31,14 @@ public class CandleSerie extends QuoteSerie {
 
     public void setVolumeSmaPercentile(double volumeSmaPercentile) {
         this.volumeSmaPercentile = volumeSmaPercentile;
+    }
+
+    public double getPriceSma() {
+        return priceSma;
+    }
+
+    public void setPriceSma(double priceSma) {
+        this.priceSma = priceSma;
     }
 
     public static final class VolumeComparator implements Comparator<CandleSerie> {

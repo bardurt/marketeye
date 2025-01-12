@@ -1,4 +1,4 @@
-package com.zygne.data.domain.interactor.implementation.data.base;
+package com.zygne.data.domain.interactor.implementation.data;
 
 import com.zygne.data.domain.model.TendencyReport;
 import com.zygne.arch.domain.interactor.base.Interactor;

@@ -1,20 +1,22 @@
-package com.zygne.data.presentation.presenter.implementation;
+package com.zygne.data.presentation.presenter;
 
 import com.zygne.data.AlphaVantageDataBroker;
+import com.zygne.data.CryptoDataBroker;
 import com.zygne.data.domain.DataBroker;
 import com.zygne.data.domain.FinanceData;
 import com.zygne.data.domain.interactor.implementation.data.DataFetchInteractorImpl;
 import com.zygne.data.domain.interactor.implementation.data.HistogramInteractorImpl;
+import com.zygne.data.domain.interactor.implementation.data.MonthlyHistogramInteractorImpl;
 import com.zygne.data.domain.interactor.implementation.data.TendencyInteractorImpl;
 import com.zygne.data.domain.interactor.implementation.data.WeeklyHistogramInteractorImpl;
-import com.zygne.data.domain.interactor.implementation.data.base.DataFetchInteractor;
-import com.zygne.data.domain.interactor.implementation.data.base.HistogramInteractor;
-import com.zygne.data.domain.interactor.implementation.data.base.TendencyInteractor;
-import com.zygne.data.domain.interactor.implementation.data.base.WeeklyHistogramInteractor;
+import com.zygne.data.domain.interactor.implementation.data.DataFetchInteractor;
+import com.zygne.data.domain.interactor.implementation.data.HistogramInteractor;
+import com.zygne.data.domain.interactor.implementation.data.MonthlyHistogramInteractor;
+import com.zygne.data.domain.interactor.implementation.data.TendencyInteractor;
+import com.zygne.data.domain.interactor.implementation.data.WeeklyHistogramInteractor;
 import com.zygne.data.domain.model.BarData;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.TendencyReport;
-import com.zygne.data.presentation.presenter.base.MainPresenter;
 import com.zygne.arch.domain.Logger;
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
@@ -27,21 +29,25 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter,
         DataFetchInteractor.Callback,
         HistogramInteractor.Callback,
         WeeklyHistogramInteractor.Callback,
+        MonthlyHistogramInteractor.Callback,
         TendencyInteractor.Callback{
 
     private final DataBroker dataBroker;
+    private final DataBroker cryptoBroker;
     private final View view;
     private String ticker;
     private boolean downloadingData = false;
     private final List<BarData> downloadedData = new ArrayList<>();
     private final List<Histogram> histogramDaily = new ArrayList<>();
     private final List<Histogram> histogramWeekly = new ArrayList<>();
+    private final List<Histogram> histogramMonthly = new ArrayList<>();
     private final Logger logger;
 
     public MainPresenterImpl(Executor executor, MainThread mainThread, MainPresenter.View view, Logger logger, String apiKey) {
         super(executor, mainThread);
         this.mainThread = mainThread;
         this.dataBroker = new AlphaVantageDataBroker(logger, apiKey);
+        this.cryptoBroker = new CryptoDataBroker();
         this.view = view;
         this.view.showError("");
         this.logger = logger;
@@ -50,7 +56,7 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter,
     }
 
     @Override
-    public void createReport(String ticker) {
+    public void createReport(String ticker, int type) {
 
         if (downloadingData) {
             return;
@@ -68,12 +74,17 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter,
 
         view.showLoading("Fetching data for " + ticker.toUpperCase() + "");
 
-        new DataFetchInteractorImpl(executor, mainThread, this, ticker, 5, "", dataBroker).execute();
+        if(type == 0) {
+            new DataFetchInteractorImpl(executor, mainThread, this, ticker, 5, "", dataBroker).execute();
+        } else {
+            new DataFetchInteractorImpl(executor, mainThread, this, ticker, 5, "", cryptoBroker).execute();
+        }
     }
 
 
     @Override
     public void onDataFetched(List<FinanceData> entries) {
+        downloadedData.clear();
         for (FinanceData e : entries) {
             downloadedData.add((BarData) e);
         }
@@ -101,14 +112,22 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter,
         logger.log(Logger.LOG_LEVEL.INFO, "Weekly Bars Created");
         histogramWeekly.clear();
         histogramWeekly.addAll(data);
-        view.hideLoading();
-        new TendencyInteractorImpl(executor, mainThread, this, histogramDaily).execute();
+        new MonthlyHistogramInteractorImpl(executor, mainThread, this, histogramDaily).execute();
+    }
 
+    @Override
+    public void onMonthlyHistogramCreated(List<Histogram> data) {
+        logger.log(Logger.LOG_LEVEL.INFO, "Monthly Bars Created");
+        histogramMonthly.clear();
+        histogramMonthly.addAll(data);
+        new TendencyInteractorImpl(executor, mainThread, this, histogramDaily).execute();
     }
 
     @Override
     public void onTendencyReportCreated(TendencyReport tendencyReport) {
         logger.log(Logger.LOG_LEVEL.INFO, "Tendency Created");
-        view.onComplete(histogramDaily, histogramWeekly, tendencyReport, ticker);
+        downloadingData = false;
+        view.hideLoading();
+        view.onComplete(histogramDaily, histogramWeekly, histogramMonthly, tendencyReport, ticker);
     }
 }

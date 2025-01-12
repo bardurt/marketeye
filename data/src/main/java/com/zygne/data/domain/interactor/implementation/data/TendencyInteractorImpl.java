@@ -1,6 +1,5 @@
 package com.zygne.data.domain.interactor.implementation.data;
 
-import com.zygne.data.domain.interactor.implementation.data.base.TendencyInteractor;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.Tendency;
 import com.zygne.data.domain.model.TendencyEntry;

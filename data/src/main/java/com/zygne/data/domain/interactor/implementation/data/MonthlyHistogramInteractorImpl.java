@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class WeeklyHistogramInteractorImpl extends BaseInteractor implements WeeklyHistogramInteractor {
+public class MonthlyHistogramInteractorImpl extends BaseInteractor implements MonthlyHistogramInteractor {
 
     private final Callback callback;
     private final List<Histogram> entries;
     private final SimpleMovingAverage sma;
     private final int periods = 9;
 
-    public WeeklyHistogramInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<Histogram> entries) {
+    public MonthlyHistogramInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<Histogram> entries) {
         super(executor, mainThread);
         this.callback = callback;
         this.entries = entries;
@@ -39,13 +39,13 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
                     merger.add(histogram);
                 } else {
 
-                    Histogram weeklyHistogram = merger.merge();
-                    sma.addData(weeklyHistogram.volume);
-                    weeklyHistogram.volumeSma = (long) sma.getMean();
+                    Histogram monthlyHistogram = merger.merge();
+                    sma.addData(monthlyHistogram.volume);
+                    monthlyHistogram.volumeSma = (long) sma.getMean();
                     merger.clear();
                     merger.add(histogram);
 
-                    data.add(weeklyHistogram);
+                    data.add(monthlyHistogram);
                 }
 
             }
@@ -68,7 +68,7 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
         data.sort(new Histogram.TimeComparator());
         Collections.reverse(data);
 
-        mainThread.post(() -> callback.onWeeklyHistogramCreated(data));
+        mainThread.post(() -> callback.onMonthlyHistogramCreated(data));
 
     }
 
@@ -89,7 +89,7 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
                 return true;
             }
 
-            if (items.get(0).isSameWeek(h.timeStamp)) {
+            if (items.get(0).isSameMonth(h.timeStamp)) {
                 return true;
             }
 
@@ -125,7 +125,7 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
             h.volume = volume;
             h.timeStamp = items.get(0).timeStamp;
 
-            System.out.println("Merging weekly bar, item count " + items.size());
+            System.out.println("Merging monthly bar, item count " + items.size());
 
             return h;
         }
@@ -133,5 +133,3 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
     }
 
 }
-
-

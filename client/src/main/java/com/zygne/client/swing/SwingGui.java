@@ -2,14 +2,13 @@ package com.zygne.client.swing;
 
 import com.zygne.client.ProjectProps;
 import com.zygne.client.swing.components.tabs.ChartTab;
-import com.zygne.client.swing.components.tabs.WeeklyChartTab;
 import com.zygne.client.swing.components.views.LoadingView;
 import com.zygne.client.swing.components.UiLogger;
 import com.zygne.client.swing.components.tabs.TendencyTab;
-import com.zygne.client.swing.components.views.StocksView;
+import com.zygne.client.swing.components.views.SettingsView;
 import com.zygne.data.domain.model.*;
-import com.zygne.data.presentation.presenter.base.*;
-import com.zygne.data.presentation.presenter.implementation.*;
+import com.zygne.data.presentation.presenter.MainPresenter;
+import com.zygne.data.presentation.presenter.MainPresenterImpl;
 import com.zygne.arch.domain.Logger;
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
@@ -20,9 +19,9 @@ import java.awt.*;
 import java.util.List;
 
 public class SwingGui extends JPanel implements MainPresenter.View,
-        StocksView.Callback {
+        SettingsView.Callback {
 
-    private final StocksView reportView;
+    private final SettingsView reportView;
 
     private final JLabel labelStatus;
     private final JLabel labelLoading;
@@ -30,9 +29,11 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
     private final MainPresenter mainPresenter;
 
-    private final ChartTab settingsTab;
+    private final ChartTab dailyChartTab;
+    private final ChartTab weeklyChartTab;
+    private final ChartTab moonthlyChartTab;
     private final TendencyTab tendencyTab;
-    private final WeeklyChartTab weeklyChartTab;
+
 
     private final JTabbedPane tabbedPane;
 
@@ -43,16 +44,16 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         setSize(880, 880);
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        reportView = new StocksView();
+        reportView = new SettingsView();
         reportView.setCallback(this);
 
-        settingsTab = new ChartTab();
+        dailyChartTab = new ChartTab();
+        weeklyChartTab = new ChartTab();
+        moonthlyChartTab = new ChartTab();
         tendencyTab = new TendencyTab();
-        weeklyChartTab = new WeeklyChartTab();
 
         tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Settings", settingsTab);
-        tabbedPane.addTab("Settings", settingsTab);
+        tabbedPane.addTab("Settings", dailyChartTab);
 
         JPanel infoPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -93,12 +94,13 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
 
     @Override
-    public void onComplete(List<Histogram> daily, List<Histogram> weekly, TendencyReport tendencyReport, String symbol) {
+    public void onComplete(List<Histogram> daily, List<Histogram> weekly, List<Histogram> monthly, TendencyReport tendencyReport, String symbol) {
         this.symbol = symbol;
         labelStatus.setText("");
         labelLoading.setText("");
-        settingsTab.priceChartView.addData(daily, symbol.toUpperCase() + " Daily");
-        weeklyChartTab.priceChartView.addData(weekly, symbol.toUpperCase() + " Weekly");
+        dailyChartTab.priceChartView.addData(daily, symbol.toUpperCase() + " Day");
+        weeklyChartTab.priceChartView.addData(weekly, symbol.toUpperCase() + " Week");
+        moonthlyChartTab.priceChartView.addData(monthly, symbol.toUpperCase() + " Month");
         tendencyTab.addTendency(tendencyReport, symbol.toUpperCase() + " Seasonality");
     }
 
@@ -120,8 +122,9 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     @Override
     public void prepareView() {
         tabbedPane.removeAll();
-        tabbedPane.addTab("Daily", settingsTab);
+        tabbedPane.addTab("Daily", dailyChartTab);
         tabbedPane.addTab("Weekly", weeklyChartTab);
+        tabbedPane.addTab("Monthly", moonthlyChartTab);
         tabbedPane.addTab("Seasonality", tendencyTab);
     }
 
@@ -136,9 +139,9 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     }
 
     @Override
-    public void reportButtonClicked(String symbol) {
+    public void reportButtonClicked(String symbol, int type) {
         if (mainPresenter != null) {
-            mainPresenter.createReport(symbol);
+            mainPresenter.createReport(symbol, type);
         }
     }
 }

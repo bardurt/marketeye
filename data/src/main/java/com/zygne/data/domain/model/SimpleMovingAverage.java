@@ -5,7 +5,7 @@ import java.util.Queue;
 
 public class SimpleMovingAverage {
 
-    private final Queue<Long> dataSet = new LinkedList<>();
+    private final Queue<Double> dataSet = new LinkedList<>();
     private final int period;
     private long sum;
 
@@ -13,7 +13,7 @@ public class SimpleMovingAverage {
         this.period = period;
     }
 
-    public void addData(Long num) {
+    public void addData(double num) {
         sum += num;
         dataSet.add(num);
 
@@ -22,7 +22,7 @@ public class SimpleMovingAverage {
         }
     }
 
-    public long getMean() {
+    public double getMean() {
         return sum / period;
     }
 }

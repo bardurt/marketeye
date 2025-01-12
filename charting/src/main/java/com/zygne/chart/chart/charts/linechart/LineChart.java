@@ -67,13 +67,6 @@ public class LineChart extends JPanel implements Chart,
         waterMark.setzOrder(-1);
         this.waterMark.setColor("#00306C");
 
-        StatusBar statusBar = new StatusBar();
-        statusBar.setWidth(canvasWidth);
-        statusBar.setHeight(canvasHeight);
-        int labelWidth = 60;
-        statusBar.setLabelWidth(labelWidth);
-        statusBar.setzOrder(2);
-
         priceScale.setX(canvasWidth - 50);
         priceScale.setY(1);
         priceScale.setWidth(100);

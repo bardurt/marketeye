@@ -1,7 +1,6 @@
 package com.zygne.data.domain.interactor.implementation.data;
 
 
-import com.zygne.data.domain.interactor.implementation.data.base.HistogramInteractor;
 import com.zygne.data.domain.model.BarData;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.SimpleMovingAverage;
@@ -33,12 +32,11 @@ public class HistogramInteractorImpl extends BaseInteractor implements Histogram
     public void run() {
         List<Histogram> data = new ArrayList<>();
 
-        int count = 0;
+
         for (BarData line : entries) {
 
             try {
 
-                count++;
                 long timeStamp = line.getTimeStamp();
                 double open = NumberHelper.round2Decimals(line.open());
                 double high = NumberHelper.round2Decimals(line.high());
@@ -57,8 +55,7 @@ public class HistogramInteractorImpl extends BaseInteractor implements Histogram
                 histogram.dateTime = dateTime;
 
                 sma.addData(volume);
-
-                histogram.volumeSma = sma.getMean();
+                histogram.volumeSma = (long) sma.getMean();
 
                 data.add(histogram);
 
@@ -74,7 +71,7 @@ public class HistogramInteractorImpl extends BaseInteractor implements Histogram
         double percentile;
 
         for (int i = 0; i < data.size(); i++) {
-            percentile = ((size-(i)) / (double) size) * 100d;
+            percentile = ((size - (i)) / (double) size) * 100d;
             data.get(i).volumeSmaPercentile = percentile;
         }
 

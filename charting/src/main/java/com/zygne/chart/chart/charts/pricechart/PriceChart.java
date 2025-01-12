@@ -7,6 +7,7 @@ import com.zygne.chart.chart.menu.indicators.*;
 import com.zygne.chart.chart.model.chart.*;
 import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.model.data.CandleSerie;
+import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;
 
 import javax.swing.*;
@@ -32,6 +33,7 @@ public class PriceChart extends JPanel implements Chart,
     private int loadY;
 
     private final List<CandleSerie> bars = new ArrayList<>();
+    private final List<LineSerie> line = new ArrayList<>();
 
     private int canvasHeight = DEFAULT_HEIGHT;
     private int canvasWidth = DEFAULT_WIDTH;
@@ -40,6 +42,7 @@ public class PriceChart extends JPanel implements Chart,
     private TextObject waterMark;
     private final List<Object2d> objects = new ArrayList<>();
     private final RendererImpl renderer;
+    private LineIndicator lineIndicator = null;
     private CandleSticksIndicator candleSticksIndicator = null;
     private VolumeProfileIndicator volumeProfileIndicator = null;
     private VolumeIndicator volumeIndicator = null;
@@ -51,6 +54,7 @@ public class PriceChart extends JPanel implements Chart,
     private boolean dataLoad = false;
 
     public PriceChart() {
+        setFocusable(true);
         this.camera = new Camera(0, 0);
         this.camera.setX(0);
         this.camera.setY(0);
@@ -78,13 +82,6 @@ public class PriceChart extends JPanel implements Chart,
         waterMark.setzOrder(-1);
         this.waterMark.setColor("#00306C");
 
-        StatusBar statusBar = new StatusBar();
-        statusBar.setWidth(canvasWidth);
-        statusBar.setHeight(canvasHeight);
-        int labelWidth = 60;
-        statusBar.setLabelWidth(labelWidth);
-        statusBar.setzOrder(2);
-
         priceScale.setX(canvasWidth - 50);
         priceScale.setY(1);
         priceScale.setWidth(100);
@@ -109,9 +106,17 @@ public class PriceChart extends JPanel implements Chart,
         }
 
         List<CandleSerie> quotes = new ArrayList<>();
+        List<Serie> lineSeries = new ArrayList<>();
 
+        int index = 0;
         for (Serie s : bars) {
-            quotes.add((CandleSerie) s);
+            CandleSerie candleSerie = ((CandleSerie) s);
+            quotes.add(candleSerie);
+            LineSerie l = new LineSerie();
+            l.setX(index);
+            l.setY(candleSerie.getPriceSma());
+            lineSeries.add(l);
+            index++;
         }
 
         this.bars.clear();
@@ -164,6 +169,10 @@ public class PriceChart extends JPanel implements Chart,
             objects.add(candleSticksIndicator);
         }
 
+        if(lineIndicator != null){
+            objects.add(lineIndicator);
+        }
+
         objects.add(priceScale);
 
         if (volumeProfileIndicator != null) {
@@ -200,6 +209,7 @@ public class PriceChart extends JPanel implements Chart,
         volumeIndicator = null;
         volumeProfileIndicator = null;
         timeIndicator = null;
+        lineIndicator = null;
 
         if (candleSticksIndicator == null) {
             return;
@@ -264,7 +274,6 @@ public class PriceChart extends JPanel implements Chart,
         this.timeIndicator = timeIndicator;
         refresh();
     }
-
 
     private void createVolumeProfile() {
         if (candleSticksIndicator == null) {

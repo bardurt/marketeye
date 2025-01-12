@@ -3,7 +3,6 @@ package com.zygne.client.swing.components.tabs;
 import com.zygne.chart.chart.charts.linechart.LineChart;
 import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;
-import com.zygne.client.swing.components.views.LineChart2;
 import com.zygne.data.domain.model.*;
 
 import javax.swing.*;

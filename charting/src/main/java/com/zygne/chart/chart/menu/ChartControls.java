@@ -2,6 +2,8 @@ package com.zygne.chart.chart.menu;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 
 public class ChartControls extends MouseInputAdapter {
@@ -10,6 +12,7 @@ public class ChartControls extends MouseInputAdapter {
     private int startY;
     private int startX;
     private boolean scaling = false;
+    private boolean drawing = false;
 
     private final Callback callback;
 
@@ -33,7 +36,6 @@ public class ChartControls extends MouseInputAdapter {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
         if (!SwingUtilities.isRightMouseButton(e)) {
             return;
         }
@@ -78,6 +80,7 @@ public class ChartControls extends MouseInputAdapter {
         }
         int dy = startY - e.getY();
         int dx = startX - e.getX();
+
         callback.onDrag(dx, dy);
     }
 
