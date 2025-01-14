@@ -3,6 +3,10 @@ package com.zygne.chart.chart.menu;
 public class Zoom {
 
     private static final double[] zoomScales = {
+            0.000000001d,
+            0.00000001d,
+            0.0000001d,
+            0.000001d,
             0.00001d,
             0.0001d,
             0.001d,
@@ -24,7 +28,11 @@ public class Zoom {
             500,
             1000,
             5000,
-            10000};
+            10000,
+            100000,
+            1000000,
+            10000000,
+            100000000,};
 
     private static final double[] stretchScale = {
             0,

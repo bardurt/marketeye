@@ -320,6 +320,7 @@ public class PriceChart extends JPanel implements Chart,
         if (!dataLoad) {
             shouldCenterCamera = false;
         }
+        System.out.println("Zoom : " + scale);
         createCandleSticks();
     }
 

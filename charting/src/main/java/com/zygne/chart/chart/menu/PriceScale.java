@@ -6,7 +6,7 @@ import com.zygne.chart.chart.model.chart.TextObject;
 
 public class PriceScale extends Object2d {
 
-    private static final int MAX_SIZE = 500;
+    private static final int MAX_SIZE = 750;
     private double scale = 1;
 
     public void setScale(double scale) {
@@ -27,11 +27,11 @@ public class PriceScale extends Object2d {
             int level = i * 50;
 
             label.setY(-level);
-            label.setText(String.format("%.2f", (level / scale)));
+            label.setText(String.format("%.5f", (level / scale)));
             label.draw(canvas);
 
             label.setY(-level - 25);
-            label.setText(String.format("%.2f", ((level+25) / scale)));
+            label.setText(String.format("%.5f", ((level+25) / scale)));
             label.draw(canvas);
             label.setY(-level - 12);
             label.setText("-");
@@ -49,11 +49,11 @@ public class PriceScale extends Object2d {
             int level = i * 50;
 
             label.setY(level);
-            label.setText(String.format("%.2f", (-level / scale)));
+            label.setText(String.format("%.5f", (-level / scale)));
             label.draw(canvas);
 
             label.setY(level + 25);
-            label.setText(String.format("%.2f", (-(level+25) / scale)));
+            label.setText(String.format("%.5f", (-(level+25) / scale)));
             label.draw(canvas);
             label.setY(level + 12);
             label.setText("-");

@@ -3,6 +3,7 @@ package com.zygne.chart.chart.menu.indicators;
 import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.model.chart.Line;
 import com.zygne.chart.chart.model.chart.Object2d;
+import com.zygne.chart.chart.model.chart.Object2d.ColorSchema;
 import com.zygne.chart.chart.model.chart.Point2d;
 import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;
@@ -14,6 +15,15 @@ public class LineIndicator extends Object2d {
 
     private static final int MAX_SIZE = 5;
     private final List<Line> lines = new ArrayList<>();
+    private static final List<ColorSchema> colorSchemas =new ArrayList<>();
+
+
+    public LineIndicator() {
+        colorSchemas.add(ColorSchema.BLUE);
+        colorSchemas.add(ColorSchema.GREEN);
+        colorSchemas.add(ColorSchema.YELLOW);
+        colorSchemas.add(ColorSchema.RED);
+    }
 
     public void addLine(Line line) {
 
@@ -75,13 +85,15 @@ public class LineIndicator extends Object2d {
 
                 }
                 zeroLine.setLineWidth(Canvas.LineWidth.SMALL);
-                zeroLine.setColorSchema(Object2d.ColorSchema.WHITE);
+                zeroLine.setColorSchema(ColorSchema.WHITE);
                 lineIndicator.addLine(zeroLine);
 
-                lines.get(0).setColorSchema(Object2d.ColorSchema.BLUE);
-                lines.get(1).setColorSchema(Object2d.ColorSchema.GREEN);
-                lines.get(2).setColorSchema(Object2d.ColorSchema.YELLOW);
-                lines.get(3).setColorSchema(Object2d.ColorSchema.RED);
+
+                int max = Math.min(lines.size(), colorSchemas.size());
+
+                for (int i = 0; i < max; i++) {
+                    lines.get(i).setColorSchema(colorSchemas.get(i));
+                }
 
                 for (Line l : lines) {
                     lineIndicator.addLine(l);

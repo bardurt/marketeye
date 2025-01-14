@@ -115,27 +115,15 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
             report.tendencies().add(new Tendency("3 Year", getAverageFor(avgList, minLength, 3)));
             report.tendencies().add(new Tendency("5 Year", getAverageFor(avgList, minLength, 5)));
             report.tendencies().add(new Tendency("7 Year", getAverageFor(avgList, minLength, 7)));
+        } else if(avgList.size() > 3){
+            report.tendencies().add(new Tendency("2 Year", getAverageFor(avgList, minLength, 2)));
+            report.tendencies().add(new Tendency("3 Year", getAverageFor(avgList, minLength, 3)));
+        } else if(avgList.size() > 2){
+            report.tendencies().add(new Tendency("1 Year", getAverageFor(avgList, minLength, 1)));
+            report.tendencies().add(new Tendency("2 Year", getAverageFor(avgList, minLength, 2)));
+        } else if(avgList.size() >= 1){
+            report.tendencies().add(new Tendency("1 Year", getAverageFor(avgList, minLength, 1)));
         }
-
-
-        String dates = "timestamp:";
-        Tendency t = report.tendencies().get(1);
-
-        for (TendencyEntry tendencyEntry : t.data) {
-            dates += tendencyEntry.timeStamp + ",";
-
-        }
-
-
-        for (Tendency tendency : report.tendencies()) {
-
-            String line = "" + tendency.name + ":";
-            for (TendencyEntry tendencyEntry : tendency.data) {
-                line += tendencyEntry.value + ",";
-
-            }
-        }
-
 
         mainThread.post(() -> callback.onTendencyReportCreated(report));
     }

@@ -42,10 +42,6 @@ public class VolumeProfileIndicator extends Object2d {
 
                 this.grouping = barHeight / scale;
 
-                if (grouping < 0.01) {
-                    grouping = 0.01;
-                }
-
                 double maxValue = Double.MIN_VALUE;
                 double minValue = Double.MAX_VALUE;
 

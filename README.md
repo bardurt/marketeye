@@ -7,7 +7,7 @@
 
 ![logo](images/icon.png)
 ### About
-A small application that fetches data from Alpha Vantage and allows the user to visualize the price chart, and, fetch the seasonal tendency for a given market.
+Project that fetches data from Alpha Vantage, and other data providers, and allows the user to visualize the price chart, and, see the seasonal tendency for a given market.
 
 ### Features
 - Bar chart with Volume Profile

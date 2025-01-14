@@ -38,10 +38,10 @@ public class HistogramInteractorImpl extends BaseInteractor implements Histogram
             try {
 
                 long timeStamp = line.getTimeStamp();
-                double open = NumberHelper.round2Decimals(line.open());
-                double high = NumberHelper.round2Decimals(line.high());
-                double low = NumberHelper.round2Decimals(line.low());
-                double close = NumberHelper.round2Decimals(line.close());
+                double open = line.open();
+                double high = line.high();
+                double low = line.low();
+                double close = line.close();
                 long volume = line.volume();
                 String dateTime = TimeHelper.getDateFromTimeStamp(timeStamp);
 

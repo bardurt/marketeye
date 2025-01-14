@@ -14,8 +14,12 @@ import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
 import com.zygne.arch.domain.executor.ThreadExecutor;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SwingGui extends JPanel implements MainPresenter.View,
@@ -129,13 +133,33 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     }
 
     public static void launch(String api) {
-        String title = ProjectProps.readProperty("name") + " by " + ProjectProps.readProperty("author");
-        JFrame frame = new JFrame(title);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new SwingGui(api));
-        frame.getContentPane().setPreferredSize(new Dimension(1024, 512));
-        frame.pack();
-        frame.setVisible(true);
+        EventQueue.invokeLater(() -> {
+            String title = ProjectProps.readProperty("name") + " by " + ProjectProps.readProperty("author");
+            JFrame frame = new JFrame(title);
+
+            try {
+                List<Image> icons = new ArrayList<>();
+                URL url = SwingGui.class.getResource("/resources/icon.png");
+
+                if (url == null) {
+                    System.out.println("Icon url is null");
+                } else {
+                    Image icon = ImageIO.read(url);
+                    icons.add(icon);
+                }
+
+                frame.setIconImages(icons);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.add(new SwingGui(api));
+            frame.getContentPane().setPreferredSize(new Dimension(1024, 512));
+            frame.pack();
+            frame.setVisible(true);
+        });
+
     }
 
     @Override
