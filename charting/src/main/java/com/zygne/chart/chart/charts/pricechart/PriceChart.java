@@ -88,9 +88,7 @@ public class PriceChart extends JPanel implements Chart,
         priceScale.setHeight(camera.getHeight());
         priceScale.setzOrder(1);
         priceScale.setScale(scale);
-
     }
-
 
     @Override
     public void setSeries(List<List<Serie>> series) {

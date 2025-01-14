@@ -6,7 +6,7 @@ import com.zygne.chart.chart.model.chart.TextObject;
 
 public class PriceScale extends Object2d {
 
-    private int MAX_SIZE = 500;
+    private static final int MAX_SIZE = 500;
     private double scale = 1;
 
     public void setScale(double scale) {
@@ -44,7 +44,7 @@ public class PriceScale extends Object2d {
             canvas.drawLine(x, -level, -width, -level, Canvas.LineStyle.DASHED, Canvas.LineWidth.SMALL);
         }
 
-        for (int i = 0; i < MAX_SIZE; i++) {
+        for (int i = 0; i < MAX_SIZE/10; i++) {
 
             int level = i * 50;
 

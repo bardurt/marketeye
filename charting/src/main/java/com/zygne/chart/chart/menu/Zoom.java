@@ -3,6 +3,8 @@ package com.zygne.chart.chart.menu;
 public class Zoom {
 
     private static final double[] zoomScales = {
+            0.00001d,
+            0.0001d,
             0.001d,
             0.005d,
             0.01d,
