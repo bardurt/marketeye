@@ -27,46 +27,46 @@ public class RendererImpl implements Renderer {
     private void drawCanvas(List<Object2d> object2dList) {
         canvas.drawRectangle(0, 0, camera.getWidth(), camera.getHeight(), Canvas.Fill.SOLID);
 
-        for (Object2d object2d : object2dList) {
-            if (object2d.getzOrder() == -1) {
-                object2d.draw(canvas);
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == -1) {
+                object2dList.get(i).draw(canvas);
             }
         }
 
         canvas.translate(0, camera.getViewPortY());
-        for (Object2d object2d : object2dList) {
-            if (object2d.getzOrder() == 1) {
-                object2d.draw(canvas);
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == 1) {
+                object2dList.get(i).draw(canvas);
             }
         }
         canvas.translate(0, -camera.getViewPortY());
 
         canvas.translate(camera.getViewPortX(), camera.getViewPortY());
-        for (Object2d object2d : object2dList) {
-            if (object2d.getzOrder() == 0) {
-                object2d.draw(canvas);
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == 0) {
+                object2dList.get(i).draw(canvas);
             }
         }
         canvas.translate(-camera.getViewPortX(), -camera.getViewPortY());
 
-        for (Object2d object2d : object2dList) {
-            if (object2d.getzOrder() == 2) {
-                object2d.draw(canvas);
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == 2) {
+                object2dList.get(i).draw(canvas);
             }
         }
 
         canvas.translate(camera.getViewPortX(), 0);
 
-        for (Object2d object2d : object2dList) {
-            if (object2d.getzOrder() == 3) {
-                object2d.draw(canvas);
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == 3) {
+                object2dList.get(i).draw(canvas);
             }
         }
         canvas.translate(-camera.getViewPortX(), 0);
 
-        for (Object2d object2d : object2dList) {
-            if (object2d.getzOrder() == 4) {
-                object2d.draw(canvas);
+        for (int i = 0; i < object2dList.size(); i++) {
+            if (object2dList.get(i).getzOrder() == 4) {
+                object2dList.get(i).draw(canvas);
             }
         }
 
