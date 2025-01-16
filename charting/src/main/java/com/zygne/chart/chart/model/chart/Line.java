@@ -8,7 +8,6 @@ import java.util.List;
 public class Line extends Object2d {
 
     private List<Point2d> point2dList = new ArrayList<>();
-    private String color;
     private String name;
     private Canvas.LineWidth lineWidth = Canvas.LineWidth.MEDIUM;
     private Canvas.LineStyle lineStyle = Canvas.LineStyle.SOLID;
@@ -33,37 +32,6 @@ public class Line extends Object2d {
         return point2dList;
     }
 
-    private void setColor() {
-        if (colorSchema == null) {
-            color = "";
-            return;
-        }
-        switch (colorSchema) {
-            case WHITE -> {
-                color = Colors.SNOW_WHITE;
-            }
-            case RED -> {
-                color = Colors.RED;
-            }
-            case ORANGE -> {
-                color = Colors.ORANGE;
-            }
-            case YELLOW -> {
-                color = Colors.YELLOW;
-            }
-            case BLUE -> {
-                color = Colors.BLUE;
-            }
-            case GREEN -> {
-                color = Colors.GREEN;
-            }
-            case HIGHLIGHT -> {
-                color = "#B2E1BD";
-            }
-        }
-
-    }
-
     public String getName() {
         return name;
     }
@@ -74,7 +42,6 @@ public class Line extends Object2d {
 
     @Override
     public void draw(Canvas canvas) {
-        setColor();
         canvas.setColor(color);
         for (int i = 0; i < point2dList.size() - 1; i++) {
             Point2d p1 = point2dList.get(i);

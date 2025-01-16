@@ -4,11 +4,10 @@ package com.zygne.data.domain.interactor.implementation.data;
 import com.zygne.data.domain.model.BarData;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.SimpleMovingAverage;
-import com.zygne.data.domain.utils.NumberHelper;
 import com.zygne.data.domain.utils.TimeHelper;
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
-import com.zygne.arch.domain.interactor.base.BaseInteractor;
+import com.zygne.arch.domain.interactor.BaseInteractor;
 
 import java.util.ArrayList;
 import java.util.Collections;

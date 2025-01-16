@@ -16,17 +16,19 @@ public class VolumeProfileLine extends Object2d {
 
     private void prepareColors() {
         if (colorSchema == ColorSchema.BLUE) {
-            boxColorHex = "#0093FF";
+            boxColorHex = Colors.BLUE;
         } else if (colorSchema == ColorSchema.RED) {
-            boxColorHex = "#FF0000";
+            boxColorHex = Colors.RED;
         } else if (colorSchema == ColorSchema.ORANGE) {
-            boxColorHex = "#FF9E00";
+            boxColorHex = Colors.ORANGE;
         } else if (colorSchema == ColorSchema.YELLOW) {
-            boxColorHex = "#FFE800";
+            boxColorHex = Colors.YELLOW;
         } else if (colorSchema == ColorSchema.GREEN) {
-            boxColorHex = "#23FF00";
+            boxColorHex = Colors.GREEN;
         } else if (colorSchema == ColorSchema.HIGHLIGHT) {
-            boxColorHex = "#FFFFFF";
+            boxColorHex = Colors.WHITE;
+        } else {
+            boxColorHex = Colors.BLUE;
         }
     }
 

@@ -1,4 +1,4 @@
-package com.zygne.arch.presentation.presenter.base;
+package com.zygne.arch.presentation.presenter;
 
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;

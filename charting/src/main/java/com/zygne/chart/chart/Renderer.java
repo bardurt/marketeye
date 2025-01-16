@@ -5,6 +5,6 @@ import com.zygne.chart.chart.model.chart.Object2d;
 import java.util.List;
 
 public interface Renderer {
-    void Render(List<Object2d> object2dList);
+    void render(List<Object2d> object2dList);
     boolean sizeChanged(int width, int height);
 }

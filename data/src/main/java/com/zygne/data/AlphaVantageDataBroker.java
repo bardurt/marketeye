@@ -32,20 +32,17 @@ public class AlphaVantageDataBroker implements DataBroker {
         logger.log(Logger.LOG_LEVEL.INFO, symbol + " " + yearsBack + " years");
 
 
-        String url = "";
-
-        if(Objects.equals(symbol, "wti")){
-            url = "https://www.alphavantage.co/query?function=WTI&interval=daily&apikey=" + apiKey + "&datatype=csv";
-        } else {
-            url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + symbol + "&apikey=" + apiKey + "&outputsize=full&datatype=csv";
-        }
+        final String url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" +
+                symbol +
+                "&apikey=" +
+                apiKey +
+                "&outputsize=full&datatype=csv";
 
         System.out.println(url);
         logger.log(Logger.LOG_LEVEL.INFO, "Downloading data for " + symbol);
 
-        String finalUrl = url;
         Thread t = new Thread(() -> {
-            List<FinanceData> data = downLoadTimeSeries(finalUrl);
+            List<FinanceData> data = downLoadTimeSeries(url);
             if (callback != null) {
                 callback.onDataFinished(data);
             }

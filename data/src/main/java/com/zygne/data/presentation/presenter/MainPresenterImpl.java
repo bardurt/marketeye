@@ -20,7 +20,7 @@ import com.zygne.data.domain.model.TendencyReport;
 import com.zygne.arch.domain.Logger;
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
-import com.zygne.arch.presentation.presenter.base.BasePresenter;
+import com.zygne.arch.presentation.presenter.BasePresenter;
 
 import java.util.ArrayList;
 import java.util.List;

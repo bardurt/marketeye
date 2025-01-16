@@ -2,7 +2,7 @@ package com.zygne.arch.domain.executor;
 
 
 
-import com.zygne.arch.domain.interactor.base.BaseInteractor;
+import com.zygne.arch.domain.interactor.BaseInteractor;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

@@ -4,7 +4,7 @@ import com.zygne.data.domain.DataBroker;
 import com.zygne.data.domain.FinanceData;
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
-import com.zygne.arch.domain.interactor.base.BaseInteractor;
+import com.zygne.arch.domain.interactor.BaseInteractor;
 
 import java.util.ArrayList;
 import java.util.List;

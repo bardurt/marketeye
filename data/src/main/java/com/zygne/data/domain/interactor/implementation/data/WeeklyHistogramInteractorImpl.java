@@ -2,7 +2,7 @@ package com.zygne.data.domain.interactor.implementation.data;
 
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
-import com.zygne.arch.domain.interactor.base.BaseInteractor;
+import com.zygne.arch.domain.interactor.BaseInteractor;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.SimpleMovingAverage;
 
