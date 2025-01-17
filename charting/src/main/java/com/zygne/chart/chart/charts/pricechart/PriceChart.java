@@ -12,6 +12,8 @@ import com.zygne.chart.chart.model.data.Serie;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +42,7 @@ public class PriceChart extends JPanel implements Chart,
     private final Camera camera;
     private String waterMarkText = "";
     private TextObject waterMark;
-    private final List<Object2d> objects = new ArrayList<>();
+    private final List<Object2d> chartObjects = new ArrayList<>();
     private final RendererImpl renderer;
     private LineIndicator lineIndicator = null;
     private CandleSticksIndicator candleSticksIndicator = null;
@@ -50,8 +52,8 @@ public class PriceChart extends JPanel implements Chart,
     private SmoothedVolumeIndicator smoothedVolumeIndicator = null;
     private final Zoom zoom;
     private final PriceScale priceScale = new PriceScale();
-    private boolean shouldCenterCamera = true;
     private boolean dataLoad = false;
+    private ChartControls chartControls;
 
     public PriceChart() {
         setFocusable(true);
@@ -63,7 +65,7 @@ public class PriceChart extends JPanel implements Chart,
 
         zoom = new Zoom(this);
         renderer = new RendererImpl(camera);
-        ChartControls chartControls = new ChartControls(this);
+        chartControls = new ChartControls(this);
 
         addMouseMotionListener(chartControls);
         addMouseListener(chartControls);
@@ -82,7 +84,7 @@ public class PriceChart extends JPanel implements Chart,
         waterMark.setzOrder(-1);
         this.waterMark.setColor("#00306C");
 
-        priceScale.setX(canvasWidth - 50);
+        priceScale.setX(canvasWidth - 75);
         priceScale.setY(1);
         priceScale.setWidth(100);
         priceScale.setHeight(camera.getHeight());
@@ -121,7 +123,6 @@ public class PriceChart extends JPanel implements Chart,
         this.bars.addAll(quotes);
         this.bars.sort(new CandleSerie.TimeComparator());
         dataLoad = true;
-        shouldCenterCamera = true;
         createCandleSticks();
 
         zoom.reset();
@@ -142,39 +143,39 @@ public class PriceChart extends JPanel implements Chart,
         }
 
         g.setColor(Colors.BLUE_DARK);
-        renderer.Render(objects);
+        renderer.render(chartObjects);
     }
 
     private void refresh() {
-        objects.clear();
-        objects.add(waterMark);
-        objects.add(camera);
+        chartObjects.clear();
+        chartObjects.add(waterMark);
+        chartObjects.add(camera);
 
 
         if (smoothedVolumeIndicator != null) {
-            objects.add(smoothedVolumeIndicator);
+            chartObjects.add(smoothedVolumeIndicator);
         }
 
         if (volumeIndicator != null) {
-            objects.add(volumeIndicator);
+            chartObjects.add(volumeIndicator);
         }
 
         if (timeIndicator != null) {
-            objects.add(timeIndicator);
+            chartObjects.add(timeIndicator);
         }
 
         if (candleSticksIndicator != null) {
-            objects.add(candleSticksIndicator);
+            chartObjects.add(candleSticksIndicator);
         }
 
-        if(lineIndicator != null){
-            objects.add(lineIndicator);
+        if (lineIndicator != null) {
+            chartObjects.add(lineIndicator);
         }
 
-        objects.add(priceScale);
+        chartObjects.add(priceScale);
 
         if (volumeProfileIndicator != null) {
-            objects.add(volumeProfileIndicator);
+            chartObjects.add(volumeProfileIndicator);
         }
 
     }
@@ -287,7 +288,7 @@ public class PriceChart extends JPanel implements Chart,
                 candleSticksIndicator.getCandleSticks(),
                 scale,
                 150,
-                camera.getWidth() - 200
+                camera.getWidth() - 225
         );
     }
 
@@ -317,9 +318,6 @@ public class PriceChart extends JPanel implements Chart,
     public void onZoomChanged(Zoom.ZoomDetails zoomDetails) {
         scale = zoomDetails.zoomLevel();
         barWidth = (int) zoomDetails.stretchLevel();
-        if (!dataLoad) {
-            shouldCenterCamera = false;
-        }
         System.out.println("Zoom : " + scale);
         createCandleSticks();
     }
@@ -379,7 +377,7 @@ public class PriceChart extends JPanel implements Chart,
                 EventQueue.invokeLater(component::repaint);
 
                 try {
-                    Thread.sleep(20);
+                    Thread.sleep(30);
                 } catch (InterruptedException e) {
                 }
             }

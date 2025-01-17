@@ -67,7 +67,7 @@ public class LineChart extends JPanel implements Chart,
         waterMark.setzOrder(-1);
         this.waterMark.setColor("#00306C");
 
-        priceScale.setX(canvasWidth - 50);
+        priceScale.setX(canvasWidth - 100);
         priceScale.setY(1);
         priceScale.setWidth(100);
         priceScale.setHeight(camera.getHeight());
@@ -109,7 +109,7 @@ public class LineChart extends JPanel implements Chart,
         }
 
         g.setColor(Colors.BLUE_DARK);
-        renderer.Render(objects);
+        renderer.render(objects);
     }
 
     private void refresh() {

@@ -4,9 +4,6 @@ import com.zygne.chart.chart.Canvas;
 
 public class TextObject extends Object2d {
 
-    private String color = "#FFFFFF";
-    private boolean useColorScheme = false;
-
     public enum FontSize {
         SMALL_EXTRA,
         SMALL,
@@ -93,11 +90,6 @@ public class TextObject extends Object2d {
         }
     }
 
-    @Override
-    public void setColorSchema(ColorSchema colorSchema) {
-        super.setColorSchema(colorSchema);
-        useColorScheme = true;
-    }
 
     @Override
     public void draw(Canvas canvas) {
@@ -121,31 +113,6 @@ public class TextObject extends Object2d {
             textCenterY = y + height / 2 + (scalar / 2);
         }
 
-        if(useColorScheme){
-            switch (colorSchema) {
-                case WHITE -> {
-                    color = Colors.SNOW_WHITE;
-                }
-                case RED -> {
-                    color = Colors.RED;
-                }
-                case ORANGE -> {
-                    color = Colors.ORANGE;
-                }
-                case YELLOW -> {
-                    color = Colors.YELLOW;
-                }
-                case BLUE -> {
-                    color = Colors.BLUE;
-                }
-                case GREEN -> {
-                    color = Colors.GREEN;
-                }
-                case HIGHLIGHT -> {
-                    color = "#B2E1BD";
-                }
-            }
-        }
         canvas.setColor(color);
 
         if(text.contains("\n")){

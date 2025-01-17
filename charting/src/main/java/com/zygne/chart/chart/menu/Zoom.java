@@ -12,27 +12,25 @@ public class Zoom {
             0.001d,
             0.005d,
             0.01d,
-            0.025d,
-            0.05,
-            0.1,
-            0.25,
-            0.5,
-            1,
-            2,
-            5,
-            10,
-            20,
-            50,
-            100,
-            250,
-            500,
-            1000,
-            5000,
-            10000,
-            100000,
-            1000000,
-            10000000,
-            100000000,};
+            0.1d,
+            0.25d,
+            0.5d,
+            1d,
+            2d,
+            5d,
+            10d,
+            20d,
+            50d,
+            100d,
+            250d,
+            500d,
+            1000d,
+            5000d,
+            10000d,
+            100000d,
+            1000000d,
+            10000000d,
+            100000000d};
 
     private static final double[] stretchScale = {
             0,
@@ -106,7 +104,7 @@ public class Zoom {
 
         currentZoom = (int) (zoomScales.length * level);
 
-        if(currentZoom < 0){
+        if (currentZoom < 0) {
             currentZoom = 0;
         }
 
@@ -129,7 +127,7 @@ public class Zoom {
 
         currentStretch = (int) (stretchScale.length * level);
 
-        if(currentStretch < 0){
+        if (currentStretch < 0) {
             currentStretch = 0;
         }
 

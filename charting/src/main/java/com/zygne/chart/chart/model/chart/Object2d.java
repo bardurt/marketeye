@@ -5,10 +5,22 @@ import com.zygne.chart.chart.Renderable;
 public abstract class Object2d extends BoxCollider implements Renderable {
 
     protected ColorSchema colorSchema = ColorSchema.BLUE;
+    protected String color = Colors.WHITE;
     private int zOrder = 0;
 
     public void setColorSchema(ColorSchema colorSchema) {
         this.colorSchema = colorSchema;
+
+        switch (colorSchema) {
+            case WHITE -> color = Colors.SNOW_WHITE;
+            case RED -> color = Colors.RED;
+            case ORANGE -> color = Colors.ORANGE;
+            case YELLOW -> color = Colors.YELLOW;
+            case BLUE -> color = Colors.BLUE;
+            case GREEN -> color = Colors.GREEN;
+            case HIGHLIGHT -> color = Colors.WHITE;
+            case BLUE_METAL -> color = Colors.BLUE_METAL;
+        }
     }
 
     public ColorSchema getColorSchema() {
@@ -31,6 +43,7 @@ public abstract class Object2d extends BoxCollider implements Renderable {
         GREEN,
         WHITE,
         HIGHLIGHT,
-        GRAY
+        GRAY,
+        BLUE_METAL
     }
 }

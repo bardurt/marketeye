@@ -1,4 +1,4 @@
-package com.zygne.arch.domain.interactor.base;
+package com.zygne.arch.domain.interactor;
 
 
 import com.zygne.arch.domain.executor.Executor;

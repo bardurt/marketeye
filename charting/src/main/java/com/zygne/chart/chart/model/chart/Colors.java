@@ -13,6 +13,7 @@ public final class Colors {
     public static final String WHITE = "#FFFFFF";
     public static final String BLACK = "#000000";
     public static final String SILVER = "#B5BCCE";
+    public static final String BLUE_METAL = "#5B87A8";
 
     private Colors(){}
 }

@@ -1,4 +1,4 @@
-package com.zygne.arch.domain.interactor.base;
+package com.zygne.arch.domain.interactor;
 
 public interface Interactor {
     void execute();
