@@ -23,6 +23,6 @@ public class SimpleMovingAverage {
     }
 
     public double getMean() {
-        return sum / period;
+        return sum / (double)period;
     }
 }

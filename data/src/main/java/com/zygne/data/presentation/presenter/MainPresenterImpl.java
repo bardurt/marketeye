@@ -30,7 +30,7 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter,
         HistogramInteractor.Callback,
         WeeklyHistogramInteractor.Callback,
         MonthlyHistogramInteractor.Callback,
-        TendencyInteractor.Callback{
+        TendencyInteractor.Callback {
 
     private final DataBroker dataBroker;
     private final DataBroker cryptoBroker;
@@ -47,7 +47,7 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter,
         super(executor, mainThread);
         this.mainThread = mainThread;
         this.dataBroker = new AlphaVantageDataBroker(logger, apiKey);
-        this.cryptoBroker = new CryptoDataBroker();
+        this.cryptoBroker = new CryptoDataBroker(logger);
         this.view = view;
         this.view.showError("");
         this.logger = logger;
@@ -74,10 +74,24 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter,
 
         view.showLoading("Fetching data for " + ticker.toUpperCase() + "");
 
-        if(type == 0) {
-            new DataFetchInteractorImpl(executor, mainThread, this, ticker, 5, "", dataBroker).execute();
+        if (type == 0) {
+            new DataFetchInteractorImpl(executor,
+                    mainThread,
+                    this,
+                    ticker,
+                    5,
+                    "",
+                    dataBroker,
+                    logger).execute();
         } else {
-            new DataFetchInteractorImpl(executor, mainThread, this, ticker, 5, "", cryptoBroker).execute();
+            new DataFetchInteractorImpl(executor,
+                    mainThread,
+                    this,
+                    ticker,
+                    5,
+                    "",
+                    cryptoBroker,
+                    logger).execute();
         }
     }
 
