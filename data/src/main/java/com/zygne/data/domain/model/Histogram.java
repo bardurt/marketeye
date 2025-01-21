@@ -1,6 +1,5 @@
 package com.zygne.data.domain.model;
 
-
 import java.util.Calendar;
 import java.util.Comparator;
 
@@ -23,9 +22,7 @@ public class Histogram {
         c2.setTimeInMillis(timeStamp);
 
         if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR)) {
-            if (c1.get(Calendar.WEEK_OF_YEAR) == c2.get(Calendar.WEEK_OF_YEAR)) {
-                return true;
-            }
+            return c1.get(Calendar.WEEK_OF_YEAR) == c2.get(Calendar.WEEK_OF_YEAR);
         }
 
         return false;

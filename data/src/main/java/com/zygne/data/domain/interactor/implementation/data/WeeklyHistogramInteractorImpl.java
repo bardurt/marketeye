@@ -15,13 +15,12 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
     private final Callback callback;
     private final List<Histogram> entries;
     private final SimpleMovingAverage sma;
-    private final int periods = 9;
 
     public WeeklyHistogramInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<Histogram> entries) {
         super(executor, mainThread);
         this.callback = callback;
         this.entries = entries;
-        this.sma = new SimpleMovingAverage(periods);
+        this.sma = new SimpleMovingAverage(9);
     }
 
     @Override
@@ -33,8 +32,7 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
 
         try {
 
-            for(int i = 0; i < entries.size(); i++){
-                Histogram histogram = entries.get(i);
+            for (Histogram histogram : entries) {
                 if (merger.belongs(histogram)) {
                     merger.add(histogram);
                 } else {
@@ -49,7 +47,7 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
                 }
 
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -74,7 +72,7 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
 
     static final class HistogramMerger {
 
-        private List<Histogram> items = new ArrayList<>();
+        private final List<Histogram> items = new ArrayList<>();
 
         public void add(Histogram histogram) {
             items.add(histogram);
@@ -89,20 +87,16 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
                 return true;
             }
 
-            if (items.get(0).isSameWeek(h.timeStamp)) {
-                return true;
-            }
-
-            return false;
+            return items.get(0).isSameWeek(h.timeStamp);
         }
 
         public Histogram merge() {
 
             items.sort(new Histogram.TimeComparator());
-            Histogram h = new Histogram();
+            Histogram mergedHistogram = new Histogram();
 
-            h.close = items.getLast().close;
-            h.open = items.getFirst().open;
+            mergedHistogram.close = items.getLast().close;
+            mergedHistogram.open = items.getFirst().open;
 
             double high = -1000000;
             double low = Double.MAX_VALUE;
@@ -120,14 +114,14 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
                 volume += histogram.volume;
             }
 
-            h.high = high;
-            h.low = low;
-            h.volume = volume;
-            h.timeStamp = items.get(0).timeStamp;
+            mergedHistogram.high = high;
+            mergedHistogram.low = low;
+            mergedHistogram.volume = volume;
+            mergedHistogram.timeStamp = items.get(0).timeStamp;
 
             System.out.println("Merging weekly bar, item count " + items.size());
 
-            return h;
+            return mergedHistogram;
         }
 
     }

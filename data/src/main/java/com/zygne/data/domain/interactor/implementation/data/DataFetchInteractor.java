@@ -1,6 +1,5 @@
 package com.zygne.data.domain.interactor.implementation.data;
 
-
 import com.zygne.data.domain.FinanceData;
 import com.zygne.arch.domain.interactor.Interactor;
 

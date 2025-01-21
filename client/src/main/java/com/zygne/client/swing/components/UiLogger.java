@@ -1,10 +1,9 @@
 package com.zygne.client.swing.components;
 
-
 import com.zygne.arch.domain.Logger;
 import com.zygne.arch.domain.executor.MainThread;
 
-import javax.swing.*;
+import javax.swing.JLabel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;

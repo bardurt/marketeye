@@ -2,14 +2,21 @@ package com.zygne.chart.chart.model.chart;
 
 import com.zygne.chart.chart.Canvas;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+
 
 public class AwtCanvas implements Canvas {
+
+    private static final String FONT_NAME = "TimesRoman";
     private final Graphics2D graphics2D;
 
     public AwtCanvas(Graphics graphics) {
         this.graphics2D = (Graphics2D) graphics.create();
-
     }
 
     @Override
@@ -98,7 +105,7 @@ public class AwtCanvas implements Canvas {
 
     @Override
     public void drawString(String text, int xPos, int yPos, int fontSize) {
-        graphics2D.setFont(new Font("TimesRoman", Font.PLAIN, fontSize));
+        graphics2D.setFont(new Font(FONT_NAME, Font.PLAIN, fontSize));
         graphics2D.drawString(text, xPos, yPos);
     }
 
@@ -106,9 +113,9 @@ public class AwtCanvas implements Canvas {
     public void drawString(String text, int xPos, int yPos, int fontSize, TextStyle textStyle) {
 
         if (textStyle == TextStyle.BOLD) {
-            graphics2D.setFont(new Font("TimesRoman", Font.BOLD, fontSize));
+            graphics2D.setFont(new Font(FONT_NAME, Font.BOLD, fontSize));
         } else {
-            graphics2D.setFont(new Font("TimesRoman", Font.PLAIN, fontSize));
+            graphics2D.setFont(new Font(FONT_NAME, Font.PLAIN, fontSize));
         }
 
         graphics2D.drawString(text, xPos, yPos);

@@ -2,8 +2,9 @@ package com.zygne.client.swing.components.tabs;
 
 import com.zygne.client.swing.components.views.PriceChartView;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+
 
 public class ChartTab extends JPanel {
 

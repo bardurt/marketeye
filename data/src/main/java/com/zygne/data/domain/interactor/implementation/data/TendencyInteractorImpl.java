@@ -133,7 +133,7 @@ public class TendencyInteractorImpl extends BaseInteractor implements TendencyIn
             throw new RuntimeException("Data size " + data.size() + " is less than " + years);
         }
 
-        List<TendencyEntry> yearAvg = new ArrayList();
+        List<TendencyEntry> yearAvg = new ArrayList<>();
 
         int max = data.size() - 1;
         int end = max - years;

@@ -1,6 +1,5 @@
 package com.zygne.client;
 
-
 import com.zygne.client.swing.SwingGui;
 
 public class Launcher {

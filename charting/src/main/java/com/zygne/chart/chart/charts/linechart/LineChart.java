@@ -3,14 +3,25 @@ package com.zygne.chart.chart.charts.linechart;
 import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.Chart;
 import com.zygne.chart.chart.RendererImpl;
-import com.zygne.chart.chart.menu.*;
-import com.zygne.chart.chart.menu.indicators.*;
-import com.zygne.chart.chart.model.chart.*;
+import com.zygne.chart.chart.menu.ChartControls;
+import com.zygne.chart.chart.menu.PriceScale;
+import com.zygne.chart.chart.menu.Zoom;
+import com.zygne.chart.chart.menu.indicators.LineIndicator;
+import com.zygne.chart.chart.menu.indicators.TimeIndicator;
+import com.zygne.chart.chart.model.chart.AwtCanvas;
+import com.zygne.chart.chart.model.chart.Camera;
+import com.zygne.chart.chart.model.chart.Colors;
+import com.zygne.chart.chart.model.chart.Line;
+import com.zygne.chart.chart.model.chart.Object2d;
+import com.zygne.chart.chart.model.chart.TextObject;
 import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +29,7 @@ public class LineChart extends JPanel implements Chart,
         LineIndicator.Creator.Callback,
         TimeIndicator.Creator.Callback,
         Zoom.Callback,
-        ChartControls.Callback{
+        ChartControls.Callback {
 
     private static final int DEFAULT_HEIGHT = 640;
     private static final int DEFAULT_WIDTH = 720;

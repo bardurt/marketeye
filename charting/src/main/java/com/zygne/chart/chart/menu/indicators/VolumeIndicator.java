@@ -24,7 +24,6 @@ public class VolumeIndicator extends Object2d {
     }
 
     public static final class Creator {
-
         public void create(Callback callback, List<CandleStick> candleSticks, int height, int y) {
 
             Runnable r = () -> {
@@ -68,6 +67,5 @@ public class VolumeIndicator extends Object2d {
         public interface Callback {
             void onVolumeIndicatorCreated(VolumeIndicator volumeIndicator);
         }
-
     }
 }

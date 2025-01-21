@@ -1,7 +1,13 @@
 package com.zygne.chart.chart.menu.indicators;
 
 import com.zygne.chart.chart.Canvas;
-import com.zygne.chart.chart.model.chart.*;
+import com.zygne.chart.chart.model.chart.Bar;
+import com.zygne.chart.chart.model.chart.CandleStick;
+import com.zygne.chart.chart.model.chart.Line;
+import com.zygne.chart.chart.model.chart.Object2d;
+import com.zygne.chart.chart.model.chart.Point2d;
+import com.zygne.chart.chart.model.chart.TextObject;
+import com.zygne.chart.chart.model.chart.TimeBar;
 import com.zygne.chart.chart.model.data.TimeBox;
 
 import java.util.ArrayList;
@@ -23,11 +29,8 @@ public class TimeIndicator extends Object2d {
     }
 
     public static final class Creator {
-
         public void create(Callback callback, List<CandleStick> candleSticks, int y, int height) {
-
             Runnable r = () -> {
-
                 TimeBox timeBox = new TimeBox(candleSticks.get(0).getTimeStamp());
                 TimeBar timeBar = new TimeBar();
                 timeBar.setX(candleSticks.get(0).getX() - 30);
@@ -65,17 +68,12 @@ public class TimeIndicator extends Object2d {
 
             };
 
-
             Thread t = new Thread(r);
-
             t.start();
-
         }
 
         public void create(Callback callback, Line line, int y, int height, int barWidth) {
-
             Runnable r = () -> {
-
                 TimeBox timeBox = new TimeBox(line.getPoint(0).getTimeStamp());
                 TimeBar timeBar = new TimeBar();
                 timeBar.setX(line.getPoint(0).getX());
@@ -86,7 +84,7 @@ public class TimeIndicator extends Object2d {
 
                 List<TimeBar> timeBarList = new ArrayList<>();
                 int count = 1;
-                int whenToAdd = 5;
+                int whenToAdd;
 
                 if (barWidth < 7) {
                     whenToAdd = 7;
@@ -131,13 +129,10 @@ public class TimeIndicator extends Object2d {
             Thread t = new Thread(r);
 
             t.start();
-
         }
 
         public void create(Callback callback, List<Bar> barSeries, int y, int height, int barWidth) {
-
             Runnable r = () -> {
-
                 TimeBox timeBox = new TimeBox(barSeries.get(0).getTimeStamp());
                 TimeBar timeBar = new TimeBar();
                 timeBar.setX(barSeries.get(0).getX());
@@ -210,6 +205,5 @@ public class TimeIndicator extends Object2d {
         public interface Callback {
             void onTimeIndicatorCreated(TimeIndicator timeIndicator);
         }
-
     }
 }
