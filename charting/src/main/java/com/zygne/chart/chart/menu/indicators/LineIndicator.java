@@ -3,7 +3,6 @@ package com.zygne.chart.chart.menu.indicators;
 import com.zygne.chart.chart.Canvas;
 import com.zygne.chart.chart.model.chart.Line;
 import com.zygne.chart.chart.model.chart.Object2d;
-import com.zygne.chart.chart.model.chart.Object2d.ColorSchema;
 import com.zygne.chart.chart.model.chart.Point2d;
 import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;

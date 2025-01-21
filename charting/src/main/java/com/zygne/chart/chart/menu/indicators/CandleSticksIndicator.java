@@ -28,7 +28,7 @@ public class CandleSticksIndicator extends Object2d {
     }
 
     public static final class Creator {
-        public void create(Callback callback, List<CandleSerie> quoteList, double scalar, int barWidth, int separator) {
+        public void create(Callback callback, List<CandleSerie> quoteList, double scalar, int barWidth) {
 
 
             final int spacing;
@@ -89,8 +89,7 @@ public class CandleSticksIndicator extends Object2d {
         }
 
         public interface Callback {
-            void onCandleSticksIndicatorCreated(CandleSticksIndicator candleSticksIndicator,
-                                                int x, int y);
+            void onCandleSticksIndicatorCreated(CandleSticksIndicator candleSticksIndicator, int x, int y);
         }
     }
 }

@@ -2,8 +2,9 @@ package com.zygne.client.swing.components.views;
 
 import com.zygne.client.swing.StringUtils;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
 
 public class LoadingView extends JPanel {
 
@@ -20,7 +21,7 @@ public class LoadingView extends JPanel {
 
     public void showLoading(String message) {
 
-        if(loadingRunnable != null){
+        if (loadingRunnable != null) {
             loadingRunnable.stop();
             loadingRunnable = null;
         }
@@ -64,7 +65,7 @@ public class LoadingView extends JPanel {
 
                     count = ++count % MAX_DOTS;
 
-                    String loadingString = content+ StringUtils.repeatAndPad(".", count+1, MAX_DOTS);
+                    String loadingString = content + StringUtils.repeatAndPad(".", count + 1, MAX_DOTS);
                     jLabel.setText(loadingString);
                     Thread.sleep(TIME_TO_SLEEP);
                 } catch (InterruptedException e) {

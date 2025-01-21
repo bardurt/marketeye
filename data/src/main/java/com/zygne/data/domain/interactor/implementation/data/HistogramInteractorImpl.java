@@ -1,6 +1,5 @@
 package com.zygne.data.domain.interactor.implementation.data;
 
-
 import com.zygne.data.domain.model.BarData;
 import com.zygne.data.domain.model.Histogram;
 import com.zygne.data.domain.model.SimpleMovingAverage;
@@ -18,13 +17,12 @@ public class HistogramInteractorImpl extends BaseInteractor implements Histogram
     private final Callback callback;
     private final List<BarData> entries;
     private final SimpleMovingAverage sma;
-    private final int periods = 9;
 
     public HistogramInteractorImpl(Executor executor, MainThread mainThread, Callback callback, List<BarData> entries) {
         super(executor, mainThread);
         this.callback = callback;
         this.entries = entries;
-        this.sma = new SimpleMovingAverage(periods);
+        this.sma = new SimpleMovingAverage(9);
     }
 
     @Override

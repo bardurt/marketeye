@@ -1,6 +1,7 @@
 package com.zygne.chart.chart.menu;
 
-import javax.swing.*;
+
+import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseEvent;
 

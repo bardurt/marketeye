@@ -81,9 +81,7 @@ public record BarData(String time,
             long volume = (long) (Double.parseDouble(tempArr[5]));
 
             barData = new BarData(timeStamp, open, high, low, close, volume);
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
+        } catch (Exception ignored) {}
         return barData;
     }
 
@@ -102,9 +100,7 @@ public record BarData(String time,
             long volume = (long) (Double.parseDouble(tempArr[8]));
 
             barData = new BarData(timeStamp, open, high, low, close, volume);
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
+        } catch (Exception ignored) {}
         return barData;
     }
 

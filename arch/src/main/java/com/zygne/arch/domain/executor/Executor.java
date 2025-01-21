@@ -1,6 +1,5 @@
 package com.zygne.arch.domain.executor;
 
-
 import com.zygne.arch.domain.interactor.BaseInteractor;
 
 public interface Executor {

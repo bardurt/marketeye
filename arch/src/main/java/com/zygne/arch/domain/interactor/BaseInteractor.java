@@ -1,6 +1,5 @@
 package com.zygne.arch.domain.interactor;
 
-
 import com.zygne.arch.domain.executor.Executor;
 import com.zygne.arch.domain.executor.MainThread;
 

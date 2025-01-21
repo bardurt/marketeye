@@ -5,12 +5,12 @@ import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;
 import com.zygne.data.domain.model.*;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TendencyTab extends JPanel  {
+public class TendencyTab extends JPanel {
 
 
     private final LineChart linePanel;

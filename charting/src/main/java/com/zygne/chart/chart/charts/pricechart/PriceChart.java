@@ -2,18 +2,30 @@ package com.zygne.chart.chart.charts.pricechart;
 
 import com.zygne.chart.chart.Chart;
 import com.zygne.chart.chart.RendererImpl;
-import com.zygne.chart.chart.menu.*;
-import com.zygne.chart.chart.menu.indicators.*;
-import com.zygne.chart.chart.model.chart.*;
+import com.zygne.chart.chart.menu.ChartControls;
+import com.zygne.chart.chart.menu.PriceScale;
+import com.zygne.chart.chart.menu.Zoom;
+import com.zygne.chart.chart.menu.indicators.CandleSticksIndicator;
+import com.zygne.chart.chart.menu.indicators.SmoothedVolumeIndicator;
+import com.zygne.chart.chart.menu.indicators.TimeIndicator;
+import com.zygne.chart.chart.menu.indicators.VolumeIndicator;
+import com.zygne.chart.chart.menu.indicators.VolumeProfileIndicator;
 import com.zygne.chart.chart.Canvas;
+import com.zygne.chart.chart.model.chart.AwtCanvas;
+import com.zygne.chart.chart.model.chart.Camera;
+import com.zygne.chart.chart.model.chart.CandleStick;
+import com.zygne.chart.chart.model.chart.Colors;
+import com.zygne.chart.chart.model.chart.Object2d;
+import com.zygne.chart.chart.model.chart.TextObject;
 import com.zygne.chart.chart.model.data.CandleSerie;
 import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +47,6 @@ public class PriceChart extends JPanel implements Chart,
     private int loadY;
 
     private final List<CandleSerie> bars = new ArrayList<>();
-    private final List<LineSerie> line = new ArrayList<>();
 
     private int canvasHeight = DEFAULT_HEIGHT;
     private int canvasWidth = DEFAULT_WIDTH;
@@ -44,7 +55,6 @@ public class PriceChart extends JPanel implements Chart,
     private TextObject waterMark;
     private final List<Object2d> chartObjects = new ArrayList<>();
     private final RendererImpl renderer;
-    private LineIndicator lineIndicator = null;
     private CandleSticksIndicator candleSticksIndicator = null;
     private VolumeProfileIndicator volumeProfileIndicator = null;
     private VolumeIndicator volumeIndicator = null;
@@ -52,8 +62,7 @@ public class PriceChart extends JPanel implements Chart,
     private SmoothedVolumeIndicator smoothedVolumeIndicator = null;
     private final Zoom zoom;
     private final PriceScale priceScale = new PriceScale();
-    private boolean dataLoad = false;
-    private ChartControls chartControls;
+    private final ChartControls chartControls;
 
     public PriceChart() {
         setFocusable(true);
@@ -122,11 +131,8 @@ public class PriceChart extends JPanel implements Chart,
         this.bars.clear();
         this.bars.addAll(quotes);
         this.bars.sort(new CandleSerie.TimeComparator());
-        dataLoad = true;
         createCandleSticks();
-
         zoom.reset();
-        dataLoad = false;
     }
 
     @Override
@@ -168,10 +174,6 @@ public class PriceChart extends JPanel implements Chart,
             chartObjects.add(candleSticksIndicator);
         }
 
-        if (lineIndicator != null) {
-            chartObjects.add(lineIndicator);
-        }
-
         chartObjects.add(priceScale);
 
         if (volumeProfileIndicator != null) {
@@ -208,7 +210,6 @@ public class PriceChart extends JPanel implements Chart,
         volumeIndicator = null;
         volumeProfileIndicator = null;
         timeIndicator = null;
-        lineIndicator = null;
 
         if (candleSticksIndicator == null) {
             return;
@@ -295,13 +296,11 @@ public class PriceChart extends JPanel implements Chart,
     private void createCandleSticks() {
         candleSticksIndicator = null;
 
-        int barSeparator = 0;
         new CandleSticksIndicator.Creator().create(
                 this,
                 bars,
                 scale,
-                barWidth,
-                barSeparator
+                barWidth
         );
     }
 
@@ -378,7 +377,7 @@ public class PriceChart extends JPanel implements Chart,
 
                 try {
                     Thread.sleep(30);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
             }
         }

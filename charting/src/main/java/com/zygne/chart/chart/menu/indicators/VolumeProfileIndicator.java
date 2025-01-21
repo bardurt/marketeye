@@ -32,7 +32,6 @@ public class VolumeProfileIndicator extends Object2d {
         private final int barHeight = 2;
         private double grouping = 0.1;
         private long highestValue;
-        private int y = 0;
 
         public void create(Callback callback, List<CandleStick> data, double scalar, int indicatorWidth, int x) {
 
@@ -69,38 +68,48 @@ public class VolumeProfileIndicator extends Object2d {
                     start += grouping;
                 }
 
+                int divisor = 5;
                 for (CandleStick candleStick : data) {
                     if (candleStick.visible) {
                         for (VolumeProfileGroup group : volumeProfileGroups) {
-                            // distribute the candlestick into 3 prices, high, mid, low.
-                            if (group.getPriceBox().inside(candleStick.getPriceBox().getEnd())) {
-                                group.incrementVolume(candleStick.getVolume() / 3);
+                            if (group.getPriceBox().inside(candleStick.getPriceBox().getPercentile(100))) {
+                                group.incrementVolume(candleStick.getVolume() / divisor);
                             }
-                            if (group.getPriceBox().inside(candleStick.getPriceBox().getStart())) {
-                                group.incrementVolume(candleStick.getVolume() / 3);
+
+                            if (group.getPriceBox().inside(candleStick.getPriceBox().getPercentile(75))) {
+                                group.incrementVolume(candleStick.getVolume() / divisor);
                             }
-                            if (group.getPriceBox().inside(candleStick.getPriceBox().getMid())) {
-                                group.incrementVolume(candleStick.getVolume() / 3);
+
+                            if (group.getPriceBox().inside(candleStick.getPriceBox().getPercentile(50))) {
+                                group.incrementVolume(candleStick.getVolume() / divisor);
+                            }
+
+                            if (group.getPriceBox().inside(candleStick.getPriceBox().getPercentile(25))) {
+                                group.incrementVolume(candleStick.getVolume() / divisor);
+                            }
+
+                            if (group.getPriceBox().inside(candleStick.getPriceBox().getPercentile(0))) {
+                                group.incrementVolume(candleStick.getVolume() / divisor);
                             }
                         }
                     }
                 }
 
-
-                Collections.sort(volumeProfileGroups, new VolumeProfileGroup.VolumeComparator());
+                volumeProfileGroups.sort(new VolumeProfileGroup.VolumeComparator());
                 Collections.reverse(volumeProfileGroups);
 
                 if (!volumeProfileGroups.isEmpty()) {
                     highestValue = volumeProfileGroups.get(0).getVolume();
                 }
 
-                Collections.sort(volumeProfileGroups, new VolumeProfileGroup.PriceComparator());
+                volumeProfileGroups.sort(new VolumeProfileGroup.PriceComparator());
                 Collections.reverse(volumeProfileGroups);
 
                 List<VolumeProfileLine> volumeProfileLines = new ArrayList<>();
 
                 for (VolumeProfileGroup vp : volumeProfileGroups) {
                     VolumeProfileLine b = new VolumeProfileLine();
+                    b.setColorSchema(ColorSchema.BLUE);
                     b.setY((int) (-vp.getPrice() * scale));
 
                     b.setHeight(barHeight);
@@ -112,8 +121,6 @@ public class VolumeProfileIndicator extends Object2d {
                     b.setX(barX);
 
                     b.setzOrder(0);
-
-                    y -= barHeight;
 
                     if (barWidth > 0) {
                         volumeProfileLines.add(b);
