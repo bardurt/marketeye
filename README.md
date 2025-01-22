@@ -9,6 +9,11 @@
 ### About
 Project that fetches data from Alpha Vantage, and other data providers, and allows the user to visualize the price chart, and, see the seasonal tendency for a given market.
 
+### This project supports these data providers
+- [Polygon](https://polygon.io)
+- [AlphaVantage](https://www.alphavantage.co/)
+- [Cryptodatadownload](https://www.cryptodatadownload.com/)
+
 ### Features
 - Bar chart with Volume Profile
 - Line chart for seasonal tendencies
@@ -22,4 +27,9 @@ Project that fetches data from Alpha Vantage, and other data providers, and allo
 
 
 ### How to use
-Locate the file ```api.properties``` and change the value for `api` to the API key that you can get from https://www.alphavantage.co/ for free
+Locate the file ```api.properties``` add they api keys for `AlphaVantage` and `Polygon`, the both provide free API keys.
+```
+alpha_vantage_api=[ YOUR KEY FROM ALPHAVANTAGE GOES HERE ]
+polygon_api=[ YOUR KEY FROM POLYGON GOES HERE ]
+```
+Data for Crypto currencies is from [Cryptodatadownload](https://www.cryptodatadownload.com/) which is free.
