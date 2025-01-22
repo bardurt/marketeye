@@ -17,51 +17,64 @@ public class SettingsView extends JPanel {
     public SettingsView() {
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        JPanel optionsPanel = new JPanel(new GridBagLayout());
-
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-
-        JLabel labelSymbol = new JLabel("Symbol");
+        JPanel optionsPanel = new JPanel(new GridLayout(2,2));
 
         textFieldSymbol = new TextField();
         textFieldSymbol.setColumns(18);
 
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        optionsPanel.add(labelSymbol, constraints);
+        optionsPanel.add(textFieldSymbol);
 
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        optionsPanel.add(textFieldSymbol, constraints);
+        JPanel buttonPanel = new JPanel(new GridLayout(1,5));
 
-
-        JPanel buttonPanel = new JPanel(new GridLayout(1,2));
-
-        JButton buttonEquities = new JButton("Equity");
-        buttonEquities.setBounds(50, 100, 95, 30);
-        buttonEquities.addActionListener(e -> {
+        JButton buttonAlphaVantage = new JButton("AlphaVantage");
+        buttonAlphaVantage.setBounds(50, 100, 95, 30);
+        buttonAlphaVantage.addActionListener(e -> {
             String symbolText = textFieldSymbol.getText();
             callback.reportButtonClicked(symbolText, 0);
         });
 
-        buttonPanel.add(buttonEquities);
+        buttonPanel.add(buttonAlphaVantage);
+
+        JButton buttonPolygon = new JButton("Polygon");
+        buttonPolygon.setBounds(50, 100, 95, 30);
+        buttonPolygon.addActionListener(e -> {
+            String symbolText = textFieldSymbol.getText();
+            callback.reportButtonClicked(symbolText, 1);
+        });
+
+        buttonPanel.add(buttonPolygon);
 
         JButton buttonCrypto = new JButton("Crypto");
         buttonCrypto.setBounds(50, 100, 95, 30);
         buttonCrypto.addActionListener(e -> {
 
             String symbolText = textFieldSymbol.getText();
-            callback.reportButtonClicked(symbolText, 1);
+            callback.reportButtonClicked(symbolText, 2);
 
         });
 
         buttonPanel.add(buttonCrypto);
 
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-        optionsPanel.add(buttonPanel, constraints);
 
+        JPanel configPanel = new JPanel(new GridLayout(1,2));
+        JButton buttonAdjust = new JButton("Adjust");
+        buttonAdjust.setBounds(50, 100, 95, 30);
+        buttonAdjust.addActionListener(e -> {
+            callback.configButtonClicked(true);
+        });
+
+        configPanel.add(buttonAdjust);
+
+        JButton buttonRaw = new JButton("Raw");
+        buttonRaw.setBounds(50, 100, 95, 30);
+        buttonRaw.addActionListener(e -> {
+            callback.configButtonClicked(false);
+        });
+
+        configPanel.add(buttonRaw);
+
+        optionsPanel.add(configPanel);
+        optionsPanel.add(buttonPanel);
         mainPanel.add(optionsPanel, BorderLayout.NORTH);
         add(mainPanel);
     }
@@ -72,5 +85,6 @@ public class SettingsView extends JPanel {
 
     public interface Callback {
         void reportButtonClicked(String symbol, int type);
+        void configButtonClicked(Boolean adjust);
     }
 }

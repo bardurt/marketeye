@@ -66,39 +66,23 @@ public class BoxCollider {
     }
 
     public boolean inside(float x, float y) {
-        if (x >= this.getLeft()) {
-            if (y >= this.getTop()) {
-                if (x <= this.getRight()) {
-                    if (y <= this.getBottom()) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return x >= this.getLeft() && x <= this.getRight() &&
+                y >= this.getTop() && y <= this.getBottom();
     }
+
 
     public boolean intersects(BoxCollider boxCollider) {
-        if (boxCollider.getLeft() <= this.getRight()) {
-            if (boxCollider.getRight() >= this.getLeft()) {
-                if (boxCollider.getTop() <= this.getBottom()) {
-                    if (boxCollider.getBottom() >= this.getTop()) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return boxCollider.getLeft() <= this.getRight() &&
+                boxCollider.getRight() >= this.getLeft() &&
+                boxCollider.getTop() <= this.getBottom() &&
+                boxCollider.getBottom() >= this.getTop();
     }
 
-    public boolean inVerticalSpace(BoxCollider boxCollider) {
-        if (boxCollider.getLeft() <= this.getRight()) {
-            if (boxCollider.getRight() >= this.getLeft()) {
-                    return true;
-            }
-        }
-        return false;
+    public boolean inHorizontalSpace(BoxCollider boxCollider) {
+        return boxCollider.getLeft() <= this.getRight() &&
+                boxCollider.getRight() >= this.getLeft();
     }
+
 
     @Override
     public String toString() {

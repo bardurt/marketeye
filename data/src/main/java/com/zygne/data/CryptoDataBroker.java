@@ -47,7 +47,6 @@ public class CryptoDataBroker implements DataBroker {
         try {
             java.net.URL content = new java.net.URL(url);
 
-            // establish connection to file in URL
             urlConnection = content.openConnection();
 
             inputStreamReader = new InputStreamReader(urlConnection.getInputStream());
