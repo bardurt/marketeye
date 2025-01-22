@@ -9,4 +9,5 @@ repositories {
 
 dependencies {
     implementation project(path: ':arch')
+    implementation 'com.google.code.gson:gson:2.8.6'
 }

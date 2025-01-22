@@ -115,8 +115,6 @@ public class MonthlyHistogramInteractorImpl extends BaseInteractor implements Mo
             mergedHistogram.volume = volume;
             mergedHistogram.timeStamp = items.get(0).timeStamp;
 
-            System.out.println("Merging monthly bar, item count " + items.size());
-
             return mergedHistogram;
         }
     }

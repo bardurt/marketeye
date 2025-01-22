@@ -72,24 +72,33 @@ public class VolumeProfileIndicator extends Object2d {
                 for (CandleStick candleStick : data) {
                     if (candleStick.visible) {
                         for (VolumeProfileGroup group : volumeProfileGroups) {
+
+                            long vol =candleStick.getVolume();
+
+                            if(vol == 0L){
+                                vol = 1000;
+                            } else {
+                                vol = vol / divisor;
+                            }
+
                             if (group.getPriceBox().inside(candleStick.getPriceBox().getPercentile(100))) {
-                                group.incrementVolume(candleStick.getVolume() / divisor);
+                                group.incrementVolume(vol);
                             }
 
                             if (group.getPriceBox().inside(candleStick.getPriceBox().getPercentile(75))) {
-                                group.incrementVolume(candleStick.getVolume() / divisor);
+                                group.incrementVolume(vol);
                             }
 
                             if (group.getPriceBox().inside(candleStick.getPriceBox().getPercentile(50))) {
-                                group.incrementVolume(candleStick.getVolume() / divisor);
+                                group.incrementVolume(vol);
                             }
 
                             if (group.getPriceBox().inside(candleStick.getPriceBox().getPercentile(25))) {
-                                group.incrementVolume(candleStick.getVolume() / divisor);
+                                group.incrementVolume(vol);
                             }
 
                             if (group.getPriceBox().inside(candleStick.getPriceBox().getPercentile(0))) {
-                                group.incrementVolume(candleStick.getVolume() / divisor);
+                                group.incrementVolume(vol);
                             }
                         }
                     }

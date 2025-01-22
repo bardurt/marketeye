@@ -37,6 +37,7 @@ public class PriceChart extends JPanel implements Chart,
         TimeIndicator.Creator.Callback,
         Zoom.Callback,
         ChartControls.Callback {
+    private static final long THREAD_SLEEP_TIME = 30;
 
     private static final int DEFAULT_HEIGHT = 640;
     private static final int DEFAULT_WIDTH = 720;
@@ -317,7 +318,6 @@ public class PriceChart extends JPanel implements Chart,
     public void onZoomChanged(Zoom.ZoomDetails zoomDetails) {
         scale = zoomDetails.zoomLevel();
         barWidth = (int) zoomDetails.stretchLevel();
-        System.out.println("Zoom : " + scale);
         createCandleSticks();
     }
 
@@ -362,7 +362,7 @@ public class PriceChart extends JPanel implements Chart,
             return;
         }
         for (CandleStick c : candleSticksIndicator.getCandleSticks()) {
-            c.visible = camera.inVerticalSpace(c);
+            c.visible = camera.inHorizontalSpace(c);
         }
     }
 
@@ -376,7 +376,7 @@ public class PriceChart extends JPanel implements Chart,
                 EventQueue.invokeLater(component::repaint);
 
                 try {
-                    Thread.sleep(30);
+                    Thread.sleep(THREAD_SLEEP_TIME);
                 } catch (InterruptedException ignored) {
                 }
             }

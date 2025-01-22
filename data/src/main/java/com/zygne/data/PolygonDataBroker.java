@@ -1,44 +1,56 @@
 package com.zygne.data;
 
+import com.google.gson.Gson;
 import com.zygne.arch.domain.Logger;
 import com.zygne.data.domain.DataBroker;
 import com.zygne.data.domain.FinanceData;
 import com.zygne.data.domain.model.BarData;
+import com.zygne.data.domain.model.PolygonData;
+import com.zygne.data.domain.model.PolygonResponse;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-public class AlphaVantageDataBroker implements DataBroker {
-
+public class PolygonDataBroker implements DataBroker {
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
     private final String apiKey;
     private Callback callback;
     private final Logger logger;
 
-    public AlphaVantageDataBroker(Logger logger, String api) {
+    DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+
+    public PolygonDataBroker(Logger logger, String apiKey) {
         this.logger = logger;
-        this.apiKey = api;
+        this.apiKey = apiKey;
     }
 
     @Override
     public void downloadData(String symbol, String interval, int yearsBack) {
 
-        logger.log(Logger.LOG_LEVEL.INFO, symbol + " " + yearsBack + " years");
+        Calendar c = Calendar.getInstance();
+        String end = df.format(c.getTimeInMillis());
 
-        final String url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" +
-                symbol +
-                "&apikey=" +
-                apiKey +
-                "&outputsize=full&datatype=csv";
+        c.add(Calendar.YEAR, -10);
+        String start = df.format(c.getTimeInMillis());
 
-        System.out.println(url);
-        logger.log(Logger.LOG_LEVEL.INFO, "Downloading data for " + symbol);
+        final String url = "https://api.polygon.io/v2/aggs/ticker/" +
+                symbol.toUpperCase() +
+                "/range/1/day/" +
+                start +
+                "/" +
+                end +
+                "?adjusted=true&sort=desc&apiKey=" +
+                apiKey;
+
+        logger.log(Logger.LOG_LEVEL.INFO, "Downloading data from Polygon : " + symbol);
 
         Thread t = new Thread(() -> {
+
             if (apiKey.isEmpty()) {
                 if (callback != null) {
                     callback.onDataFinished(new ArrayList<>());
@@ -56,13 +68,15 @@ public class AlphaVantageDataBroker implements DataBroker {
 
     private List<FinanceData> downLoadTimeSeries(String url) {
 
-        List<FinanceData> lines = new ArrayList<>();
+        List<FinanceData> lines = new java.util.ArrayList<>();
 
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
-        URLConnection urlConnection;
+        java.net.URLConnection urlConnection;
+
+        StringBuilder stringBuilder = new StringBuilder();
         try {
-            URL content = new URL(url);
+            java.net.URL content = new java.net.URL(url);
 
             urlConnection = content.openConnection();
 
@@ -70,18 +84,10 @@ public class AlphaVantageDataBroker implements DataBroker {
 
             bufferedReader = new BufferedReader(inputStreamReader);
 
+
             String line;
-
-            int count = 0;
             while ((line = bufferedReader.readLine()) != null) {
-                count++;
-                if (count > 1) {
-                    BarData barData = BarData.fromStreamAlphaVantage(line);
-                    if (barData != null) {
-                        lines.add(barData);
-                    }
-                }
-
+                stringBuilder.append(line);
             }
 
         } catch (Exception e) {
@@ -90,7 +96,7 @@ public class AlphaVantageDataBroker implements DataBroker {
             if (bufferedReader != null) {
                 try {
                     bufferedReader.close();
-                } catch (IOException e) {
+                } catch (java.io.IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -98,10 +104,27 @@ public class AlphaVantageDataBroker implements DataBroker {
             if (inputStreamReader != null) {
                 try {
                     inputStreamReader.close();
-                } catch (IOException e) {
+                } catch (java.io.IOException e) {
                     e.printStackTrace();
                 }
             }
+        }
+
+        String result = stringBuilder.toString();
+
+        PolygonResponse response = new Gson().fromJson(result, PolygonResponse.class);
+
+        if (response.data == null) {
+            return lines;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        for (PolygonData data : response.data) {
+            calendar.setTimeInMillis(data.timeStamp);
+
+            String date = df.format(calendar.getTimeInMillis());
+            BarData barData = new BarData(date, data.open, data.high, data.low, data.close, (long) data.volume);
+            lines.add(barData);
         }
 
         return lines;
@@ -116,4 +139,5 @@ public class AlphaVantageDataBroker implements DataBroker {
     public void removeCallback() {
         this.callback = null;
     }
+
 }

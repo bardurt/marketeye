@@ -119,8 +119,6 @@ public class WeeklyHistogramInteractorImpl extends BaseInteractor implements Wee
             mergedHistogram.volume = volume;
             mergedHistogram.timeStamp = items.get(0).timeStamp;
 
-            System.out.println("Merging weekly bar, item count " + items.size());
-
             return mergedHistogram;
         }
 

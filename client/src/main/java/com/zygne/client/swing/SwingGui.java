@@ -51,7 +51,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
     private String symbol = "";
 
-    public SwingGui(String api) {
+    public SwingGui(String avApi, String polygonApi) {
         super(new BorderLayout());
         setSize(880, 880);
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -101,7 +101,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         MainThread mainThread = new JavaSwingThread();
         Executor executor = ThreadExecutor.getInstance();
 
-        mainPresenter = new MainPresenterImpl(executor, mainThread, this, logger, api);
+        mainPresenter = new MainPresenterImpl(executor, mainThread, this, logger, avApi, polygonApi);
     }
 
 
@@ -140,7 +140,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         tabbedPane.addTab("Seasonality", tendencyTab);
     }
 
-    public static void launch(String api) {
+    public static void launch(String avApi, String polygonApi) {
         EventQueue.invokeLater(() -> {
             String title = ProjectProps.readProperty("name") + " by " + ProjectProps.readProperty("author");
             JFrame frame = new JFrame(title);
@@ -162,7 +162,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
             }
 
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(new SwingGui(api));
+            frame.add(new SwingGui(avApi, polygonApi));
             frame.getContentPane().setPreferredSize(new Dimension(1024, 512));
             frame.pack();
             frame.setVisible(true);
@@ -174,6 +174,13 @@ public class SwingGui extends JPanel implements MainPresenter.View,
     public void reportButtonClicked(String symbol, int type) {
         if (mainPresenter != null) {
             mainPresenter.createReport(symbol, type);
+        }
+    }
+
+    @Override
+    public void configButtonClicked(Boolean adjust) {
+        if (mainPresenter != null) {
+            mainPresenter.adjust(adjust);
         }
     }
 }
