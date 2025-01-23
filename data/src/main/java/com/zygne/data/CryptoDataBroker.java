@@ -58,7 +58,7 @@ public class CryptoDataBroker implements DataBroker {
             int count = 0;
             while ((line = bufferedReader.readLine()) != null) {
                 count++;
-                if(count > 2) {
+                if (count > 2) {
                     var barData = BarData.fromStreamBitstamp(line);
                     if (barData != null) {
                         lines.add(barData);
@@ -68,7 +68,7 @@ public class CryptoDataBroker implements DataBroker {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Logger.LOG_LEVEL.INFO, "Unable to fetch data");
         } finally {
             if (bufferedReader != null) {
                 try {

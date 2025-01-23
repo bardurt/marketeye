@@ -91,7 +91,7 @@ public class PolygonDataBroker implements DataBroker {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Logger.LOG_LEVEL.INFO, "Unable to fetch data");
         } finally {
             if (bufferedReader != null) {
                 try {
