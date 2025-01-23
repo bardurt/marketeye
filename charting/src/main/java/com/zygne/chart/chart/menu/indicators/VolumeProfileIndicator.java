@@ -73,14 +73,17 @@ public class VolumeProfileIndicator extends Object2d {
                     if (candleStick.visible) {
                         for (VolumeProfileGroup group : volumeProfileGroups) {
 
-                            long vol =candleStick.getVolume();
+                            long vol = candleStick.getVolume();
 
-                            if(vol == 0L){
-                                vol = 1000;
+                            if (vol == 0L) {
+                                // if no volume is provided then we tick the volume profile bar by a fixed value for each hit
+                                // some data providers do not give volume for some assets
+                                vol = 10;
                             } else {
                                 vol = vol / divisor;
                             }
 
+                            // Distribute volume according to hits
                             if (group.getPriceBox().inside(candleStick.getPriceBox().getPercentile(100))) {
                                 group.incrementVolume(vol);
                             }

@@ -26,8 +26,11 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class SwingGui extends JPanel implements MainPresenter.View,
@@ -142,18 +145,25 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
     public static void launch(String avApi, String polygonApi) {
         EventQueue.invokeLater(() -> {
-            String title = ProjectProps.readProperty("name") + " by " + ProjectProps.readProperty("author");
+
+            int year = Calendar.getInstance().get(Calendar.YEAR);
+            String title = ProjectProps.readProperty("name") + " by " + ProjectProps.readProperty("author") + " - " + year;
             JFrame frame = new JFrame(title);
 
             try {
                 List<Image> icons = new ArrayList<>();
-                URL url = SwingGui.class.getResource("/resources/icon.png");
+                InputStream stream = SwingGui.class
+                        .getResourceAsStream( "/icon.png" );
 
-                if (url == null) {
-                    System.out.println("Icon url is null");
+                if(stream != null) {
+                    BufferedImage image = ImageIO.read(stream);
+                    if (image == null) {
+                        System.out.println("Icon url is null");
+                    } else {
+                        icons.add(image);
+                    }
                 } else {
-                    Image icon = ImageIO.read(url);
-                    icons.add(icon);
+                    System.out.println("Error : Cannot open stream");
                 }
 
                 frame.setIconImages(icons);
