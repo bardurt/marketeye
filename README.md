@@ -33,3 +33,7 @@ alpha_vantage_api=[ YOUR KEY FROM ALPHAVANTAGE GOES HERE ]
 polygon_api=[ YOUR KEY FROM POLYGON GOES HERE ]
 ```
 Data for Crypto currencies is from [Cryptodatadownload](https://www.cryptodatadownload.com/) which is free.
+
+
+#### Adjusting Price Data
+If the fetched price data does not include adjusted prices (such as those adjusted for stock splits or reverse splits), for example, when using the free version of AlphaVantage, there is an option to adjust the price data. This is done by analyzing price changes and comparing them with common split ratios (e.g., 1/10, 10/1, etc.). Please note that this algorithm may occasionally produce inaccurate results.
