@@ -28,7 +28,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -36,7 +35,7 @@ import java.util.List;
 public class SwingGui extends JPanel implements MainPresenter.View,
         SettingsView.Callback {
 
-    private final SettingsView reportView;
+    private final SettingsView settingsView;
 
     private final JLabel labelStatus;
     private final JLabel labelLoading;
@@ -56,11 +55,9 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
     public SwingGui(String avApi, String polygonApi) {
         super(new BorderLayout());
-        setSize(880, 880);
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        reportView = new SettingsView();
-        reportView.setCallback(this);
+        settingsView = new SettingsView(this);
 
         dailyChartTab = new ChartTab();
         weeklyChartTab = new ChartTab();
@@ -85,8 +82,12 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
         constraints.gridy = 1;
         infoPanel.add(loadingView, constraints);
+
+        // Set constraints for settingsView to fill the width
         constraints.gridy = 2;
-        infoPanel.add(reportView, constraints);
+        constraints.weightx = 1.0;  // Allow the component to stretch horizontally
+        constraints.fill = GridBagConstraints.HORIZONTAL;  // Make it fill the horizontal space
+        infoPanel.add(settingsView, constraints);
 
         add(infoPanel, BorderLayout.NORTH);
         add(tabbedPane, BorderLayout.CENTER);
@@ -106,7 +107,6 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
         mainPresenter = new MainPresenterImpl(executor, mainThread, this, logger, avApi, polygonApi);
     }
-
 
     @Override
     public void onComplete(List<Histogram> daily, List<Histogram> weekly, List<Histogram> monthly, TendencyReport tendencyReport, String symbol) {
