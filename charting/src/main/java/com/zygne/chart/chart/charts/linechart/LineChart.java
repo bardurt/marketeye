@@ -157,7 +157,6 @@ public class LineChart extends JPanel implements Chart,
 
     @Override
     public void stretch(double level) {
-        zoom.stretch(level);
     }
 
     private void updateIndicators() {

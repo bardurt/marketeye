@@ -42,6 +42,12 @@ public class CandleStick extends Object2d {
         }
     }
 
+    public void adjust(double scalar) {
+        int height = (int) ((this.priceBox.getEnd() - this.priceBox.getStart()) * scalar);
+        this.setHeight(height);
+        this.setY((int) (this.priceBox.getEnd() * scalar));
+    }
+
     public long getId() {
         return id;
     }

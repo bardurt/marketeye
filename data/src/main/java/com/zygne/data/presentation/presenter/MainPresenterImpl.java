@@ -59,7 +59,6 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter,
         this.view = view;
         this.view.showError("");
         this.logger = logger;
-
         view.prepareView();
     }
 
@@ -136,7 +135,6 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter,
         }
     }
 
-
     @Override
     public void onDataFetched(List<FinanceData> entries) {
         downloadedData.clear();
@@ -180,7 +178,7 @@ public class MainPresenterImpl extends BasePresenter implements MainPresenter,
 
         try {
             new TendencyInteractorImpl(executor, mainThread, this, histogramDaily).execute();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

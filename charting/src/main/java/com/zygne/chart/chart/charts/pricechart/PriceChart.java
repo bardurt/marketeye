@@ -201,7 +201,6 @@ public class PriceChart extends JPanel implements Chart,
 
     @Override
     public void stretch(double level) {
-        zoom.stretch(level);
     }
 
     private void updateIndicators() {
@@ -319,6 +318,12 @@ public class PriceChart extends JPanel implements Chart,
         scale = zoomDetails.zoomLevel();
         barWidth = (int) zoomDetails.stretchLevel();
         createCandleSticks();
+
+//        if (candleSticksIndicator != null) {
+//            candleSticksIndicator.adjust(barWidth, scale);
+//            refresh();
+//            updateIndicators();
+//        }
     }
 
     @Override
