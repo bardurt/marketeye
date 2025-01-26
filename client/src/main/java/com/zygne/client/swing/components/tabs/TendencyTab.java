@@ -12,7 +12,6 @@ import java.util.List;
 
 public class TendencyTab extends JPanel {
 
-
     private final LineChart linePanel;
 
     public TendencyTab() {

@@ -27,17 +27,33 @@ public class CandleSticksIndicator extends Object2d {
         }
     }
 
+    public void adjust(int barWidth, double zoom) {
+        final int width;
+
+        if (barWidth == 0) {
+            width = 1;
+        } else {
+            width = barWidth;
+        }
+
+        int xPos = 0;
+        for (int i = 0; i < candleSticks.size(); i++) {
+            CandleStick c = candleSticks.get(i);
+            c.setWidth(width);
+            c.setX(xPos);
+            xPos += width;
+
+            c.adjust(zoom);
+        }
+    }
+
     public static final class Creator {
         public void create(Callback callback, List<CandleSerie> quoteList, double scalar, int barWidth) {
 
-
-            final int spacing;
             final int width;
-            if(barWidth == 0){
-                spacing = 0;
+            if (barWidth == 0) {
                 width = 1;
             } else {
-                spacing = 1;
                 width = barWidth;
             }
 
@@ -68,10 +84,8 @@ public class CandleSticksIndicator extends Object2d {
 
                     b.setzOrder(0);
                     candleSticks.add(b);
-                    candleSticks.add(b);
 
                     x += width;
-                    x += spacing;
                 }
 
                 int lastBar = x;

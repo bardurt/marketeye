@@ -36,22 +36,15 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         SettingsView.Callback {
 
     private final SettingsView settingsView;
-
     private final JLabel labelStatus;
     private final JLabel labelLoading;
     private final LoadingView loadingView;
-
     private final MainPresenter mainPresenter;
-
     private final ChartTab dailyChartTab;
     private final ChartTab weeklyChartTab;
-    private final ChartTab moonthlyChartTab;
+    private final ChartTab monthlyChartTab;
     private final TendencyTab tendencyTab;
-
-
     private final JTabbedPane tabbedPane;
-
-    private String symbol = "";
 
     public SwingGui(String avApi, String polygonApi) {
         super(new BorderLayout());
@@ -61,7 +54,7 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
         dailyChartTab = new ChartTab();
         weeklyChartTab = new ChartTab();
-        moonthlyChartTab = new ChartTab();
+        monthlyChartTab = new ChartTab();
         tendencyTab = new TendencyTab();
 
         tabbedPane = new JTabbedPane();
@@ -83,10 +76,9 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         constraints.gridy = 1;
         infoPanel.add(loadingView, constraints);
 
-        // Set constraints for settingsView to fill the width
         constraints.gridy = 2;
-        constraints.weightx = 1.0;  // Allow the component to stretch horizontally
-        constraints.fill = GridBagConstraints.HORIZONTAL;  // Make it fill the horizontal space
+        constraints.weightx = 1.0;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
         infoPanel.add(settingsView, constraints);
 
         add(infoPanel, BorderLayout.NORTH);
@@ -110,12 +102,11 @@ public class SwingGui extends JPanel implements MainPresenter.View,
 
     @Override
     public void onComplete(List<Histogram> daily, List<Histogram> weekly, List<Histogram> monthly, TendencyReport tendencyReport, String symbol) {
-        this.symbol = symbol;
         labelStatus.setText("");
         labelLoading.setText("");
         dailyChartTab.priceChartView.addData(daily, symbol.toUpperCase() + " Day");
         weeklyChartTab.priceChartView.addData(weekly, symbol.toUpperCase() + " Week");
-        moonthlyChartTab.priceChartView.addData(monthly, symbol.toUpperCase() + " Month");
+        monthlyChartTab.priceChartView.addData(monthly, symbol.toUpperCase() + " Month");
         tendencyTab.addTendency(tendencyReport, symbol.toUpperCase() + " Seasonality");
     }
 
@@ -139,23 +130,20 @@ public class SwingGui extends JPanel implements MainPresenter.View,
         tabbedPane.removeAll();
         tabbedPane.addTab("Daily", dailyChartTab);
         tabbedPane.addTab("Weekly", weeklyChartTab);
-        tabbedPane.addTab("Monthly", moonthlyChartTab);
+        tabbedPane.addTab("Monthly", monthlyChartTab);
         tabbedPane.addTab("Seasonality", tendencyTab);
     }
 
     public static void launch(String avApi, String polygonApi) {
         EventQueue.invokeLater(() -> {
-
             int year = Calendar.getInstance().get(Calendar.YEAR);
             String title = ProjectProps.readProperty("name") + " by " + ProjectProps.readProperty("author") + " - " + year;
             JFrame frame = new JFrame(title);
-
             try {
                 List<Image> icons = new ArrayList<>();
                 InputStream stream = SwingGui.class
-                        .getResourceAsStream( "/icon.png" );
-
-                if(stream != null) {
+                        .getResourceAsStream("/icon.png");
+                if (stream != null) {
                     BufferedImage image = ImageIO.read(stream);
                     if (image == null) {
                         System.out.println("Icon url is null");
@@ -165,19 +153,16 @@ public class SwingGui extends JPanel implements MainPresenter.View,
                 } else {
                     System.out.println("Error : Cannot open stream");
                 }
-
                 frame.setIconImages(icons);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.add(new SwingGui(avApi, polygonApi));
             frame.getContentPane().setPreferredSize(new Dimension(1024, 512));
             frame.pack();
             frame.setVisible(true);
         });
-
     }
 
     @Override

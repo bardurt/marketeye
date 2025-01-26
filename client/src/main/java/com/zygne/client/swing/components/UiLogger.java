@@ -73,22 +73,21 @@ public class UiLogger extends Thread implements Logger {
 
             var running = true;
             while (running) {
-
                 Command item = itemsToLog.take();
-
                 mainThread.post(() -> {
-
-                    if(outPut != null) {
+                    if (outPut != null) {
                         if (item instanceof Command.Log) {
                             String log = "\n" + getTime() + " - " + ((Command.Log) item).getMessage();
                             mainThread.post(() -> outPut.setText(log));
 
-                        } else if (item instanceof Command.Clear){
+                        } else if (item instanceof Command.Clear) {
                             mainThread.post(() -> outPut.setText(""));
                         }
                     }
                 });
-
+                if (shuttingDown) {
+                    running = false;
+                }
             }
         } catch (InterruptedException ignored) {
         } finally {
@@ -99,5 +98,4 @@ public class UiLogger extends Thread implements Logger {
     private String getTime() {
         return formatter.format(new Date());
     }
-
 }
