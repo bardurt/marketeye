@@ -18,7 +18,6 @@ import com.zygne.chart.chart.model.chart.Colors;
 import com.zygne.chart.chart.model.chart.Object2d;
 import com.zygne.chart.chart.model.chart.TextObject;
 import com.zygne.chart.chart.model.data.CandleSerie;
-import com.zygne.chart.chart.model.data.LineSerie;
 import com.zygne.chart.chart.model.data.Serie;
 
 import javax.swing.JPanel;
@@ -116,17 +115,10 @@ public class PriceChart extends JPanel implements Chart,
         }
 
         List<CandleSerie> quotes = new ArrayList<>();
-        List<Serie> lineSeries = new ArrayList<>();
 
-        int index = 0;
         for (Serie s : bars) {
             CandleSerie candleSerie = ((CandleSerie) s);
             quotes.add(candleSerie);
-            LineSerie l = new LineSerie();
-            l.setX(index);
-            l.setY(candleSerie.getPriceSma());
-            lineSeries.add(l);
-            index++;
         }
 
         this.bars.clear();
@@ -317,13 +309,14 @@ public class PriceChart extends JPanel implements Chart,
     public void onZoomChanged(Zoom.ZoomDetails zoomDetails) {
         scale = zoomDetails.zoomLevel();
         barWidth = (int) zoomDetails.stretchLevel();
-        createCandleSticks();
-
-//        if (candleSticksIndicator != null) {
-//            candleSticksIndicator.adjust(barWidth, scale);
-//            refresh();
-//            updateIndicators();
-//        }
+        if(candleSticksIndicator != null){
+            candleSticksIndicator.adjust((x, y) -> {
+                loadY = y;
+                lastBar = x;
+                centerCamera();
+                updateIndicators();
+            }, barWidth, scale);
+        }
     }
 
     @Override

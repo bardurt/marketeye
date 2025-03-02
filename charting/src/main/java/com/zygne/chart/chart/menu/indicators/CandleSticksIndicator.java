@@ -27,24 +27,20 @@ public class CandleSticksIndicator extends Object2d {
         }
     }
 
-    public void adjust(int barWidth, double zoom) {
-        final int width;
-
-        if (barWidth == 0) {
-            width = 1;
-        } else {
-            width = barWidth;
-        }
+    public void adjust(Creator.UpdateListener updateListener, int barWidth, double zoom) {
+        final int width = (barWidth > 0) ? barWidth : 1; // Use fallback width if barWidth is 0
 
         int xPos = 0;
-        for (int i = 0; i < candleSticks.size(); i++) {
-            CandleStick c = candleSticks.get(i);
-            c.setWidth(width);
-            c.setX(xPos);
-            xPos += width;
-
+        int loadY = 0;
+        for (CandleStick c : candleSticks) {
             c.adjust(zoom);
+            c.setWidth(width);          // Adjust width
+            c.setX(xPos);               // Set new position
+            xPos += width;
+            loadY = c.getY();
         }
+
+        updateListener.onUpdated(xPos, loadY);
     }
 
     public static final class Creator {
@@ -104,6 +100,10 @@ public class CandleSticksIndicator extends Object2d {
 
         public interface Callback {
             void onCandleSticksIndicatorCreated(CandleSticksIndicator candleSticksIndicator, int x, int y);
+        }
+
+        public interface UpdateListener {
+            void onUpdated(int x, int y);
         }
     }
 }

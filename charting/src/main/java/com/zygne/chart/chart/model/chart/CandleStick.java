@@ -16,24 +16,37 @@ public class CandleStick extends Object2d {
     private int bodyHeight;
     private String color;
     public boolean visible;
+    private double open;
+    private double high;
+    private double low;
+    private double close;
 
     public void ohlc(double open, double high, double low, double close, long volume, double scalar) {
+        this.open = open;
+        this.high = high;
+        this.open = open;
+        this.low = low;
+        this.close = close;
         this.priceBox = new PriceBox();
         this.priceBox.setEnd(high);
         this.priceBox.setStart(low);
         this.volume = volume;
 
-        int height = (int) ((high - low) * scalar);
-        this.setHeight(height);
-        this.setY((int) (high * scalar));
+        setUp(scalar);
+    }
 
-        if (open < close) {
-            bodyTop = (int) (-close * scalar);
-            bodyHeight = (int) ((close - open) * scalar);
+    private void setUp(double scalar){
+        int height = (int) ((this.high - this.low) * scalar);
+        this.setHeight(height);
+        this.setY((int) (this.high * scalar));
+
+        if (this.open < this.close) {
+            bodyTop = (int) (-this.close * scalar);
+            bodyHeight = (int) ((this.close - this.open) * scalar);
             color = Colors.BLUE;
         } else {
-            bodyTop = (int) (-open * scalar);
-            bodyHeight = (int) ((open - close) * scalar);
+            bodyTop = (int) (-this.open * scalar);
+            bodyHeight = (int) ((this.open - this.close) * scalar);
             color = Colors.ORANGE_BRIGHT;
         }
 
@@ -43,9 +56,7 @@ public class CandleStick extends Object2d {
     }
 
     public void adjust(double scalar) {
-        int height = (int) ((this.priceBox.getEnd() - this.priceBox.getStart()) * scalar);
-        this.setHeight(height);
-        this.setY((int) (this.priceBox.getEnd() * scalar));
+        setUp(scalar);
     }
 
     public long getId() {

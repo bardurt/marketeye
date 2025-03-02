@@ -114,6 +114,10 @@ public class PolygonDataBroker implements DataBroker {
 
         PolygonResponse response = new Gson().fromJson(result, PolygonResponse.class);
 
+        if (response == null) {
+            return lines;
+        }
+
         if (response.data == null) {
             return lines;
         }

@@ -67,7 +67,5 @@ public class Camera extends Object2d {
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.setColor("#00A33B");
-        canvas.drawRectangle(viewPortX, viewPortY, width, height, Canvas.Fill.OUTLINE);
     }
 }
