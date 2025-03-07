@@ -90,3 +90,5 @@ gradle-app.setting
 /.idea/.name
 
 api.properties
+´.idea/´
+´api.properties´
