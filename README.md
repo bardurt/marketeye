@@ -27,7 +27,7 @@ Project that fetches data from Alpha Vantage, and other data providers, and allo
 
 
 ### How to use
-Locate the file ```api.properties``` add they api keys for `AlphaVantage` and `Polygon`, the both provide free API keys.
+Locate the file ```api.properties``` add they api keys for `AlphaVantage` and `Polygon`, they both provide free API keys.
 ```
 alpha_vantage_api=[ YOUR KEY FROM ALPHAVANTAGE GOES HERE ]
 polygon_api=[ YOUR KEY FROM POLYGON GOES HERE ]
