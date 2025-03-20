@@ -88,6 +88,7 @@ gradle-app.setting
 /.idea/misc.xml
 /.idea/vcs.xml
 /.idea/.name
+.idea/
 
 api.properties
 ´.idea/´
